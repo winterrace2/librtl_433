@@ -35,6 +35,6 @@ void samp_grab_push(samp_grab_t *g, unsigned char *iq_buf, uint32_t len);
 void samp_grab_reset(samp_grab_t *g);
 
 // grab_end is counted in samples from end of buf
-void samp_grab_write(samp_grab_t *g, unsigned grab_len, unsigned grab_end);
+void samp_grab_write(samp_grab_t *g, unsigned grab_len, unsigned grab_end, const char *path_sigdmp, int ovr_ok);
 
 #endif /* INCLUDE_SAMP_GRAB_H_ */

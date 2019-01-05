@@ -25,13 +25,16 @@
  */
 
 
+#include "librtl_433.h"
+#include "pulse_demod.h"
+#include "util.h"
 #include "decoder.h"
 
-static int steelmate_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
-	//if (decoder->verbose) {
-	//	fprintf(stdout, "Steelmate TPMS decoder\n");
+static int steelmate_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
+	//if (verbose >= 1) {
+	//	rtl433_fprintf(stdout, "Steelmate TPMS decoder\n");
 	//	bitbuffer_print(bitbuffer);
-	//	fprintf(stdout, "\n");
+	//	rtl433_fprintf(stdout, "\n");
 	//}
 
 	bitrow_t *bb = bitbuffer->bb;
@@ -90,7 +93,7 @@ static int steelmate_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
 			"battery_mV", "", DATA_INT, battery_mV,
 			"mic", "Integrity", DATA_STRING, "CHECKSUM",
 			NULL);
-		decoder_output_data(decoder, data);
+		decoder_output_data(decoder, data, ext);
 
 		return 1;
 	}
@@ -116,7 +119,7 @@ r_device steelmate = {
 	.short_width	= 12*4,
 	.long_width     = 0,
 	.reset_limit    = 27*4,
-	.decode_fn    	= &steelmate_callback,
+	.decode_fn	= &steelmate_callback,
 	.disabled		= 0,
 	.fields			= output_fields,
 };

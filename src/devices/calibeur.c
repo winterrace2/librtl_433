@@ -32,7 +32,7 @@
 */
 #include "decoder.h"
 
-static int calibeur_rf104_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int calibeur_rf104_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
 	data_t *data;
 
 	uint8_t ID;
@@ -83,7 +83,7 @@ static int calibeur_rf104_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
 						"humidity",      "Humidity",    DATA_FORMAT, "%2.0f %%", DATA_DOUBLE, humidity,
 						"mic",           "Integrity",   DATA_STRING,    "CRC",
 						NULL);
-		decoder_output_data(decoder, data);
+		decoder_output_data(decoder, data, ext);
 		return 1;
 	}
 	return 0;
@@ -108,5 +108,5 @@ r_device calibeur_RF104 = {
 	.tolerance      = 0,	// raw mode
 	.decode_fn      = &calibeur_rf104_callback,
 	.disabled       = 0,
-	.fields         = output_fields,
+	.fields = output_fields,
 };

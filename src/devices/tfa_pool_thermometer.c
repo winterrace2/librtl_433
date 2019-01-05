@@ -11,7 +11,7 @@
 
 #include "decoder.h"
 
-static int pool_temperature_sensor_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int pool_temperature_sensor_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
 	bitrow_t *bb = bitbuffer->bb;
 	data_t *data;
 	int i,device,channel;
@@ -45,8 +45,8 @@ E: ?
 			"id",				"Id",				DATA_INT,	device,
 			"channel",			"Channel",			DATA_INT,	channel,
 			"temperature_C",	"Temperature",		DATA_FORMAT, 	"%.01f C",	DATA_DOUBLE,	fTemp,
-			NULL);
-	decoder_output_data(decoder, data);
+		NULL);
+	decoder_output_data(decoder, data, ext);
 
 	return 1;
 
@@ -67,7 +67,7 @@ r_device tfa_pool_thermometer = {
 	.long_width    = 4600,
 	.gap_limit     = 7800,
 	.reset_limit   = 10000,
-	.decode_fn     = &pool_temperature_sensor_callback,
+	.decode_fn = &pool_temperature_sensor_callback,
 	.disabled      = 0,
 	.fields        = output_fields,
 };

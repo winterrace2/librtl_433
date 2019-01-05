@@ -10,7 +10,7 @@
 
 #include "decoder.h"
 
-static int kw9015b_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int kw9015b_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     int row;
@@ -44,12 +44,12 @@ static int kw9015b_callback(r_device *decoder, bitbuffer_t *bitbuffer)
             (reverse8(b[3])>>4)+(reverse8(b[3])&0x0F));
 
     if (decoder->verbose) {
-        fprintf(stdout, "\nSensor        = Inovalley kw9015b, TFA Dostmann 30.3161 (Rain and temperature sensor)\n");
-        fprintf(stdout, "Device        = %d\n", device);
-        fprintf(stdout, "Temp          = %f\n", temp_c);
-        fprintf(stdout, "Rain          = %d\n", rain);
-        fprintf(stdout, "checksum      = %02x==%02x\n", chksum&0xF, reverse8(b[4]));
-        fprintf(stdout, "Received Data = %02X %02X %02X %02X %02X\n",
+		rtl433_fprintf(stdout, "\nSensor        = Inovalley kw9015b, TFA Dostmann 30.3161 (Rain and temperature sensor)\n");
+		rtl433_fprintf(stdout, "Device        = %d\n", device);
+		rtl433_fprintf(stdout, "Temp          = %f\n", temp_c);
+		rtl433_fprintf(stdout, "Rain          = %d\n", rain);
+		rtl433_fprintf(stdout, "checksum      = %02x==%02x\n", chksum&0xF, reverse8(b[4]));
+		rtl433_fprintf(stdout, "Received Data = %02X %02X %02X %02X %02X\n",
         reverse8(b[0]),
         reverse8(b[1]),
         reverse8(b[2]),
@@ -67,7 +67,7 @@ static int kw9015b_callback(r_device *decoder, bitbuffer_t *bitbuffer)
             "rain","Rain Count", DATA_INT, rain,
             NULL);
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

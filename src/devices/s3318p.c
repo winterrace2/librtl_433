@@ -47,7 +47,7 @@
 
 #include "decoder.h"
 
-static int s3318p_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int s3318p_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     uint8_t *b;
     int browlen;
     data_t *data;
@@ -94,18 +94,18 @@ static int s3318p_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
 
     if (decoder->verbose) {
       bitbuffer_print(bitbuffer);
-      fprintf(stderr, "Sensor ID            = %2x\n",  sensor_id);
-      fprintf(stdout, "Bitstream HEX        = ");
-      bitrow_print(b, 48);
-      fprintf(stdout, "Humidity HEX         = %02x\n", b[3]);
-      fprintf(stdout, "Humidity DEC         = %u\n",   humidity);
-      fprintf(stdout, "Button               = %d\n",   button);
-      fprintf(stdout, "Battery Low          = %d\n",   battery_low);
-      fprintf(stdout, "Channel HEX          = %02x\n", b[1]);
-      fprintf(stdout, "Channel              = %u\n",   channel);
-      fprintf(stdout, "temp_with_offset HEX = %02x\n", temperature_with_offset);
-      fprintf(stdout, "temp_with_offset     = %d\n",   temperature_with_offset);
-      fprintf(stdout, "TemperatureF         = %.1f\n", temperature_f);
+      rtl433_fprintf(stderr, "Sensor ID            = %2x\n",  sensor_id);
+      rtl433_fprintf(stdout, "Bitstream HEX        = ");
+	  bitrow_print(b, 48);
+      rtl433_fprintf(stdout, "Humidity HEX         = %02x\n", b[3]);
+      rtl433_fprintf(stdout, "Humidity DEC         = %u\n",   humidity);
+      rtl433_fprintf(stdout, "Button               = %d\n",   button);
+      rtl433_fprintf(stdout, "Battery Low          = %d\n",   battery_low);
+      rtl433_fprintf(stdout, "Channel HEX          = %02x\n", b[1]);
+      rtl433_fprintf(stdout, "Channel              = %u\n",   channel);
+      rtl433_fprintf(stdout, "temp_with_offset HEX = %02x\n", temperature_with_offset);
+      rtl433_fprintf(stdout, "temp_with_offset     = %d\n",   temperature_with_offset);
+      rtl433_fprintf(stdout, "TemperatureF         = %.1f\n", temperature_f);
     }
 
     data = data_make(
@@ -118,7 +118,7 @@ static int s3318p_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
                      "humidity",      "Humidity",    DATA_FORMAT, "%u %%", DATA_INT, humidity,
                       NULL);
 
-    decoder_output_data(decoder, data);
+	decoder_output_data(decoder, data, ext);
 
     return 0;
 }
@@ -140,7 +140,7 @@ r_device s3318p = {
     .short_width    = 1900,
     .long_width     = 3800,
     .gap_limit      = 4400,
-    .reset_limit    = 9400,
+	.reset_limit    = 9400,
     .decode_fn      = &s3318p_callback,
     .disabled       = 0,
     .fields         = output_fields

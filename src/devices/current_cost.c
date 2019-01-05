@@ -1,6 +1,6 @@
 #include "decoder.h"
 
-static int current_cost_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int current_cost_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     bitbuffer_invert(bitbuffer);
     bitrow_t *bb = bitbuffer->bb;
     uint8_t *b = bb[0];
@@ -47,8 +47,8 @@ static int current_cost_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
                 "power2",       "Power 2",       DATA_FORMAT, "%d W", DATA_INT, watt2,
                 //"battery",       "Battery",       DATA_STRING, battery_low ? "LOW" : "OK", //TODO is there some low battery indicator ?
                 NULL);
-        decoder_output_data(decoder, data);
-        return 1;
+		decoder_output_data(decoder, data, ext);
+		return 1;
     }
     // Counter (packet[0] = 0100xxxx) bits 5 and 4 are "unknown", but always 0 to date.
     else if(packet_bits.bits_per_row[0] >= 56 && ((packet[0] & 0xf0) == 64) ){
@@ -63,8 +63,8 @@ static int current_cost_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
                //"counter",      "Counter",       DATA_FORMAT, "%d", DATA_INT, c_impulse,
                "power0",       "Counter",       DATA_FORMAT, "%d", DATA_INT, c_impulse,
                NULL);
-       decoder_output_data(decoder, data);
-       return 1;
+	   decoder_output_data(decoder, data, ext);
+	   return 1;
     }
 
     return 0;

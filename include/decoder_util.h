@@ -14,40 +14,41 @@
 
 #include <stdarg.h>
 #include "bitbuffer.h"
-#include "rtl_433_devices.h"
+#include "librtl_433_devices.h"
+#include "data_printer_ext.h"
 
 /// Output data.
-void decoder_output_data(r_device *decoder, data_t *data);
+void decoder_output_data(r_device *decoder, data_t *data, extdata_t *ext);
 
 // be terse, a maximum msg length of 60 characters is supported on the decoder_output_ functions
 // e.g. "FoobarCorp-XY3000: unexpected type code %02x"
 
 /// Output a message.
-void decoder_output_message(r_device *decoder, char const *msg);
+void decoder_output_message(r_device *decoder, char const *msg, extdata_t *ext);
 
 /// Output a message and the content of a bitbuffer.
-void decoder_output_bitbuffer(r_device *decoder, bitbuffer_t const *bitbuffer, char const *msg);
+void decoder_output_bitbuffer(r_device *decoder, bitbuffer_t const *bitbuffer, char const *msg, extdata_t *ext);
 
 /// Output a message and the content of a bitbuffer.
 /// Usage not recommended.
-void decoder_output_bitbuffer_array(r_device *decoder, bitbuffer_t const *bitbuffer, char const *msg);
+void decoder_output_bitbuffer_array(r_device *decoder, bitbuffer_t const *bitbuffer, char const *msg, extdata_t *ext);
 
 /// Output a message and the content of a bit row (byte buffer).
-void decoder_output_bitrow(r_device *decoder, bitrow_t const bitrow, unsigned bit_len, char const *msg);
+void decoder_output_bitrow(r_device *decoder, bitrow_t const bitrow, unsigned bit_len, char const *msg, extdata_t *ext);
 
 // print helpers
 
 /// Output a message with args.
-void decoder_output_messagef(r_device *decoder, char const *restrict format, ...);
+void decoder_output_messagef(r_device *decoder, extdata_t *ext, char const *restrict format, ...);
 
 /// Output a message with args and the content of a bitbuffer.
-void decoder_output_bitbufferf(r_device *decoder, bitbuffer_t const *bitbuffer, char const *restrict format, ...);
+void decoder_output_bitbufferf(r_device *decoder, extdata_t *ext, bitbuffer_t const *bitbuffer, char const *restrict format, ...);
 
 /// Output a message with args and the content of a bitbuffer.
-void decoder_output_bitbuffer_arrayf(r_device *decoder, bitbuffer_t const *bitbuffer, char const *restrict format, ...);
+void decoder_output_bitbuffer_arrayf(r_device *decoder, extdata_t *ext, bitbuffer_t const *bitbuffer, char const *restrict format, ...);
 
 /// Output a message with args and the content of a bit row (byte buffer).
-void decoder_output_bitrowf(r_device *decoder, bitrow_t const bitrow, unsigned bit_len, char const *restrict format, ...);
+void decoder_output_bitrowf(r_device *decoder, extdata_t *ext, bitrow_t const bitrow, unsigned bit_len, char const *restrict format, ...);
 
 /// Print the content of the bitbuffer.
 void bitbuffer_printf(const bitbuffer_t *bitbuffer, char const *restrict format, ...);

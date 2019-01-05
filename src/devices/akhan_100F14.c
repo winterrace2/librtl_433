@@ -9,7 +9,7 @@
  */
 #include "decoder.h"
 
-static int akhan_rke_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int akhan_rke_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     data_t *data;
     uint8_t *b;
     int id;
@@ -44,8 +44,8 @@ static int akhan_rke_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
             "data",     "Data (4bit)",  DATA_STRING, cmd_str,
             NULL);
 
-    decoder_output_data(decoder, data);
-    return 1;
+	decoder_output_data(decoder, data, ext);
+	return 1;
 }
 
 static char *output_fields[] = {
@@ -65,5 +65,5 @@ r_device akhan_100F14 = {
     .tolerance     = 80, // us
     .decode_fn     = &akhan_rke_callback,
     .disabled      = 0,
-    .fields        = output_fields,
+	.fields        = output_fields,
 };

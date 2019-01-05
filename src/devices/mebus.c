@@ -1,6 +1,6 @@
 #include "decoder.h"
 
-static int mebus433_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int mebus433_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     bitrow_t *bb = bitbuffer->bb;
     int16_t temp;
     int8_t  hum;
@@ -12,7 +12,6 @@ static int mebus433_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
     data_t *data;
 
     if (bb[0][0] == 0 && bb[1][4] !=0 && (bb[1][0] & 0x60) && bb[1][3]==bb[5][3] && bb[1][4] == bb[12][4]){
-
         address = bb[1][0] & 0x1f;
 
         channel = ((bb[1][1] & 0x30) >> 4) + 1;
@@ -41,7 +40,7 @@ static int mebus433_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
                 "temperature_C", "Temperature", DATA_FORMAT, "%.02f C", DATA_DOUBLE, temp / 10.0,
                 "humidity",      "Humidity",    DATA_FORMAT, "%u %%", DATA_INT, hum,
                 NULL);
-        decoder_output_data(decoder, data);
+		decoder_output_data(decoder, data, ext);
 
 
         return 1;
@@ -67,8 +66,8 @@ r_device mebus433 = {
     .short_width    = 800, // guessed, no samples available
     .long_width     = 1600, // guessed, no samples available
     .gap_limit      = 2400,
-    .reset_limit    = 6000,
+	.reset_limit    = 6000,
     .decode_fn      = &mebus433_callback,
     .disabled       = 1, // add docs, tests, false positive checks and then reenable
-    .fields         = output_fields
+	.fields         = output_fields
 };

@@ -1,4 +1,6 @@
 #include "mongoose.h"
+#include "redir_print.h"
+
 #ifdef MG_MODULE_LINES
 #line 1 "mongoose/src/mg_internal.h"
 #endif
@@ -11881,7 +11883,7 @@ static int mg_get_ip_address_of_nameserver(char *name, size_t name_len) {
 
   if ((err = RegOpenKeyExW(HKEY_LOCAL_MACHINE, key, 0, KEY_READ, &hKey)) !=
       ERROR_SUCCESS) {
-    fprintf(stderr, "cannot open reg key %S: %ld\n", key, err);
+    rtl433_fprintf(stderr, "cannot open reg key %S: %ld\n", key, err);
     ret = -1;
   } else {
     for (ret = -1, i = 0; 1; i++) {

@@ -41,7 +41,7 @@ static int lightwave_rf_nibble_from_byte(uint8_t in)
     return nibble;
 }
 
-static int lightwave_rf_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int lightwave_rf_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     bitrow_t *bb = bitbuffer->bb;
@@ -100,7 +100,7 @@ static int lightwave_rf_callback(r_device *decoder, bitbuffer_t *bitbuffer)
         int nibble = lightwave_rf_nibble_from_byte(bb[2][n]);
         if (nibble < 0) {
             if (decoder->verbose) {
-                fprintf(stderr, "LightwaveRF. Nibble decode error %X, idx: %u\n", bb[2][n], n);
+				rtl433_fprintf(stderr, "LightwaveRF. Nibble decode error %X, idx: %u\n", bb[2][n], n);
                 bitbuffer_print(bitbuffer);
             }
             return 0; // Decode error
@@ -118,7 +118,7 @@ static int lightwave_rf_callback(r_device *decoder, bitbuffer_t *bitbuffer)
 
     if (decoder->verbose) {
         bitbuffer_print(bitbuffer);
-        fprintf(stderr, "  Row 0 = Input, Row 1 = Zero bit stuffing, Row 2 = Stripped delimiters, Row 3 = Decoded nibbles\n");
+		rtl433_fprintf(stderr, "  Row 0 = Input, Row 1 = Zero bit stuffing, Row 2 = Stripped delimiters, Row 3 = Decoded nibbles\n");
     }
 
     data = data_make(
@@ -129,7 +129,7 @@ static int lightwave_rf_callback(r_device *decoder, bitbuffer_t *bitbuffer)
             "parameter",	"", DATA_INT, parameter,
             NULL);
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

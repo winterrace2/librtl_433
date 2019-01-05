@@ -18,7 +18,7 @@
 
 #include "decoder.h"
 
-static int honeywell_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int honeywell_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     const uint8_t *bb;
     int channel;
     int device_id;
@@ -47,7 +47,6 @@ static int honeywell_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
     state = (event & 0x80) >> 7;
     heartbeat = (event & 0x04) >> 2;
 
-
     data_t *data = data_make(
           "model", "", DATA_STRING, "Honeywell Door/Window Sensor",
           "id",       "", DATA_FORMAT, "%05x", DATA_INT, device_id,
@@ -57,8 +56,8 @@ static int honeywell_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
           "heartbeat" , "", DATA_STRING, heartbeat ? "yes" : "no",
           NULL);
 
-    decoder_output_data(decoder, data);
-    return 1;
+	decoder_output_data(decoder, data, ext);
+	return 1;
 }
 
 static char *output_fields[] = {

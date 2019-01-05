@@ -26,7 +26,7 @@
 
 #include "decoder.h"
 
-static int generic_motion_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int generic_motion_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     data_t *data;
     uint8_t *b;
     int code;
@@ -48,8 +48,8 @@ static int generic_motion_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
                 "code",     "",  DATA_STRING, code_str,
                 NULL);
 
-        decoder_output_data(decoder, data);
-        return 1;
+		decoder_output_data(decoder, data, ext);
+		return 1;
     }
     return 0;
 }

@@ -79,8 +79,8 @@ static int calculate_checksum(r_device *decoder, bitbuffer_t *bitbuffer, unsigne
     actual_expected_comparison = (calculated_checksum == actual_checksum);
 
     if(decoder->verbose & !actual_expected_comparison) {
-        fprintf(stderr, "Checksum error in Oregon Scientific SL109H message.  Expected: %01x  Calculated: %01x\n", actual_checksum, calculated_checksum);
-        fprintf(stderr, "Message: ");
+        rtl433_fprintf(stderr, "Checksum error in Oregon Scientific SL109H message.  Expected: %01x  Calculated: %01x\n", actual_checksum, calculated_checksum);
+        rtl433_fprintf(stderr, "Message: ");
         bitbuffer_print(bitbuffer);
     }
 
@@ -88,7 +88,7 @@ static int calculate_checksum(r_device *decoder, bitbuffer_t *bitbuffer, unsigne
 }
 
 
-static int oregon_scientific_sl109h_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int oregon_scientific_sl109h_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     uint8_t *msg;
@@ -107,7 +107,6 @@ static int oregon_scientific_sl109h_callback(r_device *decoder, bitbuffer_t *bit
 
         if( !((bitbuffer->bits_per_row[row_index] == SL109H_MESSAGE_LENGTH)
               && calculate_checksum(decoder, bitbuffer, row_index, channel_bits)) ) continue;
-
 
         temp_c = calculate_centigrade_decidegrees(bitbuffer, row_index) / 10.0;
 
@@ -128,8 +127,8 @@ static int oregon_scientific_sl109h_callback(r_device *decoder, bitbuffer_t *bit
                          "status",        "Status",                             DATA_INT,    status,
                          "mic",           "Integrity",   DATA_STRING, "CHECKSUM",
                          NULL);
-        decoder_output_data(decoder, data);
-        return 1;
+		decoder_output_data(decoder, data, ext);
+		return 1;
     }
 
     return 0;
@@ -153,7 +152,7 @@ r_device oregon_scientific_sl109h = {
     .long_width     = 4000,
     .gap_limit      = 5000,
     .reset_limit    = 10000, // packet gap is 8900
-    .decode_fn      = &oregon_scientific_sl109h_callback,
+	.decode_fn      = &oregon_scientific_sl109h_callback,
     .disabled       = 0,
     .fields         = output_fields
 };

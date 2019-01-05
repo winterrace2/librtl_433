@@ -29,7 +29,7 @@
 
 enum sensortypes { HIDEKI_UNKNOWN, HIDEKI_TEMP, HIDEKI_TS04, HIDEKI_WIND, HIDEKI_RAIN };
 
-static int hideki_ts04_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int hideki_ts04_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     data_t *data;
     uint8_t *b = bitbuffer->bb[0]; // TODO: handle the 3 row, need change in PULSE_CLOCK decoding
     uint8_t packet[HIDEKI_MAX_BYTES_PER_ROW];
@@ -63,7 +63,7 @@ static int hideki_ts04_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
         uint8_t parity = (b[i+offset+1] >> (7 - i%8)) & 1;
         if (parity != parity8(packet[i])) {
             if (decoder->verbose)
-                fprintf(stderr, "%s: Parity error at %d\n", __func__, i);
+				rtl433_fprintf(stderr, "%s: Parity error at %d\n", __func__, i);
             return 0;
         }
     }
@@ -72,14 +72,14 @@ static int hideki_ts04_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
     chk = xor_bytes(&packet[1], unstuffed_len - 2);
     if (chk) {
         if (decoder->verbose)
-            fprintf(stderr, "%s: XOR error\n", __func__);
+			rtl433_fprintf(stderr, "%s: XOR error\n", __func__);
         return 0;
     }
 
     // CRC-8 poly=0x07 init=0x00
     if (crc8(&packet[1], unstuffed_len - 1, 0x07, 0x00)) {
         if (decoder->verbose)
-            fprintf(stderr, "%s: CRC error\n", __func__);
+			rtl433_fprintf(stderr, "%s: CRC error\n", __func__);
         return 0;
     }
 
@@ -100,7 +100,7 @@ static int hideki_ts04_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
 
     if (pkt_len +3 != unstuffed_len) {
         if (decoder->verbose)
-            fprintf(stderr, "%s: LEN error\n", __func__);
+			rtl433_fprintf(stderr, "%s: LEN error\n", __func__);
         return 0;
     }
 
@@ -124,7 +124,7 @@ static int hideki_ts04_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
                 "humidity",         "Humidity",         DATA_FORMAT, "%u %%", DATA_INT, humidity,
                 "mic",              "MIC",              DATA_STRING, "CRC",
                 NULL);
-        decoder_output_data(decoder, data);
+        decoder_output_data(decoder, data, ext);
         return 1;
     }
     if (sensortype == HIDEKI_WIND) {
@@ -147,7 +147,7 @@ static int hideki_ts04_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
                 "wind_direction",   "Wind Direction",   DATA_FORMAT, "%.01f °", DATA_DOUBLE, wind_direction * 0.1f,
                 "mic",              "MIC",              DATA_STRING, "CRC",
                 NULL);
-        decoder_output_data(decoder, data);
+        decoder_output_data(decoder, data, ext);
         return 1;
     }
     if (sensortype == HIDEKI_TEMP) {
@@ -159,7 +159,7 @@ static int hideki_ts04_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
                 "temperature_C",    "Temperature",      DATA_FORMAT, "%.01f C", DATA_DOUBLE, temp * 0.1f,
                 "mic",              "MIC",              DATA_STRING, "CRC",
                 NULL);
-        decoder_output_data(decoder, data);
+        decoder_output_data(decoder, data, ext);
         return 1;
     }
     if (sensortype == HIDEKI_RAIN) {
@@ -174,7 +174,7 @@ static int hideki_ts04_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
                 "rain_mm",          "Rain",             DATA_FORMAT, "%.01f mm", DATA_DOUBLE, rain_units * 0.7f,
                 "mic",              "MIC",              DATA_STRING, "CRC",
                 NULL);
-        decoder_output_data(decoder, data);
+        decoder_output_data(decoder, data, ext);
         return 1;
     }
     return 0;

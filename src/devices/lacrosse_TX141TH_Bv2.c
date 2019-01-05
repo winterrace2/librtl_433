@@ -91,7 +91,7 @@
 #define LACROSSE_TX141_BITLEN 37
 #define LACROSSE_TX141TH_BITLEN 40
 
-static int lacrosse_tx141th_bv2_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int lacrosse_tx141th_bv2_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     int r;
@@ -133,8 +133,8 @@ static int lacrosse_tx141th_bv2_callback(r_device *decoder, bitbuffer_t *bitbuff
 
     if (0 == id || (device == LACROSSE_TX141TH && (0 == humidity || humidity > 100)) || temp_c < -40.0 || temp_c > 140.0) {
         if (decoder->verbose) {
-            fprintf(stderr, "LaCrosse TX141-Bv2/TX141TH-Bv2 data error\n");
-            fprintf(stderr, "id: %i, humidity:%i, temp:%f\n", id, humidity, temp_c);
+            rtl433_fprintf(stderr, "LaCrosse TX141-Bv2/TX141TH-Bv2 data error\n");
+            rtl433_fprintf(stderr, "id: %i, humidity:%i, temp:%f\n", id, humidity, temp_c);
         }
         return 0;
     }
@@ -157,7 +157,7 @@ static int lacrosse_tx141th_bv2_callback(r_device *decoder, bitbuffer_t *bitbuff
                 "test",          "Test?",         DATA_STRING, test ? "Yes" : "No",
                 NULL);
     }
-    decoder_output_data(decoder, data);
+	decoder_output_data(decoder, data, ext);
 
     return 1;
 }
@@ -180,7 +180,7 @@ r_device lacrosse_TX141TH_Bv2 = {
     .sync_width    = 833,    // sync pulse is 833 us + 833 us gap
     .gap_limit     = 625,    // long gap (with short pulse) is ~417 us, sync gap is ~833 us
     .reset_limit   = 1500,   // maximum gap is 1250 us (long gap + longer sync gap on last repeat)
-    .decode_fn     = &lacrosse_tx141th_bv2_callback,
+    .decode_fn = &lacrosse_tx141th_bv2_callback,
     .disabled      = 0,
     .fields        = output_fields,
 };

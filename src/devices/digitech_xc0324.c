@@ -80,7 +80,7 @@ static const uint8_t preamble_pattern[1] = {XC0324_DEVICE_STARTBYTE};
 
 /// @param *data : returns the decoded information as a data_t * 
 static int decode_xc0324_message(r_device *decoder, bitbuffer_t *bitbuffer,
-  unsigned row, uint16_t bitpos, const int latest_event, data_t **data)
+  unsigned row, uint16_t bitpos, const int latest_event, data_t **data, extdata_t *ext)
 {
     uint8_t b[XC0324_MESSAGE_BYTELEN];
     char id [4] = {0};
@@ -101,7 +101,7 @@ static int decode_xc0324_message(r_device *decoder, bitbuffer_t *bitbuffer,
     if (chksum != 0x00) {
         if (decoder->verbose == 1) {
             // Output the "bad" message (only for message level deciphering!)
-            decoder_output_bitrowf(decoder, b, XC0324_MESSAGE_BITLEN,
+            decoder_output_bitrowf(decoder, ext, b, XC0324_MESSAGE_BITLEN,
               "checksum = 0x%02X not 0x00 <- XC0324:D row %d bit %d",
               chksum, row, bitpos);
         }
@@ -135,14 +135,14 @@ static int decode_xc0324_message(r_device *decoder, bitbuffer_t *bitbuffer,
 
     // Output (simulated) message level deciphering information..
     if (decoder->verbose == 1) {
-        decoder_output_bitrowf(decoder, b, XC0324_MESSAGE_BITLEN,
+        decoder_output_bitrowf(decoder, ext, b, XC0324_MESSAGE_BITLEN,
           "Temp was %4.1f <- XC0324:D row %03d bit %03d",
           temperature, row, bitpos);
     }
     // Output "finished deciphering" reference values for future regression tests.
     if ((decoder->verbose == 3) & (latest_event == 0)) {
         //info from this first successful message is enough
-        decoder_output_messagef(decoder,
+        decoder_output_messagef(decoder, ext, 
           "XC0324:DDD Reference -> Temperature %4.1f C; sensor id %s",
           temperature, id);
     }
@@ -160,7 +160,7 @@ static char *output_fields[] = {
     NULL
 };
 
-static int xc0324_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int xc0324_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     int r; // a row index
     uint16_t bitpos;
@@ -174,7 +174,7 @@ static int xc0324_callback(r_device *decoder, bitbuffer_t *bitbuffer)
         bitbuffer_debugf(bitbuffer, "XC0324:DD Hex and binary version ");
         // And output each row to csv, json or whatever was specified.
         for (r = 0; r < bitbuffer->num_rows; ++r) {
-            decoder_output_bitrowf(decoder, bitbuffer->bb[r], bitbuffer->bits_per_row[r],
+            decoder_output_bitrowf(decoder, ext, bitbuffer->bb[r], bitbuffer->bits_per_row[r],
               "XC0324:DD row %03d", r);
         }
     }
@@ -186,7 +186,7 @@ static int xc0324_callback(r_device *decoder, bitbuffer_t *bitbuffer)
             // bail out of this "too short" row early
             if (decoder->verbose == 1) {
                 // Output the bad row, only for message level debug / deciphering.
-                decoder_output_bitrowf(decoder, bitbuffer->bb[r], bitbuffer->bits_per_row[r],
+                decoder_output_bitrowf(decoder, ext, bitbuffer->bb[r], bitbuffer->bits_per_row[r],
                   "Bad message need %d bits got %d <- XC0324:D row %d bit %d",
                   XC0324_MESSAGE_BITLEN, bitbuffer->bits_per_row[r], r, 0);
             }
@@ -199,13 +199,13 @@ static int xc0324_callback(r_device *decoder, bitbuffer_t *bitbuffer)
           (const uint8_t *)&preamble_pattern, 8))
           + XC0324_MESSAGE_BITLEN <= bitbuffer->bits_per_row[r]) {
             events += result = decode_xc0324_message(decoder, bitbuffer,
-              r, bitpos, events, &data);
+              r, bitpos, events, &data, ext);
             // Keep production output (decoder->verbose == 0) separate from 
             // (simulated) development stage output (decoder->verbose > 0)
             if (result & !decoder->verbose) { // Production output
                 data_append(data, "message_num",  "Message repeat count",
                   DATA_INT, events, NULL);
-                decoder_output_data(decoder, data);
+                decoder_output_data(decoder, data, ext);
             }
             // Uncomment the following `return` to break after first successful
             // message, instead of processing up to 3 identical repeats.
@@ -215,7 +215,7 @@ static int xc0324_callback(r_device *decoder, bitbuffer_t *bitbuffer)
     }
     // (Only) for future regression tests.
     if ((decoder->verbose == 3) & (events == 0)) {
-        decoder_output_messagef(decoder, "XC0324:DDD Reference -> Bad transmission");
+        decoder_output_messagef(decoder, ext, "XC0324:DDD Reference -> Bad transmission");
     }
     return events;
 }

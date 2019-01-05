@@ -194,7 +194,7 @@ static int acurite_5n1_getBatteryLevel(uint8_t byte)
 }
 
 
-static int acurite_rain_gauge_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int acurite_rain_gauge_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     bitrow_t *bb = bitbuffer->bb;
     // This needs more validation to positively identify correct sensor type, but it basically works if message is really from acurite raingauge and it doesn't have any errors
@@ -203,8 +203,8 @@ static int acurite_rain_gauge_callback(r_device *decoder, bitbuffer_t *bitbuffer
         total_rain /= 2; // Sensor reports number of bucket tips.  Each bucket tip is .5mm
 
         if (decoder->verbose > 1) {
-            fprintf(stdout, "AcuRite Rain Gauge Total Rain is %2.1fmm\n", total_rain);
-            fprintf(stdout, "Raw Message ");
+			rtl433_fprintf(stdout, "AcuRite Rain Gauge Total Rain is %2.1fmm\n", total_rain);
+			rtl433_fprintf(stdout, "Raw Message ");
             bitrow_print(bb[0], bitbuffer->bits_per_row[0]);
         }
 
@@ -217,7 +217,7 @@ static int acurite_rain_gauge_callback(r_device *decoder, bitbuffer_t *bitbuffer
             "rain",     "Total Rain",    DATA_FORMAT,    "%.1f mm", DATA_DOUBLE, total_rain,
             NULL);
 
-		decoder_output_data(decoder, data);
+		decoder_output_data(decoder, data, ext);
 
         return 1;
     }
@@ -248,7 +248,7 @@ static float acurite_th_temperature(uint8_t *s)
 //
 // @todo - see if the 3rd nybble is battery/status
 //
-static int acurite_th_callback(r_device *decoder, bitbuffer_t *bitbuf)
+static int acurite_th_callback(r_device *decoder, bitbuffer_t *bitbuf, extdata_t *ext)
 {
     uint8_t *bb = NULL;
     int cksum, battery_low, valid = 0;
@@ -285,7 +285,7 @@ static int acurite_th_callback(r_device *decoder, bitbuffer_t *bitbuf)
              "humidity",        "Humidity",    DATA_INT,    humidity,
              NULL);
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
     valid++;
     }
 
@@ -442,7 +442,7 @@ static float acurite_6045_getTemp(uint8_t highbyte, uint8_t lowbyte)
  * @todo - figure out remaining status bits and how to report
  */
 
-static int acurite_6045_decode(r_device *decoder, bitrow_t bb, int browlen)
+static int acurite_6045_decode(r_device *decoder, bitrow_t bb, int browlen, extdata_t *ext)
 {
     int valid = 0;
     float tempf;
@@ -500,7 +500,7 @@ static int acurite_6045_decode(r_device *decoder, bitrow_t bb, int browlen)
     for (int i=0; i < browlen; i++) {
         char pc;
         pc = parity8(bb[i]) == 0 ? ' ' : '*';
-        fprintf(stdout, " %02x%c", bb[i], pc);
+		rtl433_fprintf(stdout, " %02x%c", bb[i], pc);
     }
     printf("\n");
     }
@@ -521,7 +521,7 @@ static int acurite_6045_decode(r_device *decoder, bitrow_t bb, int browlen)
        "raw_msg",        "raw_message",        DATA_STRING,    raw_str,
      NULL);
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
     valid++;
 
     return(valid);
@@ -540,7 +540,7 @@ static int acurite_6045_decode(r_device *decoder, bitrow_t bb, int browlen)
  * @todo - TBD Are parity and checksum the same across these devices?
  *         (opportunity to DRY-up and simplify?)
  */
-static int acurite_txr_callback(r_device *decoder, bitbuffer_t *bitbuf)
+static int acurite_txr_callback(r_device *decoder, bitbuffer_t *bitbuf, extdata_t *ext)
 {
     int browlen, valid = 0;
     uint8_t *bb;
@@ -555,7 +555,7 @@ static int acurite_txr_callback(r_device *decoder, bitbuffer_t *bitbuf)
     bitbuffer_invert(bitbuf);
 
     if (decoder->verbose > 1) {
-        fprintf(stderr,"acurite_txr\n");
+		rtl433_fprintf(stderr,"acurite_txr\n");
         bitbuffer_print(bitbuf);
     }
 
@@ -564,13 +564,13 @@ static int acurite_txr_callback(r_device *decoder, bitbuffer_t *bitbuf)
         bb = bitbuf->bb[brow];
 
         if (decoder->verbose > 1)
-            fprintf(stderr,"acurite_txr: row %d bits %d, bytes %d \n", brow, bitbuf->bits_per_row[brow], browlen);
+			rtl433_fprintf(stderr,"acurite_txr: row %d bits %d, bytes %d \n", brow, bitbuf->bits_per_row[brow], browlen);
 
         if ((bitbuf->bits_per_row[brow] < ACURITE_TXR_BITLEN ||
             bitbuf->bits_per_row[brow] > ACURITE_5N1_BITLEN + 1) &&
             bitbuf->bits_per_row[brow] != ACURITE_6045_BITLEN) {
             if (decoder->verbose > 1 && bitbuf->bits_per_row[brow] > 16)
-                fprintf(stderr,"acurite_txr: skipping wrong len\n");
+				rtl433_fprintf(stderr,"acurite_txr: skipping wrong len\n");
             continue;
         }
 
@@ -581,20 +581,20 @@ static int acurite_txr_callback(r_device *decoder, bitbuffer_t *bitbuf)
 
         if (!acurite_checksum(bb,browlen - 1)) {
             if (decoder->verbose) {
-                fprintf(stderr, "Acurite bad checksum:");
+				rtl433_fprintf(stderr, "Acurite bad checksum:");
                 for (uint8_t i = 0; i < browlen; i++)
-                    fprintf(stderr," 0x%02x",bb[i]);
-                fprintf(stderr,"\n");
+					rtl433_fprintf(stderr," 0x%02x",bb[i]);
+				rtl433_fprintf(stderr,"\n");
             }
             continue;
         }
 
         if (decoder->verbose) {
-            fprintf(stderr, "acurite_txr Parity: ");
+			rtl433_fprintf(stderr, "acurite_txr Parity: ");
             for (uint8_t i = 0; i < browlen; i++) {
-                fprintf(stderr, "%d", parity8(bb[i]));
+				rtl433_fprintf(stderr, "%d", parity8(bb[i]));
             }
-            fprintf(stderr,"\n");
+			rtl433_fprintf(stderr,"\n");
         }
 
 
@@ -630,14 +630,14 @@ static int acurite_txr_callback(r_device *decoder, bitbuffer_t *bitbuf)
 
                     NULL);
 
-            decoder_output_data(decoder, data);
+            decoder_output_data(decoder, data, ext);
             valid++;
         }
 
         // The 5-n-1 weather sensor messages are 8 bytes.
         if (browlen == ACURITE_5N1_BITLEN / 8) {
             if (decoder->verbose) {
-                fprintf(stderr, "Acurite 5n1 raw msg: %02X %02X %02X %02X %02X %02X %02X %02X\n",
+				rtl433_fprintf(stderr, "Acurite 5n1 raw msg: %02X %02X %02X %02X %02X %02X %02X %02X\n",
                     bb[0], bb[1], bb[2], bb[3], bb[4], bb[5], bb[6], bb[7]);
             }
             channel = acurite_getChannel(bb[0]);
@@ -664,7 +664,7 @@ static int acurite_txr_callback(r_device *decoder, bitbuffer_t *bitbuf)
                     "rain_inch", "Rainfall Accumulation",   DATA_FORMAT, "%.2f in", DATA_DOUBLE, raincounter * 0.01f,
                     NULL);
 
-                decoder_output_data(decoder, data);
+                decoder_output_data(decoder, data, ext);
 
             } else if (message_type == ACURITE_MSGTYPE_5N1_WINDSPEED_TEMP_HUMIDITY) {
                 // Wind speed, temperature and humidity
@@ -683,7 +683,7 @@ static int acurite_txr_callback(r_device *decoder, bitbuffer_t *bitbuf)
                     "temperature_F",     "temperature",    DATA_FORMAT,    "%.1f F", DATA_DOUBLE,    tempf,
                     "humidity",     NULL,    DATA_FORMAT,    "%d",   DATA_INT,   humidity,
                     NULL);
-                decoder_output_data(decoder, data);
+                decoder_output_data(decoder, data, ext);
 
             } else if (message_type == ACURITE_MSGTYPE_WINDSPEED_TEMP_HUMIDITY_3N1) {
                 // Wind speed, temperature and humidity for 3-n-1
@@ -703,17 +703,17 @@ static int acurite_txr_callback(r_device *decoder, bitbuffer_t *bitbuf)
                     "temperature_F",     "temperature",    DATA_FORMAT,    "%.1f F", DATA_DOUBLE,    tempf,
                     "humidity",     NULL,    DATA_FORMAT,    "%d",   DATA_INT,   humidity,
                     NULL);
-                decoder_output_data(decoder, data);
+                decoder_output_data(decoder, data, ext);
 
             } else {
-                fprintf(stderr, "Acurite 5n1 sensor 0x%04X Ch %c, Status %02X, Unknown message type 0x%02x\n",
+				rtl433_fprintf(stderr, "Acurite 5n1 sensor 0x%04X Ch %c, Status %02X, Unknown message type 0x%02x\n",
                     sensor_id, channel, bb[3], message_type);
             }
         }
 
         if (browlen == ACURITE_6045_BITLEN / 8) {
             // @todo check parity and reject if invalid
-            valid += acurite_6045_decode(decoder, bb, browlen);
+            valid += acurite_6045_decode(decoder, bb, browlen, ext);
         }
 
     }
@@ -764,7 +764,7 @@ static int acurite_txr_callback(r_device *decoder, bitbuffer_t *bitbuf)
  *
  */
 
-static int acurite_986_callback(r_device *decoder, bitbuffer_t *bitbuf)
+static int acurite_986_callback(r_device *decoder, bitbuffer_t *bitbuf, extdata_t *ext)
 {
     int const browlen = 5;
     uint8_t *bb, sensor_num, status, crc, crcc;
@@ -780,12 +780,12 @@ static int acurite_986_callback(r_device *decoder, bitbuffer_t *bitbuf)
     for (uint16_t brow = 0; brow < bitbuf->num_rows; ++brow) {
 
         if (decoder->verbose > 1)
-            fprintf(stderr,"acurite_986: row %d bits %d, bytes %d \n", brow, bitbuf->bits_per_row[brow], browlen);
+			rtl433_fprintf(stderr,"acurite_986: row %d bits %d, bytes %d \n", brow, bitbuf->bits_per_row[brow], browlen);
 
         if (bitbuf->bits_per_row[brow] < 39 ||
             bitbuf->bits_per_row[brow] > 43 ) {
             if (decoder->verbose > 1 && bitbuf->bits_per_row[brow] > 16)
-                fprintf(stderr,"acurite_986: skipping wrong len\n");
+				rtl433_fprintf(stderr,"acurite_986: skipping wrong len\n");
             continue;
         }
         bb = bitbuf->bb[brow];
@@ -802,10 +802,10 @@ static int acurite_986_callback(r_device *decoder, bitbuffer_t *bitbuf)
             br[i] = reverse8(bb[i]);
 
         if (decoder->verbose) {
-            fprintf(stderr,"Acurite 986 reversed: ");
+			rtl433_fprintf(stderr,"Acurite 986 reversed: ");
             for (uint8_t i = 0; i < browlen; i++)
-                fprintf(stderr," %02x",br[i]);
-            fprintf(stderr,"\n");
+				rtl433_fprintf(stderr," %02x",br[i]);
+			rtl433_fprintf(stderr,"\n");
         }
 
         tempf = br[0];
@@ -824,11 +824,11 @@ static int acurite_986_callback(r_device *decoder, bitbuffer_t *bitbuf)
 
         if (crcc != crc) {
             if (decoder->verbose > 1) {
-                fprintf(stderr,"Acurite 986 sensor bad CRC: %02x -",
+				rtl433_fprintf(stderr,"Acurite 986 sensor bad CRC: %02x -",
                 crc8le(br, 4, 0x07, 0));
                 for (uint8_t i = 0; i < browlen; i++)
-                    fprintf(stderr," %02x", br[i]);
-                fprintf(stderr,"\n");
+					rtl433_fprintf(stderr," %02x", br[i]);
+				rtl433_fprintf(stderr,"\n");
             }
             // HACK: rct 2018-04-22
             // the message is often missing the last 1 bit either due to a
@@ -836,7 +836,7 @@ static int acurite_986_callback(r_device *decoder, bitbuffer_t *bitbuf)
             // Add 1 (0x80 because message is LSB) and retry CRC.
             if (crcc == (crc | 0x80)) {
                 if (decoder->verbose > 1) {
-                    fprintf(stderr,"Acurite 986 CRC fix %02x - %02x\n",
+					rtl433_fprintf(stderr,"Acurite 986 CRC fix %02x - %02x\n",
                             crc,crcc);
                 }
             } else {
@@ -861,7 +861,7 @@ static int acurite_986_callback(r_device *decoder, bitbuffer_t *bitbuf)
                 "status",        "status",    DATA_INT,    status,
                 NULL);
 
-        decoder_output_data(decoder, data);
+        decoder_output_data(decoder, data, ext);
 
         valid_cnt++;
 
@@ -911,7 +911,7 @@ uint8_t acurite_606_checksum(int length, uint8_t *buff)
     return checksum;
 }
 
-static int acurite_606_callback(r_device *decoder, bitbuffer_t *bitbuf)
+static int acurite_606_callback(r_device *decoder, bitbuffer_t *bitbuf, extdata_t *ext)
 {
     data_t *data;
     bitrow_t *bb = bitbuf->bb;
@@ -922,7 +922,7 @@ static int acurite_606_callback(r_device *decoder, bitbuffer_t *bitbuf)
 
 
     if (decoder->verbose > 1) {
-        fprintf(stderr,"acurite_606\n");
+		rtl433_fprintf(stderr,"acurite_606\n");
         bitbuffer_print(bitbuf);
     }
 
@@ -952,7 +952,7 @@ static int acurite_606_callback(r_device *decoder, bitbuffer_t *bitbuf)
                     "battery",          "Battery",     DATA_STRING, battery ? "OK" : "LOW",
                     "temperature_C", "Temperature", DATA_FORMAT, "%.1f C", DATA_DOUBLE, temperature,
                     NULL);
-            decoder_output_data(decoder, data);
+            decoder_output_data(decoder, data, ext);
             return 1;
         }
     }
@@ -960,7 +960,7 @@ static int acurite_606_callback(r_device *decoder, bitbuffer_t *bitbuf)
     return 0;
 }
 
-static int acurite_00275rm_callback(r_device *decoder, bitbuffer_t *bitbuf)
+static int acurite_00275rm_callback(r_device *decoder, bitbuffer_t *bitbuf, extdata_t *ext)
 {
     int crc, battery_low, id, model, valid = 0;
     data_t *data;
@@ -973,7 +973,7 @@ static int acurite_00275rm_callback(r_device *decoder, bitbuffer_t *bitbuf)
     bitbuffer_invert(bitbuf);
 
     if (decoder->verbose > 1) {
-        fprintf(stderr,"acurite_00275rm\n");
+		rtl433_fprintf(stderr,"acurite_00275rm\n");
         bitbuffer_print(bitbuf);
     }
 
@@ -983,9 +983,9 @@ static int acurite_00275rm_callback(r_device *decoder, bitbuffer_t *bitbuf)
         if (nsignal>=3) continue;
         memcpy(signal[nsignal], bitbuf->bb[brow], 11);
         if (decoder->verbose) {
-            fprintf(stderr,"acurite_00275rm: ");
-            for (int i=0; i<11; i++) fprintf(stderr," %02x",signal[nsignal][i]);
-                fprintf(stderr,"\n");
+			rtl433_fprintf(stderr,"acurite_00275rm: ");
+            for (int i=0; i<11; i++) rtl433_fprintf(stderr," %02x",signal[nsignal][i]);
+			rtl433_fprintf(stderr,"\n");
         }
         nsignal++;
     }
@@ -1002,11 +1002,11 @@ static int acurite_00275rm_callback(r_device *decoder, bitbuffer_t *bitbuf)
         // CRC check fails?
         if ((crc=crc16lsb(&(signal[0][0]), 11/*len*/, 0x00b2/*poly*/, 0x00d0/*seed*/)) != 0) {
             if (decoder->verbose) {
-                fprintf(stderr,"Acurite 00275rm sensor bad CRC: %02x -",
+				rtl433_fprintf(stderr,"Acurite 00275rm sensor bad CRC: %02x -",
                     crc);
                 for (uint8_t i = 0; i < 11; i++)
-                    fprintf(stderr," %02x", signal[0][i]);
-                fprintf(stderr,"\n");
+					rtl433_fprintf(stderr," %02x", signal[0][i]);
+				rtl433_fprintf(stderr,"\n");
             }
         // CRC is OK
         } else {
@@ -1072,7 +1072,7 @@ static int acurite_00275rm_callback(r_device *decoder, bitbuffer_t *bitbuf)
             } else { // suppress compiler warning
                 return 0;
             }
-            decoder_output_data(decoder, data);
+            decoder_output_data(decoder, data, ext);
             valid=1;
         }
     }

@@ -26,7 +26,7 @@
 // Actually 37 bits for all but last transmission which is 36 bits
 #define	NUM_BITS	36
 
-static int bt_rain_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int bt_rain_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     data_t *data;
     uint8_t *b;
     int row;
@@ -69,7 +69,7 @@ static int bt_rain_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
             "temperature_C",    "Temperature",      DATA_FORMAT, "%.01f C", DATA_DOUBLE, temp_c,
             "rainrate",         "Rain per hour",    DATA_FORMAT, "%.02f mm/h", DATA_DOUBLE, rainrate,
             NULL);
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
     return 1;
 }
 
@@ -85,7 +85,7 @@ static char *output_fields[] = {
 };
 
 r_device bt_rain = {
-    .name = "Biltema rain gauge",
+    .name           = "Biltema rain gauge",
     .modulation     = OOK_PULSE_PPM,
     .short_width    = 1940,
     .long_width     = 3900,

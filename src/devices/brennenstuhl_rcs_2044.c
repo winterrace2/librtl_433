@@ -19,7 +19,7 @@
 
 #include "decoder.h"
 
-static int brennenstuhl_rcs_2044_process_row(r_device *decoder, bitbuffer_t const *bitbuffer, int row)
+static int brennenstuhl_rcs_2044_process_row(r_device *decoder, bitbuffer_t const *bitbuffer, int row, extdata_t *ext)
 {
     uint8_t const *b = bitbuffer->bb[row];
     int const length = bitbuffer->bits_per_row[row];
@@ -93,15 +93,16 @@ static int brennenstuhl_rcs_2044_process_row(r_device *decoder, bitbuffer_t cons
             "key",      "key",      DATA_STRING, key,
             "state",    "state",    DATA_STRING, (on_off == 0x02 ? "ON" : "OFF"),
             NULL);
-    decoder_output_data(decoder, data);
-    return 1;
+	decoder_output_data(decoder, data, ext);
+	return 1;
 }
 
-static int brennenstuhl_rcs_2044_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int brennenstuhl_rcs_2044_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     int counter = 0;
     for (int row = 0; row < bitbuffer->num_rows; row++)
-        counter += brennenstuhl_rcs_2044_process_row(decoder, bitbuffer, row);
+        counter += brennenstuhl_rcs_2044_process_row(decoder, bitbuffer, row, ext);
+
     return counter;
 }
 
@@ -118,8 +119,8 @@ r_device brennenstuhl_rcs_2044 = {
     .short_width   = 320,
     .long_width    = 968,
     .gap_limit     = 1500,
-    .reset_limit   = 4000,
-    .decode_fn     = &brennenstuhl_rcs_2044_callback,
+	.reset_limit   = 4000,
+    .decode_fn = &brennenstuhl_rcs_2044_callback,
     .disabled      = 1,
     .fields        = output_fields,
 };

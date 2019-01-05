@@ -14,7 +14,7 @@ static const uint8_t preamble_pattern[2] = {0x01, 0x45}; // 12 bits
 static const uint8_t preamble_inverted[2] = {0xfd, 0x45}; // 12 bits
 
 static int
-ambient_weather_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned row, unsigned bitpos)
+ambient_weather_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext, unsigned row, unsigned bitpos)
 {
     uint8_t b[6];
     int deviceID;
@@ -31,8 +31,8 @@ ambient_weather_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned row, 
 
     if (expected != calculated) {
         if (decoder->verbose) {
-            fprintf(stderr, "Checksum error in Ambient Weather message.    Expected: %02x    Calculated: %02x\n", expected, calculated);
-            fprintf(stderr, "Message: ");
+			rtl433_fprintf(stderr, "Checksum error in Ambient Weather message.    Expected: %02x    Calculated: %02x\n", expected, calculated);
+			rtl433_fprintf(stderr, "Message: ");
             bitrow_print(b, 48);
         }
         return 0;
@@ -54,13 +54,13 @@ ambient_weather_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned row, 
             "humidity",       "Humidity",     DATA_FORMAT, "%u %%", DATA_INT, humidity,
             "mic",            "Integrity",    DATA_STRING, "CRC",
             NULL);
-    decoder_output_data(decoder, data);
+	decoder_output_data(decoder, data, ext);
 
     return 1;
 }
 
 static int
-ambient_weather_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+ambient_weather_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     int row;
     unsigned bitpos;
@@ -72,7 +72,7 @@ ambient_weather_callback(r_device *decoder, bitbuffer_t *bitbuffer)
         while ((bitpos = bitbuffer_search(bitbuffer, row, bitpos,
                 (const uint8_t *)&preamble_pattern, 12)) + 8+6*8 <=
                 bitbuffer->bits_per_row[row]) {
-            events += ambient_weather_decode(decoder, bitbuffer, row, bitpos + 8);
+            events += ambient_weather_decode(decoder, bitbuffer, ext, row, bitpos + 8);
             if (events) return events; // for now, break after first successful message
             bitpos += 16;
         }
@@ -80,7 +80,7 @@ ambient_weather_callback(r_device *decoder, bitbuffer_t *bitbuffer)
         while ((bitpos = bitbuffer_search(bitbuffer, row, bitpos,
                 (const uint8_t *)&preamble_inverted, 12)) + 8+6*8 <=
                 bitbuffer->bits_per_row[row]) {
-            events += ambient_weather_decode(decoder, bitbuffer, row, bitpos + 8);
+            events += ambient_weather_decode(decoder, bitbuffer, ext, row, bitpos + 8);
             if (events) return events; // for now, break after first successful message
             bitpos += 15;
         }
@@ -106,7 +106,7 @@ r_device ambient_weather = {
     .short_width   = 500,
     .long_width    = 0, // not used
     .reset_limit   = 2400,
-    .decode_fn     = &ambient_weather_callback,
+    .decode_fn = &ambient_weather_callback,
     .disabled      = 0,
     .fields        = output_fields
 };

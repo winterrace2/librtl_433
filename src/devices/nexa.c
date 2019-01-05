@@ -17,7 +17,7 @@
 
 #include "decoder.h"
 
-static int nexa_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int nexa_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     data_t *data;
 
     /* Reject codes of wrong length */
@@ -26,7 +26,7 @@ static int nexa_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
 
 
     bitbuffer_t databits = {0};
-    unsigned pos = bitbuffer_manchester_decode(bitbuffer, 1, 0, &databits, 80);
+	unsigned pos = bitbuffer_manchester_decode(bitbuffer, 1, 0, &databits, 80);
 
     /* Reject codes when Manchester decoding fails */
     if (pos != 64 && pos != 72)
@@ -41,8 +41,6 @@ static int nexa_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
     uint32_t channel_code = (b[3] >> 2) & 0x03;
     uint32_t unit_bit = (b[3] & 0x03);
 
-    /* Get time now */
-
     data = data_make(
                      "model",         "",            DATA_STRING, "Nexa",
                      "id",            "House Code",  DATA_INT, sensor_id,
@@ -52,7 +50,7 @@ static int nexa_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
                      "unit",          "Unit",        DATA_INT, unit_bit,
                       NULL);
 
-    decoder_output_data(decoder, data);
+	decoder_output_data(decoder, data, ext);
 
     return 0;
 }
@@ -72,7 +70,7 @@ r_device nexa = {
     .short_width    = 270,
     .long_width     = 1300,
     .gap_limit      = 1500,
-    .reset_limit    = 2800,
+	.reset_limit    = 2800,
     .decode_fn      = &nexa_callback,
     .disabled       = 0,
     .fields         = output_fields

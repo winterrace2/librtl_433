@@ -27,7 +27,7 @@
 
 #include "decoder.h"
 
-static int schraeder_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int schraeder_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
 	data_t *data;
 	uint8_t b[8];
 	int serial_id;
@@ -49,7 +49,6 @@ static int schraeder_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
 		return 0;
 	}
 
-
 	/* Get serial number id */
 	serial_id = (b[1]&0x0F) << 24 | b[2] << 16 | b[3] << 8 | b[4];
 	sprintf(id_str, "%07X", serial_id);
@@ -60,10 +59,10 @@ static int schraeder_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
 	temperature = b[6] - 50;
 
 	if (decoder->verbose) {
-		fprintf(stderr, "Schrader TPMS decoder\n");
+		rtl433_fprintf(stderr, "Schrader TPMS decoder\n");
 		bitbuffer_print(bitbuffer);
-		fprintf(stderr, "id = 0x%X\n", serial_id);
-		fprintf(stderr, "CRC = %x\n", crc8(b, 7, 0x07, 0xf0));
+		rtl433_fprintf(stderr, "id = 0x%X\n", serial_id);
+		rtl433_fprintf(stderr, "CRC = %x\n", crc8(b, 7, 0x07, 0xf0));
 	}
 
 	data = data_make(
@@ -76,7 +75,7 @@ static int schraeder_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
 					"mic", "Integrity", DATA_STRING, "CRC",
 					NULL);
 
-	decoder_output_data(decoder, data);
+	decoder_output_data(decoder, data, ext);
 	return 0;
 }
 
@@ -96,7 +95,7 @@ static int schraeder_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
   *
   */
   
-static int schrader_EG53MA4_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int schrader_EG53MA4_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
 	data_t *data;
 	uint8_t b[10];
 	int serial_id;
@@ -120,7 +119,6 @@ static int schrader_EG53MA4_callback(r_device *decoder, bitbuffer_t *bitbuffer) 
         return 0;
     }
 
-
 	/* Get sensor id */
 	serial_id = (b[4] << 16) | (b[5] << 8) | b[6];
 	sprintf(id_str, "%06X", serial_id);
@@ -135,10 +133,10 @@ static int schrader_EG53MA4_callback(r_device *decoder, bitbuffer_t *bitbuffer) 
 	temperature = b[8];
 
 	if (decoder->verbose) {
-		fprintf(stderr, "Schrader EG53MA4 TPMS decoder\n");
+		rtl433_fprintf(stderr, "Schrader EG53MA4 TPMS decoder\n");
 		bitbuffer_print(bitbuffer);
-		fprintf(stderr, "id = 0x%X\n", serial_id);
-		fprintf(stderr, "CHECKSUM = %x\n", checksum);
+		rtl433_fprintf(stderr, "id = 0x%X\n", serial_id);
+		rtl433_fprintf(stderr, "CHECKSUM = %x\n", checksum);
 	}
 
 	data = data_make(
@@ -151,7 +149,7 @@ static int schrader_EG53MA4_callback(r_device *decoder, bitbuffer_t *bitbuffer) 
 					"mic", "Integrity", DATA_STRING, "CHECKSUM",
 					NULL);
 
-	decoder_output_data(decoder, data);
+	decoder_output_data(decoder, data, ext);
 	return 0;
 }
 
@@ -183,7 +181,7 @@ r_device schraeder = {
 	.short_width	= 120,
 	.long_width     = 0,
 	.reset_limit    = 480,
-	.decode_fn    	= &schraeder_callback,
+	.decode_fn	= &schraeder_callback,
 	.disabled		= 0,
 	.fields			= output_fields,
 };
@@ -194,7 +192,7 @@ r_device schrader_EG53MA4 = {
 	.short_width	= 123,
 	.long_width     = 0,
 	.reset_limit    = 236,
-	.decode_fn    	= &schrader_EG53MA4_callback,
+	.decode_fn	= &schrader_EG53MA4_callback,
 	.disabled		= 0,
 	.fields			= output_fields_EG53MA4,
 };

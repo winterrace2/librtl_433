@@ -44,7 +44,7 @@
 
 #include "decoder.h"
 
-static int wg_pb12v1_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int wg_pb12v1_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     uint8_t *b;
@@ -77,7 +77,9 @@ static int wg_pb12v1_callback(r_device *decoder, bitbuffer_t *bitbuffer)
             "temperature_C",    "Temperature",  DATA_FORMAT, "%.01f C", DATA_DOUBLE, temperature,
             "mic",              "Integrity",    DATA_STRING, "CRC",
             NULL);
-    decoder_output_data(decoder, data);
+
+	decoder_output_data(decoder, data, ext);
+
     return 1;
 }
 

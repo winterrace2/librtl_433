@@ -25,7 +25,7 @@
 #include "decoder.h"
 
 static int
-ft004b_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+ft004b_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     uint8_t* msg;
     float temperature;
@@ -54,7 +54,7 @@ ft004b_callback(r_device *decoder, bitbuffer_t *bitbuffer)
             "model", "", DATA_STRING, "FT-004-B Temperature Sensor",
             "temperature_C", "Temperature", DATA_FORMAT, "%.1f", DATA_DOUBLE, temperature,
             NULL);
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }
@@ -71,8 +71,8 @@ r_device ft004b = {
     .short_width   = 1956,
     .long_width    = 3900,
     .gap_limit     = 4000,
-    .reset_limit   = 4000,
-    .decode_fn     = &ft004b_callback,
+	.reset_limit   = 4000,
+    .decode_fn = &ft004b_callback,
     .disabled      = 0,
     .fields        = output_fields
 };

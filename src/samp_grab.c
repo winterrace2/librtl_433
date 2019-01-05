@@ -25,6 +25,7 @@
 #endif
 
 #include "samp_grab.h"
+#include "redir_print.h"
 
 samp_grab_t *samp_grab_create(unsigned size)
 {
@@ -56,13 +57,13 @@ void samp_grab_free(samp_grab_t *g)
 
 void samp_grab_push(samp_grab_t *g, unsigned char *iq_buf, uint32_t len)
 {
-    //fprintf(stderr, "sg_index %d + len %d (size %d ", g->sg_index, len, g->sg_len);
+    //rtl433_fprintf(stderr, "sg_index %d + len %d (size %d ", g->sg_index, len, g->sg_len);
 
     g->sg_len += len;
     if (g->sg_len > g->sg_size)
         g->sg_len = g->sg_size;
 
-    //fprintf(stderr, "-> %d)\n", g->sg_len);
+    //rtl433_fprintf(stderr, "-> %d)\n", g->sg_len);
 
     while (len) {
         unsigned chunk_len = len;
@@ -86,22 +87,22 @@ void samp_grab_reset(samp_grab_t *g)
 
 #define BLOCK_SIZE (128 * 1024) /* bytes */
 
-void samp_grab_write(samp_grab_t *g, unsigned grab_len, unsigned grab_end)
+void samp_grab_write(samp_grab_t *g, unsigned grab_len, unsigned grab_end, const char *path_sigdmp, int ovr_ok)
 {
     if (!g->sg_buf)
         return;
 
     unsigned end_pos, start_pos, signal_bsize, wlen, wrest;
-    char f_name[64] = {0};
+    char f_name[256] = {0};
     FILE *fp;
 
     char *format = *g->sample_size == 1 ? "cu8" : "cs16";
     double freq_mhz = *g->frequency / 1000000.0;
     double rate_khz = *g->samp_rate / 1000.0;
     while (1) {
-        sprintf(f_name, "g%03d_%gM_%gk.%s", g->sg_counter, freq_mhz, rate_khz, format);
+        sprintf(f_name, "%sg%03d_%gM_%gk.%s", path_sigdmp, g->sg_counter, freq_mhz, rate_khz, format);
         g->sg_counter++;
-        if (access(f_name, F_OK) == -1) {
+        if (access(f_name, F_OK) == -1 || ovr_ok) {
             break;
         }
     }
@@ -110,7 +111,7 @@ void samp_grab_write(samp_grab_t *g, unsigned grab_len, unsigned grab_end)
     signal_bsize += BLOCK_SIZE - (signal_bsize % BLOCK_SIZE);
 
     if (signal_bsize > g->sg_len) {
-        fprintf(stderr, "Signal bigger than buffer, signal = %u > buffer %u !!\n", signal_bsize, g->sg_len);
+        rtl433_fprintf(stderr, "Signal bigger than buffer, signal = %u > buffer %u !!\n", signal_bsize, g->sg_len);
         signal_bsize = g->sg_len;
     }
 
@@ -127,13 +128,13 @@ void samp_grab_write(samp_grab_t *g, unsigned grab_len, unsigned grab_end)
     else
         start_pos = g->sg_size - signal_bsize + end_pos;
 
-    fprintf(stderr, "signal_bsize = %d  -      sg_index = %d\n", signal_bsize, g->sg_index);
-    fprintf(stderr, "start_pos    = %d  -   buffer_size = %d\n", start_pos, g->sg_size);
+    rtl433_fprintf(stderr, "signal_bsize = %d  -      sg_index = %d\n", signal_bsize, g->sg_index);
+    rtl433_fprintf(stderr, "start_pos    = %d  -   buffer_size = %d\n", start_pos, g->sg_size);
 
-    fprintf(stderr, "*** Saving signal to file %s\n", f_name);
+    rtl433_fprintf(stderr, "*** Saving signal to file %s\n", f_name);
     fp = fopen(f_name, "wb");
     if (!fp) {
-        fprintf(stderr, "Failed to open %s\n", f_name);
+        rtl433_fprintf(stderr, "Failed to open %s\n", f_name);
     }
 
     wlen = signal_bsize;
@@ -142,11 +143,11 @@ void samp_grab_write(samp_grab_t *g, unsigned grab_len, unsigned grab_end)
         wlen  = g->sg_size - start_pos;
         wrest = signal_bsize - wlen;
     }
-    fprintf(stderr, "*** Writing data from %d, len %d\n", start_pos, wlen);
+    rtl433_fprintf(stderr, "*** Writing data from %d, len %d\n", start_pos, wlen);
     fwrite(&g->sg_buf[start_pos], 1, wlen, fp);
 
     if (wrest) {
-        fprintf(stderr, "*** Writing data from %d, len %d\n", 0, wrest);
+        rtl433_fprintf(stderr, "*** Writing data from %d, len %d\n", 0, wrest);
         fwrite(&g->sg_buf[0], 1, wrest, fp);
     }
 

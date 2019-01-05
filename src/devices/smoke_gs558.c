@@ -40,7 +40,7 @@
 
 #include "decoder.h"
 
-static int smoke_gs558_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int smoke_gs558_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     uint8_t *b;
@@ -100,7 +100,7 @@ static int smoke_gs558_callback(r_device *decoder, bitbuffer_t *bitbuffer)
         "learn",         "",            DATA_INT, learn > 1,
         "code",          "Raw Code",    DATA_STRING, code_str,
         NULL);
-    decoder_output_data(decoder, data);
+	decoder_output_data(decoder, data, ext);
 
     return 1;
 }
@@ -121,7 +121,7 @@ r_device smoke_gs558 = {
     .long_width     = 1202, // Maximum gap size before new row of bits [us]
     .gap_limit      = 1299 * 1.5f, // Maximum gap size before new row of bits [us]
     .reset_limit    = 11764 * 1.2f, // Maximum gap size before End Of Message [us]
-    .decode_fn      = &smoke_gs558_callback,
+	.decode_fn      = &smoke_gs558_callback,
     .disabled       = 0,
     .fields         = output_fields
 };

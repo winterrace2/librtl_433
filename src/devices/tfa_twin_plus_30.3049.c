@@ -45,7 +45,7 @@
 
 #include "decoder.h"
 
-static int tfa_twin_plus_303049_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int tfa_twin_plus_303049_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     int row;
@@ -95,7 +95,7 @@ static int tfa_twin_plus_303049_callback(r_device *decoder, bitbuffer_t *bitbuff
             "temperature_C", "Temperature", DATA_FORMAT, "%.1f C", DATA_DOUBLE, tempC,
             "humidity",      "Humidity",    DATA_FORMAT, "%u %%", DATA_INT, humidity,
             NULL);
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

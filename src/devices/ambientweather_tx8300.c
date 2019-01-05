@@ -44,7 +44,7 @@
 
 #include "decoder.h"
 
-static int ambientweather_tx8300_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int ambientweather_tx8300_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     uint8_t b[9] = {0};
@@ -52,7 +52,7 @@ static int ambientweather_tx8300_callback(r_device *decoder, bitbuffer_t *bitbuf
     /* length check */
     if (74 != bitbuffer->bits_per_row[0]) {
         if (decoder->verbose > 1)
-            fprintf(stderr, "AmbientWeather-TX8300: wrong size (%i bits)\n", bitbuffer->bits_per_row[0]);
+            rtl433_fprintf(stderr, "AmbientWeather-TX8300: wrong size (%i bits)\n", bitbuffer->bits_per_row[0]);
         return 0;
     }
 
@@ -69,7 +69,7 @@ static int ambientweather_tx8300_callback(r_device *decoder, bitbuffer_t *bitbuf
     b[0] = (b[0] & 0x7f) | (b[4] & 0x80);
 
     if (decoder->verbose > 1)
-        fprintf(stderr, "H: %02x, F:%02x\n", b[0], b[1] & 0xc0);
+		rtl433_fprintf(stderr, "H: %02x, F:%02x\n", b[0], b[1] & 0xc0);
 
     // check bit-wise parity
     if (b[0] != b[4] || b[1] != b[5] || b[2] != b[6] || b[3] != b[7])
@@ -101,7 +101,7 @@ static int ambientweather_tx8300_callback(r_device *decoder, bitbuffer_t *bitbuf
     data = data_append(data,
             "mic",           "MIC",         DATA_STRING, "CHECKSUM", // actually a per-bit parity, chksum unknown
             NULL);
-    decoder_output_data(decoder, data);
+	decoder_output_data(decoder, data, ext);
 
     return 1;
 }
@@ -123,8 +123,8 @@ r_device ambientweather_tx8300 = {
     .short_width   = 2000,
     .long_width    = 4000,
     .gap_limit     = 6500,
-    .reset_limit   = 8000,
-    .decode_fn     = &ambientweather_tx8300_callback,
+	.reset_limit   = 8000,
+    .decode_fn = &ambientweather_tx8300_callback,
     .disabled      = 0,
     .fields        = output_fields
 };

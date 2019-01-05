@@ -35,11 +35,11 @@ typedef struct {
 	int ook_high_estimate;		// Estimate for the OOK high level at end of package
 	int fsk_f1_est;				// Estimate for the F1 frequency for FSK
 	int fsk_f2_est;				// Estimate for the F2 frequency for FSK
-    float freq1_hz;
-    float freq2_hz;
-    float rssi_db;
-    float snr_db;
-    float noise_db;
+	float freq1_hz;
+	float freq2_hz;
+	float rssi_db;
+	float snr_db;
+	float noise_db;
 } pulse_data_t;
 
 typedef struct pulse_detect pulse_detect_t;
@@ -75,10 +75,13 @@ void pulse_detect_free(pulse_detect_t *pulse_detect);
 /// @return 0 if all input sample data is processed
 /// @return 1 if OOK package is detected (but all sample data is still not completely processed)
 /// @return 2 if FSK package is detected (but all sample data is still not completely processed)
-int pulse_detect_package(pulse_detect_t *pulse_detect, int16_t const *envelope_data, int16_t const *fm_data, int len, int16_t level_limit, uint32_t samp_rate, uint64_t sample_offset, pulse_data_t *pulses, pulse_data_t *fsk_pulses);
 
-/// Analyze and print result
-void pulse_analyzer(pulse_data_t *data, uint32_t samp_rate);
+typedef enum {
+	PULSEDETECTION_OUTOFDATA = 0,
+	PULSEDETECTION_OOK = 1,
+	PULSEDETECTION_FSK = 2
+} PulseDetectionResult;
 
+PulseDetectionResult pulse_detect_package(pulse_detect_t *pulse_detect, int16_t const *envelope_data, int16_t const *fm_data, int len, uint16_t level_limit, uint32_t samp_rate, uint64_t sample_offset, pulse_data_t *pulses, pulse_data_t *fsk_pulses);
 
 #endif /* INCLUDE_PULSE_DETECT_H_ */

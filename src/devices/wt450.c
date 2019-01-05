@@ -55,7 +55,7 @@
 
 #include "decoder.h"
 
-static int wt450_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int wt450_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     bitrow_t *bb = bitbuffer->bb;
     uint8_t *b = bb[0];
 
@@ -76,7 +76,7 @@ static int wt450_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
     if ( bitbuffer->bits_per_row[0] != 36 )
     {
         if (decoder->verbose)
-            fprintf(stderr, "wt450_callback: wrong size of bit per row %d\n",
+            rtl433_fprintf(stderr, "wt450_callback: wrong size of bit per row %d\n",
                     bitbuffer->bits_per_row[0]);
 
         return 0;
@@ -86,7 +86,7 @@ static int wt450_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
     {
         if (decoder->verbose)
         {
-            fprintf(stderr, "wt450_callback: wrong preamble\n");
+            rtl433_fprintf(stderr, "wt450_callback: wrong preamble\n");
             bitbuffer_print(bitbuffer);
         }
         return 0;
@@ -101,7 +101,7 @@ static int wt450_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
     {
         if (decoder->verbose)
         {
-            fprintf(stderr, "wt450_callback: wrong parity\n");
+            rtl433_fprintf(stderr, "wt450_callback: wrong parity\n");
             bitbuffer_print(bitbuffer);
         }
         return 0;
@@ -123,7 +123,7 @@ static int wt450_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
         "temperature_C", "Temperature",DATA_FORMAT, "%.02f C", DATA_DOUBLE, temp,
         "humidity",      "Humidity",   DATA_FORMAT, "%u %%", DATA_INT, humidity,
         NULL);
-    decoder_output_data(decoder, data);
+	decoder_output_data(decoder, data, ext);
 
     return 1;
 }
@@ -145,7 +145,7 @@ r_device wt450 = {
     .long_width    = 1952, // bit width 1952 us
     .reset_limit   = 18000,
     .tolerance	   = 80, // us
-    .decode_fn     = &wt450_callback,
+    .decode_fn = &wt450_callback,
     .disabled      = 0,
     .fields        = output_fields
 };

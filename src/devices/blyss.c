@@ -17,16 +17,15 @@
 
 #include "decoder.h"
 
-static int blyss_callback(r_device *decoder,bitbuffer_t *bitbuffer) {
+static int blyss_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     data_t *data;
-    uint8_t *b;
 	char id_str[16];
 
     for (int i = 0; i < bitbuffer->num_rows; ++i) {
         if (bitbuffer->bits_per_row[i] != 33) // last row is 32
 			continue;
 
-        b = bitbuffer->bb[i];
+        uint8_t *b = bitbuffer->bb[i];
 
         //This needs additional validation, but works on mine. Suspect each DC5-UK-WH uses different codes as the transmitter
         //is paired to the receivers to avoid being triggered by the neighbours transmitter ?!?
@@ -40,7 +39,7 @@ static int blyss_callback(r_device *decoder,bitbuffer_t *bitbuffer) {
                 "model",	"", DATA_STRING, "Blyss-DC5ukwh",
                 "id",	 	"", DATA_STRING, id_str,
                 NULL);
-        decoder_output_data(decoder, data);
+		decoder_output_data(decoder, data, ext);
 
         return 1;
     }

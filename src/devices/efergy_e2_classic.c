@@ -24,7 +24,7 @@
 
 #include "decoder.h"
 
-static int efergy_e2_classic_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int efergy_e2_classic_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     unsigned num_bits = bitbuffer->bits_per_row[0];
     uint8_t *bytes = bitbuffer->bb[0];
     data_t *data;
@@ -76,7 +76,6 @@ static int efergy_e2_classic_callback(r_device *decoder, bitbuffer_t *bitbuffer)
     uint8_t fact = (-(int8_t)bytes[6] + 15);
     float current_adc = (float)((bytes[4] << 8 | bytes[5])) / (1 << fact);
 
-
     // Output data
     data = data_make(
                      "model",    "",               DATA_STRING, "Efergy e2 CT",
@@ -88,7 +87,7 @@ static int efergy_e2_classic_callback(r_device *decoder, bitbuffer_t *bitbuffer)
                      "mic",      "Integrity",      DATA_STRING, "CHECKSUM",
                      NULL);
 
-    decoder_output_data(decoder, data);
+	decoder_output_data(decoder, data, ext);
 
     return 1;
 }
@@ -111,7 +110,7 @@ r_device efergy_e2_classic = {
 	.sync_width     = 500,
 	.gap_limit      = 200,
 	.reset_limit    = 400,
-    .decode_fn      = &efergy_e2_classic_callback,
+	.decode_fn      = &efergy_e2_classic_callback,
     .disabled       = 0,
     .fields         = output_fields
 };

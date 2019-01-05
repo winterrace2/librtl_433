@@ -22,6 +22,7 @@
 #define INCLUDE_DATA_H_
 
 #include <stdio.h>
+#include "librtl_433_export.h"
 
 #if defined(_MSC_VER) && !defined(__clang__)
     /*
@@ -35,7 +36,7 @@
 
     // MSVC has something like C99 restrict as __restrict
     #ifndef restrict
-	#define restrict  __restrict
+     #define restrict  __restrict
     #endif
 #endif
 
@@ -52,13 +53,13 @@
 #endif
 
 typedef enum {
-    DATA_DATA,        /* pointer to data is stored */
-    DATA_INT,        /* pointer to integer is stored */
-    DATA_DOUBLE,        /* pointer to a double is stored */
-    DATA_STRING,        /* pointer to a string is stored */
-    DATA_ARRAY,        /* pointer to an array of values is stored */
-    DATA_COUNT,        /* invalid */
-    DATA_FORMAT        /* indicates the following value is formatted */
+    DATA_DATA,      /* pointer to data is stored */
+    DATA_INT,       /* pointer to integer is stored */
+    DATA_DOUBLE,    /* pointer to a double is stored */
+    DATA_STRING,    /* pointer to a string is stored */
+    DATA_ARRAY,     /* pointer to an array of values is stored */
+    DATA_COUNT,     /* invalid */
+    DATA_FORMAT     /* indicates the following value is formatted */
 } data_type_t;
 
 typedef struct data_array {
@@ -119,7 +120,7 @@ data_t *data_append(data_t *first, const char *key, const char *pretty_key, ...)
 
 /** Adds to a structured data object, by prepending data.
 
-    @see data_make()
+@see data_make()
 */
 data_t *data_prepend(data_t *first, const char *key, const char *pretty_key, ...);
 
@@ -136,55 +137,32 @@ data_array_t *data_array(int num_values, data_type_t type, void *ptr);
 void data_array_free(data_array_t *array);
 
 /** Retain a structure object, returns the structure object passed in. */
-data_t *data_retain(data_t *data);
+RTL_433_API data_t *data_retain(data_t *data);
 
 /** Releases a structure object if retain is zero, decrement retain otherwise. */
-void data_free(data_t *data);
+RTL_433_API void data_free(data_t *data);
 
-struct data_output;
-
-typedef struct data_output {
-    void (*print_data)(struct data_output *output, data_t *data, char *format);
-    void (*print_array)(struct data_output *output, data_array_t *data, char *format);
-    void (*print_string)(struct data_output *output, const char *data, char *format);
-    void (*print_double)(struct data_output *output, double data, char *format);
-    void (*print_int)(struct data_output *output, int data, char *format);
-    void (*output_start)(struct data_output *output, const char **fields, int num_fields);
-    void (*output_poll)(struct data_output *output);
-    void (*output_free)(struct data_output *output);
-    FILE *file;
+typedef struct _data_output data_output_t;
+typedef struct _data_output {
+	void(*print_data)(data_output_t *output, data_t *data, char *format);
+	void(*print_array)(data_output_t *output, data_array_t *data, char *format);
+	void(*print_string)(data_output_t *output, const char *data, char *format);
+	void(*print_double)(data_output_t *output, double data, char *format);
+	void(*print_int)(data_output_t *output, int data, char *format);
+	void(*output_start)(data_output_t *output, const char **fields, int num_fields);
+	void(*output_poll)(data_output_t *output);
+	void(*output_free)(data_output_t *output);
+	FILE *file;
+	void *ext_callback;
 } data_output_t;
 
-/** Construct data output for CSV printer
-
-    @param file the output stream
-    @return The auxiliary data to pass along with data_csv_printer to data_print.
-            You must release this object with data_output_free once you're done with it.
-*/
-struct data_output *data_output_csv_create(FILE *file);
-
-struct data_output *data_output_json_create(FILE *file);
-
-struct data_output *data_output_kv_create(FILE *file);
-
-struct data_output *data_output_syslog_create(const char *host, const char *port);
-
-/** Setup known field keys and start output, used by CSV only.
-
-    @param output the data_output handle from data_output_x_create
-    @param fields the list of fields to accept and expect. Array is copied, but the actual
-                  strings not. The list may contain duplicates and they are eliminated.
-    @param num_fields number of fields
-*/
-void data_output_start(struct data_output *output, const char **fields, int num_fields);
-
 /** Prints a structured data object */
-void data_output_print(struct data_output *output, data_t *data);
+void data_output_print(data_output_t *output, data_t *data);
 
 /** Allows to polls an event loop, if necessary */
-void data_output_poll(struct data_output *output);
+void data_output_poll(data_output_t *output);
 
-void data_output_free(struct data_output *output);
+void data_output_free(data_output_t *output);
 
 /* data output helpers */
 

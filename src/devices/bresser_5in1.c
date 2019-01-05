@@ -46,7 +46,7 @@
 
 static const uint8_t preamble_pattern[] = { 0xaa, 0xaa, 0xaa, 0x2d, 0xd4 };
 
-static int bresser_5in1_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int bresser_5in1_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     uint8_t msg[26];
@@ -57,7 +57,7 @@ static int bresser_5in1_callback(r_device *decoder, bitbuffer_t *bitbuffer)
             || bitbuffer->bits_per_row[0] < 248
             || bitbuffer->bits_per_row[0] > 440) {
         if (decoder->verbose > 1) {
-            fprintf(stderr, "%s bit_per_row %u out of range\n", __func__, bitbuffer->bits_per_row[0]);
+			rtl433_fprintf(stderr, "%s bit_per_row %u out of range\n", __func__, bitbuffer->bits_per_row[0]);
         }
         return 0; // Unrecognized data
     }
@@ -72,7 +72,7 @@ static int bresser_5in1_callback(r_device *decoder, bitbuffer_t *bitbuffer)
     len = bitbuffer->bits_per_row[0] - start_pos;
     if (((len + 7) / 8) < sizeof (msg)) {
         if (decoder->verbose > 1) {
-            fprintf(stderr, "%s %u too short\n", __func__, len);
+			rtl433_fprintf(stderr, "%s %u too short\n", __func__, len);
         }
         return 0; // message too short
     }
@@ -85,7 +85,7 @@ static int bresser_5in1_callback(r_device *decoder, bitbuffer_t *bitbuffer)
     for (unsigned col = 0; col < sizeof (msg) / 2; ++col) {
         if ((msg[col] ^ msg[col + 13]) != 0xff) {
             if (decoder->verbose > 1) {
-                fprintf(stderr, "%s Parity wrong at %u\n", __func__, col);
+				rtl433_fprintf(stderr, "%s Parity wrong at %u\n", __func__, col);
             }
             return 0; // message isn't correct
         }
@@ -123,7 +123,7 @@ static int bresser_5in1_callback(r_device *decoder, bitbuffer_t *bitbuffer)
             "mic",              "Integrity",    DATA_STRING, "CHECKSUM",
             NULL);
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }
@@ -147,7 +147,7 @@ r_device bresser_5in1 = {
     .short_width   = 124,
     .long_width    = 124,
     .reset_limit   = 25000,
-    .decode_fn     = &bresser_5in1_callback,
+	.decode_fn     = &bresser_5in1_callback,
     .disabled      = 0,
     .fields        = output_fields,
 };

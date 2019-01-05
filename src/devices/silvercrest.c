@@ -13,7 +13,7 @@
 
 uint8_t cmd_lu_tab[16] = {2,3,0,1,4,5,7,6,0xC,0xD,0xF,0xE,8,9,0xB,0xA};
 
-static int silvercrest_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int silvercrest_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     uint8_t *b; // bits of a row
     uint8_t cmd;
     data_t *data;
@@ -29,13 +29,12 @@ static int silvercrest_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
         if ((b[3]&0xF) != cmd_lu_tab[cmd])
             return 0;
 
-
         data = data_make(
             "model", "", DATA_STRING, "Silvercrest Remote Control",
             "button", "", DATA_INT, cmd,
             NULL);
 
-        decoder_output_data(decoder, data);
+		decoder_output_data(decoder, data, ext);
 
         return 1;
     }

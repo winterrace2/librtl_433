@@ -54,7 +54,7 @@
 
 #include "decoder.h"
 
-static int esperanza_ews_process_row(r_device *decoder, bitbuffer_t *bitbuffer, int row)
+static int esperanza_ews_process_row(r_device *decoder, bitbuffer_t *bitbuffer, int row, extdata_t *ext)
 {
     const uint8_t *b = bitbuffer->bb[row];
     uint8_t humidity;
@@ -78,7 +78,7 @@ static int esperanza_ews_process_row(r_device *decoder, bitbuffer_t *bitbuffer, 
             "temperature_F", "Temperature", DATA_FORMAT, "%.02f F", DATA_DOUBLE, temperature_f,
             "humidity",      "Humidity",    DATA_FORMAT, "%u %%", DATA_INT, humidity,
             NULL);
-    decoder_output_data(decoder, data);
+	decoder_output_data(decoder, data, ext);
 
     return 1;
 }
@@ -92,7 +92,7 @@ static char *output_fields[] = {
     NULL
 };
 
-static int esperanza_ews_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int esperanza_ews_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     // require two leading sync pulses
     if (bitbuffer->bits_per_row[0] != 0 || bitbuffer->bits_per_row[1] != 0)
@@ -103,7 +103,7 @@ static int esperanza_ews_callback(r_device *decoder, bitbuffer_t *bitbuffer)
             if (memcmp(bitbuffer->bb[row], bitbuffer->bb[row+2], sizeof(bitbuffer->bb[row])) != 0 || bitbuffer->bits_per_row[row] != 42)
                 return 0;
         }
-        esperanza_ews_process_row(decoder, bitbuffer, 2);
+        esperanza_ews_process_row(decoder, bitbuffer, 2, ext);
         return 1;
     }
     return 0;
@@ -115,8 +115,8 @@ r_device esperanza_ews = {
     .short_width   = 2000,
     .long_width    = 4000,
     .gap_limit     = 4400,
-    .reset_limit   = 9400,
-    .decode_fn     = &esperanza_ews_callback,
+	.reset_limit   = 9400,
+    .decode_fn = &esperanza_ews_callback,
     .disabled      = 0,
-    .fields        = output_fields,
+	.fields = output_fields, 
 };

@@ -138,4 +138,8 @@ uint8_t xor_bytes(uint8_t const message[], unsigned num_bytes);
 /// @return summation value
 int add_bytes(uint8_t const message[], unsigned num_bytes);
 
+// moved from optparse: todo: move to r_util.h/c?
+char *asepc(char **stringp, char delim);
+char *getkwargs(char **s, char **key, char **val);
+
 #endif /* INCLUDE_UTIL_H_ */

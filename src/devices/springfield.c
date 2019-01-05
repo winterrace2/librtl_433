@@ -19,7 +19,7 @@
 
 #include "decoder.h"
 
-static int springfield_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int springfield_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     int ret = 0;
     int row;
@@ -69,7 +69,7 @@ static int springfield_callback(r_device *decoder, bitbuffer_t *bitbuffer)
 //                "uk1",            "uk1",          DATA_INT,    uk1,
                 "mic",              "Integrity",    DATA_STRING, "CHECKSUM",
                 NULL);
-        decoder_output_data(decoder, data);
+        decoder_output_data(decoder, data, ext);
         ret++;
     }
     return ret;

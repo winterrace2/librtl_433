@@ -14,6 +14,7 @@
 #include "data.h"
 #include "util.h"
 #include "decoder_util.h"
+#include "redir_print.h"
 
 // variadic print functions
 
@@ -21,93 +22,141 @@ void bitbuffer_printf(const bitbuffer_t *bitbuffer, char const *restrict format,
 {
     va_list ap;
     va_start(ap, format);
-    vfprintf(stderr, format, ap);
+    char printbuf[512];
+    char *buf = printbuf;
+    int needed_cap = vsnprintf(NULL, 0, format, ap) + 1;
+    int need_more_mem = 0;
+    if (needed_cap >= 0) {
+        if (needed_cap > sizeof(printbuf)) need_more_mem = 1;
+        if (need_more_mem) buf = calloc(1, needed_cap + 10);
+        vsprintf(buf, format, ap);
+    }
+    else strcpy(buf, "bitbuffer_printf: internal error.");
     va_end(ap);
+
+    rtl433_fprintf(stderr, buf);
     bitbuffer_print(bitbuffer);
+    if (need_more_mem) free(buf);
 }
 
 void bitbuffer_debugf(const bitbuffer_t *bitbuffer, char const *restrict format, ...)
 {
     va_list ap;
     va_start(ap, format);
-    vfprintf(stderr, format, ap);
+    char printbuf[512];
+    char *buf = printbuf;
+    int needed_cap = vsnprintf(NULL, 0, format, ap) + 1;
+    int need_more_mem = 0;
+    if (needed_cap >= 0) {
+        if (needed_cap > sizeof(printbuf)) need_more_mem = 1;
+        if (need_more_mem) buf = calloc(1, needed_cap + 10);
+        vsprintf(buf, format, ap);
+    }
+    else strcpy(buf, "bitbuffer_printf: internal error.");
     va_end(ap);
+
+    rtl433_fprintf(stderr, buf);
     bitbuffer_debug(bitbuffer);
+    if (need_more_mem) free(buf);
 }
 
 void bitrow_printf(bitrow_t const bitrow, unsigned bit_len, char const *restrict format, ...)
 {
     va_list ap;
     va_start(ap, format);
-    vfprintf(stderr, format, ap);
+    char printbuf[512];
+    char *buf = printbuf;
+    int needed_cap = vsnprintf(NULL, 0, format, ap) + 1;
+    int need_more_mem = 0;
+    if (needed_cap >= 0) {
+        if (needed_cap > sizeof(printbuf)) need_more_mem = 1;
+        if (need_more_mem) buf = calloc(1, needed_cap + 10);
+        vsprintf(buf, format, ap);
+    }
+    else strcpy(buf, "bitbuffer_printf: internal error.");
     va_end(ap);
+
+	rtl433_fprintf(stderr, printbuf);
     bitrow_print(bitrow, bit_len);
+    if (need_more_mem) free(buf);
 }
 
 void bitrow_debugf(bitrow_t const bitrow, unsigned bit_len, char const *restrict format, ...)
 {
     va_list ap;
     va_start(ap, format);
-    vfprintf(stderr, format, ap);
+    char printbuf[512];
+    char *buf = printbuf;
+    int needed_cap = vsnprintf(NULL, 0, format, ap) + 1;
+    int need_more_mem = 0;
+    if (needed_cap >= 0) {
+        if (needed_cap > sizeof(printbuf)) need_more_mem = 1;
+        if (need_more_mem) buf = calloc(1, needed_cap + 10);
+        vsprintf(buf, format, ap);
+    }
+    else strcpy(buf, "bitbuffer_printf: internal error.");
     va_end(ap);
+
+    rtl433_fprintf(stderr, buf);
     bitrow_debug(bitrow, bit_len);
+    if (need_more_mem) free(buf);
 }
 
 // variadic output functions
 
-void decoder_output_messagef(r_device *decoder, char const *restrict format, ...)
+void decoder_output_messagef(r_device *decoder, extdata_t *ext, char const *restrict format, ...)
 {
     char msg[60]; // fixed length limit
     va_list ap;
     va_start(ap, format);
     vsnprintf(msg, 60, format, ap);
     va_end(ap);
-    decoder_output_message(decoder, msg);
+    decoder_output_message(decoder, msg, ext);
 }
 
-void decoder_output_bitbufferf(r_device *decoder, bitbuffer_t const *bitbuffer, char const *restrict format, ...)
+void decoder_output_bitbufferf(r_device *decoder, extdata_t *ext, bitbuffer_t const *bitbuffer, char const *restrict format, ...)
 {
     char msg[60]; // fixed length limit
     va_list ap;
     va_start(ap, format);
     vsnprintf(msg, 60, format, ap);
     va_end(ap);
-    decoder_output_bitbuffer(decoder, bitbuffer, msg);
+    decoder_output_bitbuffer(decoder, bitbuffer, msg, ext);
 }
 
-void decoder_output_bitbuffer_arrayf(r_device *decoder, bitbuffer_t const *bitbuffer, char const *restrict format, ...)
+void decoder_output_bitbuffer_arrayf(r_device *decoder, extdata_t *ext, bitbuffer_t const *bitbuffer, char const *restrict format, ...)
 {
     char msg[60]; // fixed length limit
     va_list ap;
     va_start(ap, format);
     vsnprintf(msg, 60, format, ap);
     va_end(ap);
-    decoder_output_bitbuffer_array(decoder, bitbuffer, msg);
+    decoder_output_bitbuffer_array(decoder, bitbuffer, msg, ext);
 }
 
-void decoder_output_bitrowf(r_device *decoder, bitrow_t const bitrow, unsigned bit_len, char const *restrict format, ...)
+void decoder_output_bitrowf(r_device *decoder, extdata_t *ext, bitrow_t const bitrow, unsigned bit_len, char const *restrict format, ...)
 {
     char msg[60]; // fixed length limit
     va_list ap;
     va_start(ap, format);
     vsnprintf(msg, 60, format, ap);
     va_end(ap);
-    decoder_output_bitrow(decoder, bitrow, bit_len, msg);
+    decoder_output_bitrow(decoder, bitrow, bit_len, msg, ext);
 }
 
 // output functions
 
-void decoder_output_data(r_device *decoder, data_t *data)
+void decoder_output_data(r_device *decoder, data_t *data, extdata_t *ext)
 {
-    decoder->output_fn(decoder, data);
+    decoder->output_fn(decoder, data, ext);
 }
 
-void decoder_output_message(r_device *decoder, char const *msg)
+void decoder_output_message(r_device *decoder, char const *msg, extdata_t *ext)
 {
     data_t *data = data_make(
             "msg", "", DATA_STRING, msg,
             NULL);
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 }
 
 static char *bitrow_print_bits(bitrow_t const bitrow, unsigned bit_len)
@@ -130,14 +179,14 @@ static char *bitrow_print_bits(bitrow_t const bitrow, unsigned bit_len)
     }
     *p++ = '\0';
 
-    return row_bits;
+     return row_bits;
 }
 
-void decoder_output_bitbuffer(r_device *decoder, bitbuffer_t const *bitbuffer, char const *msg)
+void decoder_output_bitbuffer(r_device *decoder, bitbuffer_t const *bitbuffer, char const *msg, extdata_t *ext)
 {
     data_t *data;
     char *row_codes[BITBUF_ROWS];
-    char *row_bits[BITBUF_ROWS] = {0};
+	char *row_bits[BITBUF_ROWS] = {0};
     char row_bytes[BITBUF_COLS * 2 + 1];
     unsigned i;
 
@@ -171,7 +220,7 @@ void decoder_output_bitbuffer(r_device *decoder, bitbuffer_t const *bitbuffer, c
                 NULL);
     }
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     for (i = 0; i < bitbuffer->num_rows; i++) {
         free(row_codes[i]);
@@ -179,7 +228,7 @@ void decoder_output_bitbuffer(r_device *decoder, bitbuffer_t const *bitbuffer, c
     }
 }
 
-void decoder_output_bitbuffer_array(r_device *decoder, bitbuffer_t const *bitbuffer, char const *msg)
+void decoder_output_bitbuffer_array(r_device *decoder, bitbuffer_t const *bitbuffer, char const *msg, extdata_t *ext)
 {
     data_t *data;
     data_t *row_data[BITBUF_ROWS];
@@ -212,18 +261,18 @@ void decoder_output_bitbuffer_array(r_device *decoder, bitbuffer_t const *bitbuf
             "rows", "", DATA_ARRAY, data_array(bitbuffer->num_rows, DATA_DATA, row_data),
             "codes", "", DATA_ARRAY, data_array(bitbuffer->num_rows, DATA_STRING, row_codes),
             NULL);
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     for (i = 0; i < bitbuffer->num_rows; i++) {
         free(row_codes[i]);
     }
 }
 
-void decoder_output_bitrow(r_device *decoder, bitrow_t const bitrow, unsigned bit_len, char const *msg)
+void decoder_output_bitrow(r_device *decoder, bitrow_t const bitrow, unsigned bit_len, char const *msg, extdata_t *ext)
 {
     data_t *data;
     char *row_code;
-    char *row_bits = NULL;
+	char *row_bits = NULL;
     char row_bytes[BITBUF_COLS * 2 + 1];
 
     row_bytes[0] = '\0';
@@ -248,10 +297,10 @@ void decoder_output_bitrow(r_device *decoder, bitrow_t const bitrow, unsigned bi
         data_append(data,
                 "bits", "", DATA_STRING, row_bits,
                 NULL);
-    }
+	}
 
-    decoder_output_data(decoder, data);
+	decoder_output_data(decoder, data, ext);
 
-    free(row_code);
+	free(row_code);
     free(row_bits);
 }

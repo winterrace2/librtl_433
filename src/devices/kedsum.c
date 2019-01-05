@@ -24,7 +24,7 @@
 
 #include "decoder.h"
 
-static int kedsum_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int kedsum_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     bitrow_t *bb = bitbuffer->bb;
     data_t *data;
 
@@ -63,15 +63,15 @@ static int kedsum_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
     temperature_f = (temperature_with_offset - 900) / 10.0;
 
     if (decoder->verbose) {
-      fprintf(stdout, "Bitstream HEX        = ");
-      bitrow_print(b, 48);
-      fprintf(stdout, "Humidity HEX         = %02x\n", b[3]);
-      fprintf(stdout, "Humidity DEC         = %u\n",   humidity);
-      fprintf(stdout, "Channel HEX          = %02x\n", b[1]);
-      fprintf(stdout, "Channel              = %u\n",   channel);
-      fprintf(stdout, "temp_with_offset HEX = %02x\n", temperature_with_offset);
-      fprintf(stdout, "temp_with_offset     = %d\n",   temperature_with_offset);
-      fprintf(stdout, "TemperatureF         = %.1f\n", temperature_f);
+      rtl433_fprintf(stdout, "Bitstream HEX        = ");
+	  bitrow_print(b, 48);
+      rtl433_fprintf(stdout, "Humidity HEX         = %02x\n", b[3]);
+      rtl433_fprintf(stdout, "Humidity DEC         = %u\n",   humidity);
+      rtl433_fprintf(stdout, "Channel HEX          = %02x\n", b[1]);
+      rtl433_fprintf(stdout, "Channel              = %u\n",   channel);
+      rtl433_fprintf(stdout, "temp_with_offset HEX = %02x\n", temperature_with_offset);
+      rtl433_fprintf(stdout, "temp_with_offset     = %d\n",   temperature_with_offset);
+      rtl433_fprintf(stdout, "TemperatureF         = %.1f\n", temperature_f);
     }
 
     data = data_make(
@@ -80,9 +80,8 @@ static int kedsum_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
             "temperature_F", "Temperature", DATA_FORMAT, "%.02f F", DATA_DOUBLE, temperature_f,
             "humidity",      "Humidity",    DATA_FORMAT, "%u %%", DATA_INT, humidity,
             NULL);
-
-    decoder_output_data(decoder, data);
-    return 1;
+	decoder_output_data(decoder, data, ext);
+	return 1;
 }
 
 static char *output_fields[] = {
@@ -99,7 +98,7 @@ r_device kedsum = {
     .short_width    = 2000,
     .long_width     = 4000,
     .gap_limit      = 4400,
-    .reset_limit    = 9400,
+	.reset_limit    = 9400,
     .decode_fn      = &kedsum_callback,
     .disabled       = 0,
     .fields         = output_fields

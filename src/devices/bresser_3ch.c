@@ -24,7 +24,7 @@
  */
 #include "decoder.h"
 
-static int bresser_3ch_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int bresser_3ch_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     data_t *data;
     uint8_t *b;
 
@@ -45,7 +45,7 @@ static int bresser_3ch_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
 
     if (((b[0] + b[1] + b[2] + b[3] - b[4]) & 0xFF) != 0) {
         if (decoder->verbose) {
-            fprintf(stderr, "Bresser 3CH checksum error\n");
+            rtl433_fprintf(stderr, "Bresser 3CH checksum error\n");
         }
         return 0;
     }
@@ -64,7 +64,7 @@ static int bresser_3ch_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
 
     if ((channel == 0) || (humidity > 100) || (temp_f < -20.0) || (temp_f > 160.0)) {
         if (decoder->verbose) {
-            fprintf(stderr, "Bresser 3CH data error\n");
+            rtl433_fprintf(stderr, "Bresser 3CH data error\n");
         }
         return 0;
     }
@@ -78,7 +78,7 @@ static int bresser_3ch_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
             "humidity",      "Humidity",    DATA_FORMAT, "%u %%", DATA_INT, humidity,
             "mic",           "Integrity",   DATA_STRING, "CHECKSUM",
             NULL);
-    decoder_output_data(decoder, data);
+	decoder_output_data(decoder, data, ext);
 
     return 1;
 }

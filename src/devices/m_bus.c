@@ -20,7 +20,7 @@ static unsigned bcd2int(uint8_t bcd) {
 // Mapping from 6 bits to 4 bits. "3of6" coding used for Mode T
 static uint8_t m_bus_decode_3of6(uint8_t byte) {
     uint8_t out = 0xFF; // Error
-fprintf(stderr,"Decode %0X\n", byte);
+rtl433_fprintf(stderr,"Decode %0X\n", byte);
     switch(byte) {
         case 22:    out = 0x0;  break;  // 0x16
         case 13:    out = 0x1;  break;  // 0x0D
@@ -47,7 +47,7 @@ fprintf(stderr,"Decode %0X\n", byte);
 // Decode input 6 bit nibbles to output 4 bit nibbles (packed in bytes). "3of6" coding used for Mode T
 static int m_bus_decode_3of6_buffer(const bitrow_t bits, unsigned bit_offset, uint8_t* output, unsigned num_bytes) {
     for (unsigned n=0; n<num_bytes; ++n) {
-        fprintf(stderr,"Decode %u, %u\n", n, bit_offset);
+        rtl433_fprintf(stderr,"Decode %u, %u\n", n, bit_offset);
         uint8_t nibble_h = m_bus_decode_3of6(bitrow_get_byte(bits, n*12+bit_offset) >> 2);
         uint8_t nibble_l = m_bus_decode_3of6(bitrow_get_byte(bits, n*12+bit_offset+6) >> 2);
         if (nibble_h > 0xF || nibble_l > 0xF) {
@@ -60,14 +60,13 @@ static int m_bus_decode_3of6_buffer(const bitrow_t bits, unsigned bit_offset, ui
 
 
 // Validate CRC
-static int m_bus_crc_valid(r_device *decoder, const uint8_t *bytes, unsigned crc_offset)
-{
+static int m_bus_crc_valid(r_device *decoder, const uint8_t* bytes, unsigned crc_offset) {
     static const uint16_t CRC_POLY = 0x3D65;
     uint16_t crc_calc = ~crc16(bytes, crc_offset, CRC_POLY, 0);
     uint16_t crc_read = (((uint16_t)bytes[crc_offset] << 8) | bytes[crc_offset+1]);
     if (crc_calc != crc_read) {
         if (decoder->verbose) {
-            fprintf(stderr, "M-Bus: CRC error: Calculated 0x%0X, Read: 0x%0X\n", (unsigned)crc_calc, (unsigned)crc_read);
+            rtl433_fprintf(stderr, "M-Bus: CRC error: Calculated 0x%0X, Read: 0x%0X\n", (unsigned)crc_calc, (unsigned)crc_read);
         }
         return 0;
     }
@@ -131,8 +130,8 @@ typedef struct {
     uint8_t     data[512];
 } m_bus_data_t;
 
-static int m_bus_decode_format_a(r_device *decoder, const m_bus_data_t *in, m_bus_data_t *out, m_bus_block1_t *block1)
-{
+
+static int m_bus_decode_format_a(r_device *decoder, const m_bus_data_t *in, m_bus_data_t *out, m_bus_block1_t *block1) {
     static const uint16_t BLOCK1A_SIZE = 12;     // Size of Block 1, format A
 
     // Get Block 1
@@ -152,7 +151,7 @@ static int m_bus_decode_format_a(r_device *decoder, const m_bus_data_t *in, m_bu
     // Check length of package is sufficient
     unsigned num_data_blocks = (block1->L-9+15)/16;      // Data blocks are 16 bytes long + 2 CRC bytes (not counted in L)
     if ((block1->L < 9) || ((block1->L-9)+num_data_blocks*2 > in->length-BLOCK1A_SIZE)) {   // add CRC bytes for each data block
-        if (decoder->verbose) { fprintf(stderr, "M-Bus: Package too short for Length: %u\n", block1->L); }
+        if (decoder->verbose) { rtl433_fprintf(stderr, "M-Bus: Package too short for Length: %u\n", block1->L); }
         return 0;
     }
 
@@ -171,8 +170,8 @@ static int m_bus_decode_format_a(r_device *decoder, const m_bus_data_t *in, m_bu
     return 1;
 }
 
-static int m_bus_decode_format_b(r_device *decoder, const m_bus_data_t *in, m_bus_data_t *out, m_bus_block1_t *block1)
-{
+
+static int m_bus_decode_format_b(r_device *decoder, const m_bus_data_t *in, m_bus_data_t *out, m_bus_block1_t *block1) {
     static const uint16_t BLOCK1B_SIZE  = 10;   // Size of Block 1, format B
     static const uint16_t BLOCK2B_SIZE  = 118;  // Maximum size of Block 2, format B
     static const uint16_t BLOCK1_2B_SIZE  = 128;
@@ -190,7 +189,7 @@ static int m_bus_decode_format_b(r_device *decoder, const m_bus_data_t *in, m_bu
 
     // Check length of package is sufficient
     if ((block1->L < 12) || (block1->L+1 > (int)in->length)) {   // L includes all bytes except itself
-        if (decoder->verbose) { fprintf(stderr, "M-Bus: Package too short for Length: %u\n", block1->L); }
+        if (decoder->verbose) { rtl433_fprintf(stderr, "M-Bus: Package too short for Length: %u\n", block1->L); }
         return 0;
     }
 
@@ -214,12 +213,10 @@ static int m_bus_decode_format_b(r_device *decoder, const m_bus_data_t *in, m_bu
     return 1;
 }
 
-static void m_bus_output_data(r_device *decoder, const m_bus_data_t *out, const m_bus_block1_t *block1)
-{
+
+static void m_bus_output_data(r_device *decoder, const m_bus_data_t *out, const m_bus_block1_t *block1, bitbuffer_t *bitbuffer, extdata_t *ext) {
     data_t  *data;
     char    str_buf[1024];
-
-    // Get time now
 
     // Make data string
     str_buf[0] = 0;
@@ -239,11 +236,12 @@ static void m_bus_output_data(r_device *decoder, const m_bus_data_t *out, const 
         "data",     "Data",         DATA_STRING,    str_buf,
         "mic",      "Integrity",    DATA_STRING,    "CRC",
         NULL);
-    decoder_output_data(decoder, data);
+	
+	decoder_output_data(decoder, data, ext);
 }
 
 
-static int m_bus_mode_c_t_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int m_bus_mode_c_t_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     static const uint8_t PREAMBLE_T[]  = {0x55, 0x54, 0x3D};      // Mode T Preamble (always format A - 3of6 encoded)
 //  static const uint8_t PREAMBLE_CA[] = {0x55, 0x54, 0x3D, 0x54, 0xCD};  // Mode C, format A Preamble
 //  static const uint8_t PREAMBLE_CB[] = {0x55, 0x54, 0x3D, 0x54, 0x3D};  // Mode C, format B Preamble
@@ -272,7 +270,7 @@ static int m_bus_mode_c_t_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
         bit_offset += 8;
         // Format A
         if (next_byte == 0xCD) {
-            if (decoder->verbose) { fprintf(stderr, "M-Bus: Mode C, Format A\n"); }
+            if (decoder->verbose) { rtl433_fprintf(stderr, "M-Bus: Mode C, Format A\n"); }
             // Extract data
             data_in.length = (bitbuffer->bits_per_row[0]-bit_offset)/8;
             bitbuffer_extract_bytes(bitbuffer, 0, bit_offset, data_in.data, data_in.length*8);
@@ -281,7 +279,7 @@ static int m_bus_mode_c_t_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
         } // Format A
         // Format B
         else if (next_byte == 0x3D) {
-            if (decoder->verbose) { fprintf(stderr, "M-Bus: Mode C, Format B\n"); }
+            if (decoder->verbose) { rtl433_fprintf(stderr, "M-Bus: Mode C, Format B\n"); }
             // Extract data
             data_in.length = (bitbuffer->bits_per_row[0]-bit_offset)/8;
             bitbuffer_extract_bytes(bitbuffer, 0, bit_offset, data_in.data, data_in.length*8);
@@ -291,7 +289,7 @@ static int m_bus_mode_c_t_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
         // Unknown Format
         else {
             if (decoder->verbose) {
-                fprintf(stderr, "M-Bus: Mode C, Unknown format: 0x%X\n", next_byte);
+                rtl433_fprintf(stderr, "M-Bus: Mode C, Unknown format: 0x%X\n", next_byte);
                 bitbuffer_print(bitbuffer);
             }
             return 0;
@@ -299,24 +297,24 @@ static int m_bus_mode_c_t_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
     }   // Mode C
     // Mode T
     else {
-        if (decoder->verbose) { fprintf(stderr, "M-Bus: Mode T\n"); }
-        if (decoder->verbose) { fprintf(stderr, "Experimental - Not tested\n"); }
+        if (decoder->verbose) { rtl433_fprintf(stderr, "M-Bus: Mode T\n"); }
+        if (decoder->verbose) { rtl433_fprintf(stderr, "Experimental - Not tested\n"); }
         // Extract data
         data_in.length = (bitbuffer->bits_per_row[0]-bit_offset)/12;    // Each byte is encoded into 12 bits
         if(m_bus_decode_3of6_buffer(bitbuffer->bb[0], bit_offset, data_in.data, data_in.length) < 0) {
-            if (decoder->verbose) fprintf(stderr, "M-Bus: Decoding error\n");
+            if (decoder->verbose) rtl433_fprintf(stderr, "M-Bus: Decoding error\n");
             return 0;
         }
         // Decode
         if(!m_bus_decode_format_a(decoder, &data_in, &data_out, &block1))    return 0;
     }   // Mode T
 
-    m_bus_output_data(decoder, &data_out, &block1);
+    m_bus_output_data(decoder, &data_out, &block1, bitbuffer, ext);
     return 1;
 }
 
 
-static int m_bus_mode_r_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int m_bus_mode_r_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     static const uint8_t PREAMBLE_RA[]  = {0x55, 0x54, 0x76, 0x96};      // Mode R, format A (B not supported)
 
     m_bus_data_t    data_in     = {0};  // Data from Physical layer decoded to bytes
@@ -335,20 +333,20 @@ static int m_bus_mode_r_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
     }
     bit_offset += sizeof(PREAMBLE_RA)*8;     // skip preamble
 
-    if (decoder->verbose) { fprintf(stderr, "M-Bus: Mode R, Format A\n"); }
-    if (decoder->verbose) { fprintf(stderr, "Experimental - Not tested\n"); }
+    if (decoder->verbose) { rtl433_fprintf(stderr, "M-Bus: Mode R, Format A\n"); }
+    if (decoder->verbose) { rtl433_fprintf(stderr, "Experimental - Not tested\n"); }
     // Extract data
     data_in.length = (bitbuffer->bits_per_row[0]-bit_offset)/8;
     bitbuffer_extract_bytes(bitbuffer, 0, bit_offset, data_in.data, data_in.length*8);
     // Decode
     if(!m_bus_decode_format_a(decoder, &data_in, &data_out, &block1))    return 0;
 
-    m_bus_output_data(decoder, &data_out, &block1);
+    m_bus_output_data(decoder, &data_out, &block1, bitbuffer, ext);
     return 1;
 }
 
 
-static int m_bus_mode_f_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int m_bus_mode_f_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     static const uint8_t PREAMBLE_F[]  = {0x55, 0xF6};      // Mode F Preamble
 //  static const uint8_t PREAMBLE_FA[] = {0x55, 0xF6, 0x8D};  // Mode F, format A Preamble
 //  static const uint8_t PREAMBLE_FB[] = {0x55, 0xF6, 0x72};  // Mode F, format B Preamble
@@ -373,26 +371,26 @@ static int m_bus_mode_f_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
     bit_offset += 8;
     // Format A
     if (next_byte == 0x8D) {
-        if (decoder->verbose) { fprintf(stderr, "M-Bus: Mode F, Format A\n"); }
-        if (decoder->verbose) { fprintf(stderr, "Not implemented\n"); }
+        if (decoder->verbose) { rtl433_fprintf(stderr, "M-Bus: Mode F, Format A\n"); }
+        if (decoder->verbose) { rtl433_fprintf(stderr, "Not implemented\n"); }
         return 1;
     } // Format A
     // Format B
     else if (next_byte == 0x72) {
-        if (decoder->verbose) { fprintf(stderr, "M-Bus: Mode F, Format B\n"); }
-        if (decoder->verbose) { fprintf(stderr, "Not implemented\n"); }
+        if (decoder->verbose) { rtl433_fprintf(stderr, "M-Bus: Mode F, Format B\n"); }
+        if (decoder->verbose) { rtl433_fprintf(stderr, "Not implemented\n"); }
         return 1;
     }   // Format B
     // Unknown Format
     else {
         if (decoder->verbose) {
-            fprintf(stderr, "M-Bus: Mode F, Unknown format: 0x%X\n", next_byte);
+            rtl433_fprintf(stderr, "M-Bus: Mode F, Unknown format: 0x%X\n", next_byte);
             bitbuffer_print(bitbuffer);
         }
         return 0;
     }
 
-    m_bus_output_data(decoder, &data_out, &block1);
+    m_bus_output_data(decoder, &data_out, &block1, bitbuffer, ext);
     return 1;
 }
 
@@ -436,7 +434,7 @@ r_device m_bus_mode_s = {
 r_device m_bus_mode_r = {
     .name           = "Wireless M-Bus, Mode R, 4.8kbps (-f 868330000)",
     .modulation     = FSK_PULSE_MANCHESTER_ZEROBIT,
-    .short_width    = (1000.0f / 4.8f / 2),   // ~208 us per bit -> clock half period ~104 us
+    .short_width    = (1000.0f / 4.8f /2),   // ~208 us per bit -> clock half period ~104 us
     .long_width     = 0,    // Unused
     .reset_limit    = (1000.0f / 4.8f * 1.5f), // 3 clock half periods
     .decode_fn      = &m_bus_mode_r_callback,

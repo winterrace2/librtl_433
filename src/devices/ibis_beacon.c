@@ -14,7 +14,7 @@
 
 #include "decoder.h"
 
-static int ibis_beacon_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int ibis_beacon_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
 	data_t *data;
 	uint8_t search = 0xAB; // preamble is 0xAAB
 	uint8_t msg[32];
@@ -68,7 +68,7 @@ static int ibis_beacon_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
 		"mic",		"Integrity",	DATA_STRING,	"CRC",
 		NULL);
 
-	decoder_output_data(decoder, data);
+	decoder_output_data(decoder, data, ext);
 	return 1;
 }
 
@@ -87,7 +87,7 @@ r_device ibis_beacon = {
 	.short_width	= 30,  // Nominal width of clock half period [us]
 	.long_width		= 0,   // Not used
 	.reset_limit	= 100, // Maximum gap size before End Of Message [us].
-	.decode_fn    	= &ibis_beacon_callback,
+	.decode_fn	= &ibis_beacon_callback,
 	.disabled		= 0,
 	.fields			= output_fields,
 };

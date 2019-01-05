@@ -1,6 +1,6 @@
 #include "decoder.h"
 
-static int newkaku_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int newkaku_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     /* Two bits map to 2 states, 0 1 -> 0 and 1 1 -> 1 */
     /* Status bit can be 1 1 -> 1 which indicates DIM value. 4 extra bits are present with value */
     /*start pulse: 1T high, 10.44T low */
@@ -20,7 +20,7 @@ static int newkaku_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
     uint8_t dv = 0;
     char *group_call, *command, *dim;
 
-    if (bb[0][0] == 0xac || bb[0][0] == 0xb2) {//always starts with ac or b2
+	if (bb[0][0] == 0xac || bb[0][0] == 0xb2) {//always starts with ac or b2
         // first bit is from startbit sequence, not part of payload!
         // check protocol if value is 10 or 01, else stop processing as it is no valid KAKU packet!
         //get id=24bits, remember 1st 1 bit = startbit, no payload!
@@ -113,7 +113,7 @@ static int newkaku_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
                          "dim",           "Dim",         DATA_STRING, dim,
                          "dim_value",     "Dim Value",   DATA_INT, dv,
                          NULL);
-        decoder_output_data(decoder, data);
+		decoder_output_data(decoder, data, ext);
 
         return 1;
     }
@@ -137,7 +137,7 @@ r_device newkaku = {
     .short_width    = 300,
     .long_width     = 1400,
     .reset_limit    = 3200,
-    .decode_fn      = &newkaku_callback,
+	.decode_fn      = &newkaku_callback,
     .disabled       = 0,
     .fields         = output_fields
 };

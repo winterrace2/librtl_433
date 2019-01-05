@@ -13,8 +13,7 @@
  */
 #include "decoder.h"
 
-static int generic_remote_callback(r_device *decoder, bitbuffer_t *bitbuffer)
-{
+static int generic_remote_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     data_t *data;
     bitrow_t *bb = bitbuffer->bb;
     uint8_t *b = bb[0];
@@ -59,7 +58,7 @@ static int generic_remote_callback(r_device *decoder, bitbuffer_t *bitbuffer)
             "tristate",     "Tri-State",    DATA_STRING, tristate,
             NULL);
 
-    decoder_output_data(decoder, data);
+	decoder_output_data(decoder, data, ext);
 
     return 1;
 }

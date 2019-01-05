@@ -87,7 +87,7 @@ checksum_calculate(uint8_t *b)
 }
 
 static int
-ttx201_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned row, unsigned bitpos)
+ttx201_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned row, unsigned bitpos, extdata_t *ext)
 {
     uint8_t b[MSG_PACKET_LEN];
     int bits = bitbuffer->bits_per_row[row];
@@ -105,12 +105,12 @@ ttx201_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned row, unsigned 
         if (decoder->verbose > 1) {
             if (row == 0) {
                 if (bits < MSG_PREAMBLE_BITS) {
-                    fprintf(stderr, "Short preamble: %d bits (expected %d)\n",
-                            bits, MSG_PREAMBLE_BITS);
+					rtl433_fprintf(stderr, "Short preamble: %d bits (expected %d)\n",
+                                 bits, MSG_PREAMBLE_BITS);
                 }
             } else if (row != (unsigned)bitbuffer->num_rows - 1 && bits == 1) {
-                fprintf(stderr, "Wrong packet #%d length: %d bits (expected %d)\n",
-                        row, bits, MSG_PACKET_BITS);
+				rtl433_fprintf(stderr, "Wrong packet #%d length: %d bits (expected %d)\n",
+                             row, bits, MSG_PACKET_BITS);
             }
         }
         return 0;
@@ -123,12 +123,12 @@ ttx201_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned row, unsigned 
     checksum_calculated = checksum_calculate(b);
     postmark = b[5];
 
-    if (decoder->verbose > 1) {
-        fprintf(stderr, "TTX201 received raw data: ");
-        bitbuffer_print(bitbuffer);
-        fprintf(stderr, "Data decoded:\n" \
-                " r  cs    K   ID    S   B  C  X    T    M     J\n");
-        fprintf(stderr, "%2d  %2d    %2d  %3d  0x%01x  %1d  %1d  %1d  %4d  0x%02x",
+    if (decoder->verbose > 1){
+		rtl433_fprintf(stderr, "TTX201 received raw data: ");
+		bitbuffer_print(bitbuffer);
+		rtl433_fprintf(stderr, "Data decoded:\n" \
+			" r  cs    K   ID    S   B  C  X    T    M     J\n");
+		rtl433_fprintf(stderr, "%2d  %2d    %2d  %3d  0x%01x  %1d  %1d  %1d  %4d  0x%02x",
                 row,
                 checksum_calculated,
                 checksum,
@@ -140,29 +140,29 @@ ttx201_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned row, unsigned 
                 ((int8_t)((b[3] & 0x0f) << 4) << 4) | b[4], // Temperature
                 postmark);
         if (bits == MSG_PACKET_BITS) {
-            fprintf(stderr, "  0x%01x", b[6] >> 4);         // Packet separator
+			rtl433_fprintf(stderr, "  0x%01x", b[6] >> 4);         // Packet separator
         }
-        fprintf(stderr, "\n");
+		rtl433_fprintf(stderr, "\n");
     }
 
     if (postmark != MSG_PACKET_POSTMARK) {
-        if (decoder->verbose > 1)
-            fprintf(stderr, "Packet #%d wrong postmark 0x%02x (expected 0x%02x).\n",
-                    row, postmark, MSG_PACKET_POSTMARK);
-        return 0;
-    }
+		if (decoder->verbose > 1)
+			rtl433_fprintf(stderr, "Packet #%d wrong postmark 0x%02x (expected 0x%02x).\n",
+				row, postmark, MSG_PACKET_POSTMARK);
+		return 0;
+	}
 
-    if (checksum != checksum_calculated) {
-        if (decoder->verbose > 1)
-            fprintf(stderr, "Packet #%d checksum error.\n", row);
-        return 0;
-    }
-
-    device_id = b[1];
-    battery_low = (b[2] & 0x08) != 0; // if not zero, battery is low
-    channel = (b[2] & 0x07) + 1;
-    temperature = ((int8_t)((b[3] & 0x0f) << 4) << 4) | b[4]; // note the sign extend
-    temperature_c = temperature / 10.0f;
+	if (checksum != checksum_calculated) {
+		if (decoder->verbose > 1)
+			rtl433_fprintf(stderr, "Packet #%d checksum error.\n", row);
+		return 0;
+	}
+    
+	device_id = b[1];
+	battery_low = (b[2] & 0x08) != 0; // if not zero, battery is low
+	channel = (b[2] & 0x07) + 1;
+	temperature = ((int8_t)((b[3] & 0x0f) << 4) << 4) | b[4]; // note the sign extend
+	temperature_c = temperature / 10.0f;
 
     data = data_make(
             "model",         "",            DATA_STRING, "Emos TTX201",
@@ -172,20 +172,21 @@ ttx201_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned row, unsigned 
             "temperature_C", "Temperature", DATA_FORMAT, "%.1f C", DATA_DOUBLE, temperature_c,
             "mic",           "MIC",         DATA_STRING, "CHECKSUM",
             NULL);
-    decoder_output_data(decoder, data);
+	decoder_output_data(decoder, data, ext);
 
-    return 1;
+	return 1;
 }
 
 static int
-ttx201_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+ttx201_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     int row;
     int events = 0;
 
     if (MSG_MIN_ROWS <= bitbuffer->num_rows && bitbuffer->num_rows <= MSG_MAX_ROWS) {
+
         for (row = 0; row < bitbuffer->num_rows; ++row) {
-            events += ttx201_decode(decoder, bitbuffer, row, 0);
+            events += ttx201_decode(decoder, bitbuffer, row, 0, ext);
             if (events && !decoder->verbose) return events; // for now, break after first successful message
         }
     }
@@ -210,7 +211,7 @@ r_device ttx201 = {
     .long_width    = 0, // not used
     .reset_limit   = 1700,
     .tolerance     = 250,
-    .decode_fn     = &ttx201_callback,
+    .decode_fn = &ttx201_callback,
     .disabled      = 0,
     .fields        = output_fields
 };

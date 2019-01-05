@@ -20,7 +20,7 @@
 
 #include "decoder.h"
 
-static int efergy_optical_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int efergy_optical_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     unsigned num_bits = bitbuffer->bits_per_row[0];
     uint8_t *bytes = bitbuffer->bb[0];
@@ -76,7 +76,7 @@ static int efergy_optical_callback(r_device *decoder, bitbuffer_t *bitbuffer)
 
     if (crc != csum1) {
         if (decoder->verbose)
-            fprintf(stderr, "%s: CRC error.\n", __func__);
+			rtl433_fprintf(stderr, "%s: CRC error.\n", __func__);
         return 0;
     }
 
@@ -107,7 +107,7 @@ static int efergy_optical_callback(r_device *decoder, bitbuffer_t *bitbuffer)
                 "pulses",	"Pulse-rate",	DATA_FORMAT, "%i", DATA_INT, imp_kwh[i],
                 "energy",	"Energy",     	DATA_FORMAT, "%.03f KWh", DATA_DOUBLE, energy,
                 NULL);
-        decoder_output_data(decoder, data);
+        decoder_output_data(decoder, data, ext);
     }
     return 1;
 }

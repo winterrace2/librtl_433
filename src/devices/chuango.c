@@ -21,7 +21,7 @@
  */
 #include "decoder.h"
 
-static int chuango_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int chuango_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     data_t *data;
     uint8_t *b;
     int id;
@@ -71,8 +71,8 @@ static int chuango_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
             "cmd_id",   "CMD_ID",       DATA_INT,    cmd,
             NULL);
 
-    decoder_output_data(decoder, data);
-    return 1;
+	decoder_output_data(decoder, data, ext);
+	return 1;
 }
 
 static char *output_fields[] = {
@@ -93,5 +93,5 @@ r_device chuango = {
     .tolerance      = 160,  // us
     .decode_fn      = &chuango_callback,
     .disabled       = 0,
-    .fields         = output_fields,
+	.fields         = output_fields,
 };

@@ -42,7 +42,7 @@ X = unknown, checksum maybe ?
 */
 
 
-static int maverick_et73_sensor_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int maverick_et73_sensor_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     int temp1_raw, temp2_raw, row;
     float temp1_c, temp2_c;
     uint8_t *bytes;
@@ -66,7 +66,7 @@ static int maverick_et73_sensor_callback(r_device *decoder, bitbuffer_t *bitbuff
     device = bytes[0];
 
     if (decoder->verbose) {
-        fprintf(stderr,"maverick_et73_raw_data:");
+		rtl433_fprintf(stderr, "maverick_et73_raw_data:");
         bitrow_print(bytes, 48);
     }
 
@@ -82,7 +82,7 @@ static int maverick_et73_sensor_callback(r_device *decoder, bitbuffer_t *bitbuff
             "temperature_1_C",  "Temperature 1",    DATA_FORMAT, "%.01f C", DATA_DOUBLE, temp1_c,
             "temperature_2_C",  "Temperature 2",    DATA_FORMAT, "%.01f C", DATA_DOUBLE, temp2_c,
             NULL);
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
     return 1;
 }
 
