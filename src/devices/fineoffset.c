@@ -74,7 +74,7 @@ static int fineoffset_WH2_callback(r_device *decoder, bitbuffer_t *bitbuffer, ex
     type = b[0] >> 4;
     if (type != 4) {
         if (decoder->verbose) {
-			rtl433_fprintf(stderr, "%s: Unknown type: %d\n", model, type);
+            rtl433_fprintf(stderr, "%s: Unknown type: %d\n", model, type);
         }
         return 0;
     }
@@ -175,7 +175,7 @@ static int fineoffset_WH24_callback(r_device *decoder, bitbuffer_t *bitbuffer, e
     bit_offset = bitbuffer_search(bitbuffer, 0, 0, preamble, sizeof(preamble) * 8) + sizeof(preamble) * 8;
     if (bit_offset + sizeof(b) * 8 > bitbuffer->bits_per_row[0]) { // Did not find a big enough package
         if (decoder->verbose) {
-			rtl433_fprintf(stderr, "Fineoffset_WH24: short package. Header index: %u\n", bit_offset);
+            rtl433_fprintf(stderr, "Fineoffset_WH24: short package. Header index: %u\n", bit_offset);
             bitbuffer_print(bitbuffer);
         }
         return 0;
@@ -191,7 +191,7 @@ static int fineoffset_WH24_callback(r_device *decoder, bitbuffer_t *bitbuffer, e
         for (unsigned n = 0; n < sizeof(b); n++) {
             sprintf(raw_str + n * 3, "%02x ", b[n]);
         }
-		rtl433_fprintf(stderr, "Fineoffset_WH24: Raw: %s @ bit_offset [%u]\n", raw_str, bit_offset);
+        rtl433_fprintf(stderr, "Fineoffset_WH24: Raw: %s @ bit_offset [%u]\n", raw_str, bit_offset);
     }
 
     if (b[0] != 0x24) // Check for family code 0x24
@@ -205,7 +205,7 @@ static int fineoffset_WH24_callback(r_device *decoder, bitbuffer_t *bitbuffer, e
     }
     if (crc != b[15] || checksum != b[16]) {
         if (decoder->verbose) {
-			rtl433_fprintf(stderr, "Fineoffset_WH24: Checksum error: %02x %02x\n", crc, checksum);
+            rtl433_fprintf(stderr, "Fineoffset_WH24: Checksum error: %02x %02x\n", crc, checksum);
         }
         return 0;
     }
@@ -322,7 +322,7 @@ static int fineoffset_WH25_callback(r_device *decoder, bitbuffer_t *bitbuffer, e
     bit_offset = bitbuffer_search(bitbuffer, 0, 320, preamble, sizeof(preamble) * 8) + sizeof(preamble) * 8; // Normal index is 367, skip some bytes to find faster
     if (bit_offset + sizeof(b) * 8 > bitbuffer->bits_per_row[0]) {  // Did not find a big enough package
         if (decoder->verbose) {
-			rtl433_fprintf(stderr, "Fineoffset_WH25: short package. Header index: %u\n", bit_offset);
+            rtl433_fprintf(stderr, "Fineoffset_WH25: short package. Header index: %u\n", bit_offset);
             bitbuffer_print(bitbuffer);
         }
         return 0;
@@ -332,7 +332,7 @@ static int fineoffset_WH25_callback(r_device *decoder, bitbuffer_t *bitbuffer, e
     if (decoder->verbose) {
         char raw_str[8 * 3 + 1];
         for (unsigned n=0; n<sizeof(b); n++) { sprintf(raw_str+n*3, "%02x ", b[n]); }
-		rtl433_fprintf(stderr, "Fineoffset_WH25: Raw: %s @ bit_offset [%u]\n", raw_str, bit_offset);
+        rtl433_fprintf(stderr, "Fineoffset_WH25: Raw: %s @ bit_offset [%u]\n", raw_str, bit_offset);
     }
 
     // Verify checksum
@@ -344,7 +344,7 @@ static int fineoffset_WH25_callback(r_device *decoder, bitbuffer_t *bitbuffer, e
     bitsum = (bitsum << 4) | (bitsum >> 4);     // Swap nibbles
     if (checksum != b[6] || bitsum != b[7]) {
         if (decoder->verbose) {
-			rtl433_fprintf(stderr, "Fineoffset_WH25: Checksum error: %02x %02x\n", checksum, bitsum);
+            rtl433_fprintf(stderr, "Fineoffset_WH25: Checksum error: %02x %02x\n", checksum, bitsum);
         }
         return 0;
     }
@@ -407,7 +407,7 @@ static int fineoffset_WH0530_callback(r_device *decoder, bitbuffer_t *bitbuffer,
     if (decoder->verbose) {
         char raw_str[8 * 3 + 1];
         for (unsigned n=0; n<sizeof(buffer); n++) { sprintf(raw_str + n * 3, "%02x ", buffer[n]); }
-		rtl433_fprintf(stderr, "Fineoffset_WH0530: Raw %s\n", raw_str);
+        rtl433_fprintf(stderr, "Fineoffset_WH0530: Raw %s\n", raw_str);
     }
 
     // Verify checksum
@@ -415,7 +415,7 @@ static int fineoffset_WH0530_callback(r_device *decoder, bitbuffer_t *bitbuffer,
     uint8_t checksum = buffer[0] + buffer[1] + buffer[2] + buffer[3] + buffer[4] + buffer[5] + buffer[6];
     if (crc != buffer[6] || checksum != buffer[7]) {
         if (decoder->verbose) {
-			rtl433_fprintf(stderr, "Fineoffset_WH0530: Checksum error: %02x %02x\n", crc, checksum);
+            rtl433_fprintf(stderr, "Fineoffset_WH0530: Checksum error: %02x %02x\n", crc, checksum);
         }
         return 0;
     }

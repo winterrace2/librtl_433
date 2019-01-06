@@ -31,8 +31,8 @@ ambient_weather_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext
 
     if (expected != calculated) {
         if (decoder->verbose) {
-			rtl433_fprintf(stderr, "Checksum error in Ambient Weather message.    Expected: %02x    Calculated: %02x\n", expected, calculated);
-			rtl433_fprintf(stderr, "Message: ");
+            rtl433_fprintf(stderr, "Checksum error in Ambient Weather message.    Expected: %02x    Calculated: %02x\n", expected, calculated);
+            rtl433_fprintf(stderr, "Message: ");
             bitrow_print(b, 48);
         }
         return 0;

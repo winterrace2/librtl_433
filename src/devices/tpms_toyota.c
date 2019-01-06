@@ -59,7 +59,7 @@ static int tpms_toyota_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdata
 
     if (pressure1 != pressure2) {
         if (decoder->verbose)
-			rtl433_fprintf(stderr, "Toyota TPMS pressure check error: %02x vs %02x\n", pressure1, pressure2);
+            rtl433_fprintf(stderr, "Toyota TPMS pressure check error: %02x vs %02x\n", pressure1, pressure2);
         return 0;
     }
 

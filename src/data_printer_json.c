@@ -90,7 +90,7 @@ data_output_t *data_output_json_create(FILE *file)
 {
 	data_output_t *output = calloc(1, sizeof(data_output_t));
     if (!output) {
-		rtl433_fprintf(stderr, "calloc() failed");
+        rtl433_fprintf(stderr, "calloc() failed");
         return NULL;
     }
 

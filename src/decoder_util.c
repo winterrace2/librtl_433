@@ -77,7 +77,7 @@ void bitrow_printf(bitrow_t const bitrow, unsigned bit_len, char const *restrict
     else strcpy(buf, "bitbuffer_printf: internal error.");
     va_end(ap);
 
-	rtl433_fprintf(stderr, printbuf);
+    rtl433_fprintf(stderr, printbuf);
     bitrow_print(bitrow, bit_len);
     if (need_more_mem) free(buf);
 }
@@ -180,14 +180,14 @@ static char *bitrow_print_bits(bitrow_t const bitrow, unsigned bit_len)
     }
     *p++ = '\0';
 
-     return row_bits;
+    return row_bits;
 }
 
 void decoder_output_bitbuffer(r_device *decoder, bitbuffer_t const *bitbuffer, char const *msg, extdata_t *ext)
 {
     data_t *data;
     char *row_codes[BITBUF_ROWS];
-	char *row_bits[BITBUF_ROWS] = {0};
+    char *row_bits[BITBUF_ROWS] = {0};
     char row_bytes[BITBUF_COLS * 2 + 1];
     unsigned i;
 
@@ -273,7 +273,7 @@ void decoder_output_bitrow(r_device *decoder, bitrow_t const bitrow, unsigned bi
 {
     data_t *data;
     char *row_code;
-	char *row_bits = NULL;
+    char *row_bits = NULL;
     char row_bytes[BITBUF_COLS * 2 + 1];
 
     row_bytes[0] = '\0';
@@ -298,10 +298,10 @@ void decoder_output_bitrow(r_device *decoder, bitrow_t const bitrow, unsigned bi
         data_append(data,
                 "bits", "", DATA_STRING, row_bits,
                 NULL);
-	}
+    }
 
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 
-	free(row_code);
+    free(row_code);
     free(row_bits);
 }

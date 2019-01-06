@@ -77,7 +77,7 @@ static int danfoss_cfr_callback(r_device *decoder, bitbuffer_t *bitbuffer, extda
 		unsigned bit_offset = bitbuffer_search(bitbuffer, 0, 112, HEADER, sizeof(HEADER)*8);	// Normal index is 128, skip first 14 bytes to find faster
 		if (bits-bit_offset < 126) {	// Package should be at least 126 bits
 			if (decoder->verbose) {
-				rtl433_fprintf(stderr, "Danfoss: short package. Header index: %u\n", bit_offset);
+                rtl433_fprintf(stderr, "Danfoss: short package. Header index: %u\n", bit_offset);
 				bitbuffer_print(bitbuffer);
 			}
 			return 0;
@@ -90,7 +90,7 @@ static int danfoss_cfr_callback(r_device *decoder, bitbuffer_t *bitbuffer, extda
 			uint8_t nibble_l = danfoss_decode_nibble(bitrow_get_byte(bitbuffer->bb[0], n*12+bit_offset+6) >> 2);
 			if (nibble_h > 0xF || nibble_l > 0xF) {
 				if (decoder->verbose) {
-					rtl433_fprintf(stderr, "Danfoss: 6b/4b decoding error\n");
+                    rtl433_fprintf(stderr, "Danfoss: 6b/4b decoding error\n");
 					bitbuffer_print(bitbuffer);
 				}
 				return 0;
@@ -104,7 +104,7 @@ static int danfoss_cfr_callback(r_device *decoder, bitbuffer_t *bitbuffer, extda
 			for (unsigned n=0; n<NUM_BYTES; ++n) {
 				sprintf(str_raw+n*2, "%02X", bytes[n]);
 			}
-			rtl433_fprintf(stderr, "Danfoss: Raw 6b/4b decoded = %s\n", str_raw);
+            rtl433_fprintf(stderr, "Danfoss: Raw 6b/4b decoded = %s\n", str_raw);
 		}
 
 		// Validate Prefix and CRC

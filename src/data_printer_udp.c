@@ -63,8 +63,8 @@
   static void ws2_perror (const char *str)
   {
     if (str && *str)
-		rtl433_fprintf(stderr, "%s: ", str);
-	rtl433_fprintf(stderr, "Winsock error %d.\n", WSAGetLastError());
+        rtl433_fprintf(stderr, "%s: ", str);
+    rtl433_fprintf(stderr, "Winsock error %d.\n", WSAGetLastError());
   }
 #endif
 
@@ -92,7 +92,7 @@ static int datagram_client_open(datagram_client_t *client, const char *host, con
     hints.ai_flags = AI_ADDRCONFIG;
     error = getaddrinfo(host, port, &hints, &res0);
     if (error) {
-		rtl433_fprintf(stderr, "%s\n", gai_strerror(error));
+        rtl433_fprintf(stderr, "%s\n", gai_strerror(error));
         return -1;
     }
     sock = INVALID_SOCKET;
@@ -279,7 +279,7 @@ data_output_t *data_output_syslog_create(const char *host, const char *port)
 {
     data_output_syslog_t *syslog = calloc(1, sizeof(data_output_syslog_t));
     if (!syslog) {
-		rtl433_fprintf(stderr, "calloc() failed");
+        rtl433_fprintf(stderr, "calloc() failed");
         return NULL;
     }
 #ifdef _WIN32

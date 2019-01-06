@@ -336,6 +336,6 @@ int main(int argc, char **argv)
     assert_file_type(S16_FM, ".s16_fm");
     assert_file_type(S16_FM, ".s16,fm");
 
-	rtl433_fprintf(stderr, "\nDone!\n");
+    rtl433_fprintf(stderr, "\nDone!\n");
 }
 #endif /* _TEST */

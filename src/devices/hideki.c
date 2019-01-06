@@ -63,7 +63,7 @@ static int hideki_ts04_callback(r_device *decoder, bitbuffer_t *bitbuffer, extda
         uint8_t parity = (b[i+offset+1] >> (7 - i%8)) & 1;
         if (parity != parity8(packet[i])) {
             if (decoder->verbose)
-				rtl433_fprintf(stderr, "%s: Parity error at %d\n", __func__, i);
+                rtl433_fprintf(stderr, "%s: Parity error at %d\n", __func__, i);
             return 0;
         }
     }
@@ -72,14 +72,14 @@ static int hideki_ts04_callback(r_device *decoder, bitbuffer_t *bitbuffer, extda
     chk = xor_bytes(&packet[1], unstuffed_len - 2);
     if (chk) {
         if (decoder->verbose)
-			rtl433_fprintf(stderr, "%s: XOR error\n", __func__);
+            rtl433_fprintf(stderr, "%s: XOR error\n", __func__);
         return 0;
     }
 
     // CRC-8 poly=0x07 init=0x00
     if (crc8(&packet[1], unstuffed_len - 1, 0x07, 0x00)) {
         if (decoder->verbose)
-			rtl433_fprintf(stderr, "%s: CRC error\n", __func__);
+            rtl433_fprintf(stderr, "%s: CRC error\n", __func__);
         return 0;
     }
 
@@ -100,7 +100,7 @@ static int hideki_ts04_callback(r_device *decoder, bitbuffer_t *bitbuffer, extda
 
     if (pkt_len +3 != unstuffed_len) {
         if (decoder->verbose)
-			rtl433_fprintf(stderr, "%s: LEN error\n", __func__);
+            rtl433_fprintf(stderr, "%s: LEN error\n", __func__);
         return 0;
     }
 

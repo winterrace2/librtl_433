@@ -76,7 +76,7 @@ void am_analyze(am_analyze_t *a, int16_t *am_buf, unsigned n_samples, int debug_
                 a->signal_pulse_counter++;
                 if (a->signal_pulse_counter >= PULSE_DATA_SIZE) {
                     a->signal_pulse_counter = 0;
-					rtl433_fprintf(stderr, "To many pulses detected, probably bad input data or input parameters\n");
+                    rtl433_fprintf(stderr, "To many pulses detected, probably bad input data or input parameters\n");
                     return;
                 }
             }
@@ -85,16 +85,16 @@ void am_analyze(am_analyze_t *a, int16_t *am_buf, unsigned n_samples, int debug_
                 unsigned padded_start = a->signal_start - FRAME_PAD;
                 unsigned padded_end   = a->counter - FRAME_END_MIN + FRAME_PAD;
                 unsigned padded_len   = padded_end - padded_start;
-				rtl433_fprintf(stderr, "*** signal_start = %d, signal_end = %d, signal_len = %d, pulses_found = %d\n",
+                rtl433_fprintf(stderr, "*** signal_start = %d, signal_end = %d, signal_len = %d, pulses_found = %d\n",
                         padded_start, padded_end, padded_len, a->pulses_found);
 
-				am_analyze_classify(a); // clears signal_pulse_data
-				a->pulses_found = 0;
+                am_analyze_classify(a); // clears signal_pulse_data
+                a->pulses_found = 0;
 
 /*              if (g) {
                     samp_grab_write(g, padded_len, n_samples - i - 1, path_sigdmp, ovr_ok);
                 }*/
-				a->signal_start = 0;
+                a->signal_start = 0;
             }
         }
     }
@@ -158,7 +158,7 @@ void am_analyze_classify(am_analyze_t *aa)
         max = max_new;
         t = (min + max) / 2;
 
-		rtl433_fprintf(stderr, "Iteration %d. t: %d    min: %d (%d)    max: %d (%d)    delta %d\n", k, t, min, count_min, max, count_max, delta);
+        rtl433_fprintf(stderr, "Iteration %d. t: %d    min: %d (%d)    max: %d (%d)    delta %d\n", k, t, min, count_min, max, count_max, delta);
         k++;
     }
 
@@ -169,10 +169,10 @@ void am_analyze_classify(am_analyze_t *aa)
     }
     /* 50% decision limit */
     if (min != 0 && max / min > 1) {
-		rtl433_fprintf(stderr, "Pulse coding: Short pulse length %d - Long pulse length %d\n", min, max);
+        rtl433_fprintf(stderr, "Pulse coding: Short pulse length %d - Long pulse length %d\n", min, max);
         signal_type = 2;
     } else {
-		rtl433_fprintf(stderr, "Distance coding: Pulse length %d\n", (min + max) / 2);
+        rtl433_fprintf(stderr, "Distance coding: Pulse length %d\n", (min + max) / 2);
         signal_type = 1;
     }
     p_limit = (max + min) / 2;
@@ -269,8 +269,8 @@ void am_analyze_classify(am_analyze_t *aa)
         a[1] = aa->override_long;
     }
 
-	rtl433_fprintf(stderr, "\nShort distance: %d, long distance: %d, packet distance: %d\n", a[0], a[1], a[2]);
-	rtl433_fprintf(stderr, "\np_limit: %d\n", p_limit);
+    rtl433_fprintf(stderr, "\nShort distance: %d, long distance: %d, packet distance: %d\n", a[0], a[1], a[2]);
+    rtl433_fprintf(stderr, "\np_limit: %d\n", p_limit);
 
     bitbuffer_clear(&bits);
     if (signal_type == 1) {
@@ -313,7 +313,7 @@ void am_analyze_classify(am_analyze_t *aa)
         bitbuffer_print(&bits);
     }
 
-	// clear signal_pulse_data
-	aa->signal_pulse_counter = 0; 
+    // clear signal_pulse_data
+    aa->signal_pulse_counter = 0; 
 }
 

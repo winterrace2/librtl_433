@@ -441,7 +441,7 @@ static int oregon_scientific_v2_1_parser(r_device *decoder, bitbuffer_t *bitbuff
     } else {
       if (decoder->verbose) {
         rtl433_fprintf(stdout, "\nPossible Oregon Scientific v2.1 message, but sync nibble wasn't found\n");
-		rtl433_fprintf(stdout, "Raw Data: ");
+        rtl433_fprintf(stdout, "Raw Data: ");
 		bitrow_print(bb[0], bitbuffer->bits_per_row[0]);
       }
     }

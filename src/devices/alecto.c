@@ -68,12 +68,12 @@ int alecto_checksum(r_device *decoder, bitrow_t *bb) {
     if (csum != (bb[1][4] >> 4) || csum2 != (bb[5][4] >> 4)) {
         //rtl433_fprintf(stdout, "\nAlectoV1 CRC error");
         if(decoder->verbose) {
-			rtl433_fprintf(stderr, "AlectoV1 Checksum/Parity error\n");
+            rtl433_fprintf(stderr, "AlectoV1 Checksum/Parity error\n");
         }
         return 0;
     } //Invalid checksum
     if (decoder->verbose){
-		rtl433_fprintf(stdout, "Checksum      = %01x (calculated %01x)\n", bb[1][4] >> 4, csum);
+        rtl433_fprintf(stdout, "Checksum      = %01x (calculated %01x)\n", bb[1][4] >> 4, csum);
     }
 
     return 1;
@@ -180,10 +180,10 @@ static int alectov1_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_
             decoder_output_data(decoder, data, ext);
         }
         if (decoder->verbose){
-			rtl433_fprintf(stdout, "Received Data = ");
+            rtl433_fprintf(stdout, "Received Data = ");
             bitrow_print(bb[1], 40);
             if (wind) {
-				rtl433_fprintf(stdout, "Rcvd Data 2   = ");
+                rtl433_fprintf(stdout, "Rcvd Data 2   = ");
                 bitrow_print(bb[5], 40);
             }
             /*

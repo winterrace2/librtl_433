@@ -33,19 +33,19 @@ static int cardin_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t 
 				(bb[0][2] & 0x0f) == 6) ) {
 
 /*
-		rtl433_fprintf(stdout, "------------------------------\n");
-		rtl433_fprintf(stdout, "protocol       = Cardin S466\n");
-		rtl433_fprintf(stdout, "message        = ");
+        rtl433_fprintf(stdout, "------------------------------\n");
+        rtl433_fprintf(stdout, "protocol       = Cardin S466\n");
+        rtl433_fprintf(stdout, "message        = ");
 		for (i=0 ; i<3 ; i++) {
 			for (k = 7; k >= 0; k--) {
 				if (bb[0][i] & 1 << k)
-					rtl433_fprintf(stdout, "1");
+                    rtl433_fprintf(stdout, "1");
 				else
-					rtl433_fprintf(stdout, "0");
+                    rtl433_fprintf(stdout, "0");
 			}
-			rtl433_fprintf(stdout, " ");
+            rtl433_fprintf(stdout, " ");
 		}
-		rtl433_fprintf(stdout, "\n\n");
+        rtl433_fprintf(stdout, "\n\n");
 */
 
 		// Dip 1

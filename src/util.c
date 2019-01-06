@@ -270,12 +270,12 @@ char *getkwargs(char **s, char **key, char **val)
 // Unit testing
 #ifdef _TEST
 int main(int argc, char **argv) {
-	rtl433_fprintf(stderr, "util:: test\n");
+    rtl433_fprintf(stderr, "util:: test\n");
 
     uint8_t msg[] = {0x08, 0x0a, 0xe8, 0x80};
 
-	rtl433_fprintf(stderr, "util::crc8(): odd parity:  %02X\n", crc8(msg, 3, 0x80, 0x00));
-	rtl433_fprintf(stderr, "util::crc8(): even parity: %02X\n", crc8(msg, 4, 0x80, 0x00));
+    rtl433_fprintf(stderr, "util::crc8(): odd parity:  %02X\n", crc8(msg, 3, 0x80, 0x00));
+    rtl433_fprintf(stderr, "util::crc8(): even parity: %02X\n", crc8(msg, 4, 0x80, 0x00));
 
     return 0;
 }

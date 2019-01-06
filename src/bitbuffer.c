@@ -211,24 +211,24 @@ static void print_bitrow(bitrow_t const bitrow, unsigned bit_len, unsigned highe
 {
     unsigned row_len = 0;
 
-	rtl433_fprintf(stderr, "{%2d} ", bit_len);
+    rtl433_fprintf(stderr, "{%2d} ", bit_len);
     for (unsigned col = 0; col < (bit_len + 7) / 8; ++col) {
         row_len += rtl433_fprintf(stderr, "%02x ", bitrow[col]);
     }
     // Print binary values also?
     if (always_binary || bit_len <= BITBUF_MAX_PRINT_BITS) {
-		rtl433_fprintf(stderr, "%-*s: ", highest_indent > row_len ? highest_indent - row_len : 0, "");
+        rtl433_fprintf(stderr, "%-*s: ", highest_indent > row_len ? highest_indent - row_len : 0, "");
         for (unsigned bit = 0; bit < bit_len; ++bit) {
             if (bitrow[bit / 8] & (0x80 >> (bit % 8))) {
-				rtl433_fprintf(stderr, "1");
+                rtl433_fprintf(stderr, "1");
             } else {
-				rtl433_fprintf(stderr, "0");
+                rtl433_fprintf(stderr, "0");
             }
             if ((bit % 8) == 7) // Add byte separators
-				rtl433_fprintf(stderr, " ");
+                rtl433_fprintf(stderr, " ");
         }
     }
-	rtl433_fprintf(stderr, "\n");
+    rtl433_fprintf(stderr, "\n");
 }
 
 static void print_bitbuffer(const bitbuffer_t *bits, int always_binary)
@@ -248,13 +248,13 @@ static void print_bitbuffer(const bitbuffer_t *bits, int always_binary)
             highest_indent = indent_this_row;
     }
 
-	rtl433_fprintf(stderr, "bitbuffer:: Number of rows: %d \n", bits->num_rows);
+    rtl433_fprintf(stderr, "bitbuffer:: Number of rows: %d \n", bits->num_rows);
     for (row = 0; row < bits->num_rows; ++row) {
-		rtl433_fprintf(stderr, "[%02d] ", row);
+        rtl433_fprintf(stderr, "[%02d] ", row);
         print_bitrow(bits->bb[row], bits->bits_per_row[row], highest_indent, always_binary);
     }
     if (bits->num_rows >= BITBUF_ROWS) {
-		rtl433_fprintf(stderr, "... Maximum number of rows reached. Message is likely truncated.\n");
+        rtl433_fprintf(stderr, "... Maximum number of rows reached. Message is likely truncated.\n");
     }
 }
 

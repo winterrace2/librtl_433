@@ -84,7 +84,7 @@ static int thermopro_tp12_sensor_callback(r_device *decoder, bitbuffer_t *bitbuf
 
         // This format is easily usable by bruteforce-crc, after piping through | grep raw_data | cut -d':' -f2 
         // bruteforce-crc didn't find anything, though - this may not be a CRC algorithm specifically.
-		rtl433_fprintf(stderr, "thermopro_tp12_raw_data:");
+        rtl433_fprintf(stderr, "thermopro_tp12_raw_data:");
         bitrow_print(bytes, 40);
     }
 

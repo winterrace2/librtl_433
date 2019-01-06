@@ -76,7 +76,7 @@ static int efergy_optical_callback(r_device *decoder, bitbuffer_t *bitbuffer, ex
 
     if (crc != csum1) {
         if (decoder->verbose)
-			rtl433_fprintf(stderr, "%s: CRC error.\n", __func__);
+            rtl433_fprintf(stderr, "%s: CRC error.\n", __func__);
         return 0;
     }
 

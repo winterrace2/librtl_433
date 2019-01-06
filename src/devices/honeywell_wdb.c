@@ -63,7 +63,7 @@ static int honeywell_wdb_callback(r_device *decoder, bitbuffer_t *bitbuffer, ext
     if (parity) { // ODD parity detected
         if (decoder->verbose > 1) {
             bitbuffer_print(bitbuffer);
-			rtl433_fprintf(stderr, "honeywell_wdb: Parity check on row %d failed (%d)\n", row, parity);
+            rtl433_fprintf(stderr, "honeywell_wdb: Parity check on row %d failed (%d)\n", row, parity);
         }
         return 0;
     }

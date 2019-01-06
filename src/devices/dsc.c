@@ -118,7 +118,7 @@ static int dsc_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ex
               (b[3] & 0x02) &&
               (b[4] & 0x01))) {
             if (decoder->verbose > 1) {
-				rtl433_fprintf(stderr, "DSC Invalid start/sync bits ");
+                rtl433_fprintf(stderr, "DSC Invalid start/sync bits ");
 				bitrow_print(b, 40);
             }
             continue;
@@ -132,7 +132,7 @@ static int dsc_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ex
 
         // XXX change to decoder->verbose
 		if (decoder->verbose) {
-			rtl433_fprintf(stderr, "DSC Contact Raw Data: ");
+            rtl433_fprintf(stderr, "DSC Contact Raw Data: ");
 			bitrow_print(bytes, 40);
 		}
 

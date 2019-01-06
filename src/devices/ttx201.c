@@ -105,11 +105,11 @@ ttx201_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned row, unsigned 
         if (decoder->verbose > 1) {
             if (row == 0) {
                 if (bits < MSG_PREAMBLE_BITS) {
-					rtl433_fprintf(stderr, "Short preamble: %d bits (expected %d)\n",
+                    rtl433_fprintf(stderr, "Short preamble: %d bits (expected %d)\n",
                                  bits, MSG_PREAMBLE_BITS);
                 }
             } else if (row != (unsigned)bitbuffer->num_rows - 1 && bits == 1) {
-				rtl433_fprintf(stderr, "Wrong packet #%d length: %d bits (expected %d)\n",
+                rtl433_fprintf(stderr, "Wrong packet #%d length: %d bits (expected %d)\n",
                              row, bits, MSG_PACKET_BITS);
             }
         }
@@ -124,11 +124,11 @@ ttx201_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned row, unsigned 
     postmark = b[5];
 
     if (decoder->verbose > 1){
-		rtl433_fprintf(stderr, "TTX201 received raw data: ");
+        rtl433_fprintf(stderr, "TTX201 received raw data: ");
 		bitbuffer_print(bitbuffer);
-		rtl433_fprintf(stderr, "Data decoded:\n" \
+        rtl433_fprintf(stderr, "Data decoded:\n" \
 			" r  cs    K   ID    S   B  C  X    T    M     J\n");
-		rtl433_fprintf(stderr, "%2d  %2d    %2d  %3d  0x%01x  %1d  %1d  %1d  %4d  0x%02x",
+        rtl433_fprintf(stderr, "%2d  %2d    %2d  %3d  0x%01x  %1d  %1d  %1d  %4d  0x%02x",
                 row,
                 checksum_calculated,
                 checksum,
@@ -140,21 +140,21 @@ ttx201_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned row, unsigned 
                 ((int8_t)((b[3] & 0x0f) << 4) << 4) | b[4], // Temperature
                 postmark);
         if (bits == MSG_PACKET_BITS) {
-			rtl433_fprintf(stderr, "  0x%01x", b[6] >> 4);         // Packet separator
+            rtl433_fprintf(stderr, "  0x%01x", b[6] >> 4);         // Packet separator
         }
-		rtl433_fprintf(stderr, "\n");
+        rtl433_fprintf(stderr, "\n");
     }
 
     if (postmark != MSG_PACKET_POSTMARK) {
 		if (decoder->verbose > 1)
-			rtl433_fprintf(stderr, "Packet #%d wrong postmark 0x%02x (expected 0x%02x).\n",
+            rtl433_fprintf(stderr, "Packet #%d wrong postmark 0x%02x (expected 0x%02x).\n",
 				row, postmark, MSG_PACKET_POSTMARK);
 		return 0;
 	}
 
 	if (checksum != checksum_calculated) {
 		if (decoder->verbose > 1)
-			rtl433_fprintf(stderr, "Packet #%d checksum error.\n", row);
+            rtl433_fprintf(stderr, "Packet #%d checksum error.\n", row);
 		return 0;
 	}
     

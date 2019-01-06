@@ -46,7 +46,7 @@ static int tpms_pmv107j_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdat
 	b[0] = packet_bits.bb[0][0] >> 6;
 	bitbuffer_extract_bytes(&packet_bits, 0, 2, b + 1, 64);
 	if (decoder->verbose > 1) {
-		rtl433_fprintf(stderr, "Realigned: ");
+        rtl433_fprintf(stderr, "Realigned: ");
 		bitrow_print(b, 72);
 	}
 

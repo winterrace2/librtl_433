@@ -176,7 +176,7 @@ static void data_output_csv_free(data_output_t *output){
 data_output_t *data_output_csv_create(FILE *file){
     data_output_csv_t *csv = calloc(1, sizeof(data_output_csv_t));
     if (!csv) {
-		rtl433_fprintf(stderr, "calloc() failed");
+        rtl433_fprintf(stderr, "calloc() failed");
         return NULL;
     }
 

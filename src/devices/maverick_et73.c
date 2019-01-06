@@ -66,7 +66,7 @@ static int maverick_et73_sensor_callback(r_device *decoder, bitbuffer_t *bitbuff
     device = bytes[0];
 
     if (decoder->verbose) {
-		rtl433_fprintf(stderr, "maverick_et73_raw_data:");
+        rtl433_fprintf(stderr, "maverick_et73_raw_data:");
         bitrow_print(bytes, 48);
     }
 

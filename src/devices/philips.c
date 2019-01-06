@@ -74,7 +74,7 @@ static int philips_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t
     /* Correct bit length? */
     if (bitbuffer->bits_per_row[0] != PHILIPS_BITLEN) {
         if (decoder->verbose > 1) {
-			rtl433_fprintf(stderr, "%s: wrong number of bits (%d)\n",
+            rtl433_fprintf(stderr, "%s: wrong number of bits (%d)\n",
                     __func__, bitbuffer->bits_per_row[0]);
         }
         return 0;
@@ -85,7 +85,7 @@ static int philips_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t
     /* Correct start sequence? */
     if ((bb[0] >> 4) != PHILIPS_STARTNIBBLE) {
         if (decoder->verbose > 1) {
-			rtl433_fprintf(stderr, "%s: wrong start nibble\n", __func__);
+            rtl433_fprintf(stderr, "%s: wrong start nibble\n", __func__);
         }
         return 0;
     }
@@ -101,7 +101,7 @@ static int philips_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t
 
     /* If debug enabled, print the combined majority-wins packet */
     if (decoder->verbose > 1) {
-		rtl433_fprintf(stderr, "%s: combined packet = ", __func__);
+        rtl433_fprintf(stderr, "%s: combined packet = ", __func__);
 		bitrow_print(packet, PHILIPS_PACKETLEN * 8);
 	}
 
@@ -109,7 +109,7 @@ static int philips_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t
     c_crc = crc4(packet, PHILIPS_PACKETLEN, 0x9, 1); /* Including the CRC nibble */
     if (0 != c_crc) {
         if (decoder->verbose) {
-			rtl433_fprintf(stderr, "%s: CRC failed, calculated %x\n",
+            rtl433_fprintf(stderr, "%s: CRC failed, calculated %x\n",
                     __func__, c_crc);
         }
         return 0;

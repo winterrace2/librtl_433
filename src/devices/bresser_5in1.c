@@ -57,7 +57,7 @@ static int bresser_5in1_callback(r_device *decoder, bitbuffer_t *bitbuffer, extd
             || bitbuffer->bits_per_row[0] < 248
             || bitbuffer->bits_per_row[0] > 440) {
         if (decoder->verbose > 1) {
-			rtl433_fprintf(stderr, "%s bit_per_row %u out of range\n", __func__, bitbuffer->bits_per_row[0]);
+            rtl433_fprintf(stderr, "%s bit_per_row %u out of range\n", __func__, bitbuffer->bits_per_row[0]);
         }
         return 0; // Unrecognized data
     }
@@ -72,7 +72,7 @@ static int bresser_5in1_callback(r_device *decoder, bitbuffer_t *bitbuffer, extd
     len = bitbuffer->bits_per_row[0] - start_pos;
     if (((len + 7) / 8) < sizeof (msg)) {
         if (decoder->verbose > 1) {
-			rtl433_fprintf(stderr, "%s %u too short\n", __func__, len);
+            rtl433_fprintf(stderr, "%s %u too short\n", __func__, len);
         }
         return 0; // message too short
     }
@@ -85,7 +85,7 @@ static int bresser_5in1_callback(r_device *decoder, bitbuffer_t *bitbuffer, extd
     for (unsigned col = 0; col < sizeof (msg) / 2; ++col) {
         if ((msg[col] ^ msg[col + 13]) != 0xff) {
             if (decoder->verbose > 1) {
-				rtl433_fprintf(stderr, "%s Parity wrong at %u\n", __func__, col);
+                rtl433_fprintf(stderr, "%s Parity wrong at %u\n", __func__, col);
             }
             return 0; // message isn't correct
         }

@@ -69,7 +69,7 @@ static int radiohead_ask_extract(r_device *decoder, bitbuffer_t *bitbuffer, uint
     pos = bitbuffer_search(bitbuffer, row, 0, init_pattern, init_pattern_len);
     if (pos == len) {
         if (decoder->verbose > 1) {
-			rtl433_fprintf(stdout, "RH ASK preamble not found\n");
+            rtl433_fprintf(stdout, "RH ASK preamble not found\n");
         }
         return 0;
     }

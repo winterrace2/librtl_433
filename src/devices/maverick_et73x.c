@@ -75,7 +75,7 @@ static int maverick_et73x_callback(r_device *decoder, bitbuffer_t *bitbuffer, ex
     int id = lfsr_digest16(chk_data, 24, 0x8810, 0xdd38) ^ digest;
 
     if (decoder->verbose)
-		rtl433_fprintf(stderr, "%s: pre %03x, flags %0x, t1 %d, t2 %d, digest %04x, chk_data %06x, digest xor'ed: %04x\n",
+        rtl433_fprintf(stderr, "%s: pre %03x, flags %0x, t1 %d, t2 %d, digest %04x, chk_data %06x, digest xor'ed: %04x\n",
                 __func__, pre, flags, temp1, temp2, digest, chk_data, id);
 
     data = data_make(
