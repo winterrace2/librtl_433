@@ -61,7 +61,7 @@ static int lacrossews_detect(r_device *decoder, uint8_t *pRow, uint8_t *msg_nybb
 			msg_nybbles[8] == (~msg_nybbles[11] & 0xF) &&
 			(parity & 0x1) == 0x1 &&
 			checksum == msg_nybbles[12])
-			return 1;
+            return 1;
 		else {
             if (decoder->verbose) {
             rtl433_fprintf(stdout,

@@ -123,8 +123,8 @@ r_device ambientweather_tx8300 = {
     .short_width   = 2000,
     .long_width    = 4000,
     .gap_limit     = 6500,
-	.reset_limit   = 8000,
-    .decode_fn = &ambientweather_tx8300_callback,
+    .reset_limit   = 8000,
+    .decode_fn     = &ambientweather_tx8300_callback,
     .disabled      = 0,
     .fields        = output_fields
 };

@@ -106,7 +106,7 @@ r_device ambient_weather = {
     .short_width   = 500,
     .long_width    = 0, // not used
     .reset_limit   = 2400,
-    .decode_fn = &ambient_weather_callback,
+    .decode_fn     = &ambient_weather_callback,
     .disabled      = 0,
     .fields        = output_fields
 };

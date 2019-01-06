@@ -48,7 +48,7 @@ E: ?
 		NULL);
     decoder_output_data(decoder, data, ext);
 
-	return 1;
+    return 1;
 
 }
 

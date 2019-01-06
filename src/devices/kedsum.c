@@ -81,7 +81,7 @@ static int kedsum_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t 
             "humidity",      "Humidity",    DATA_FORMAT, "%u %%", DATA_INT, humidity,
             NULL);
     decoder_output_data(decoder, data, ext);
-	return 1;
+    return 1;
 }
 
 static char *output_fields[] = {

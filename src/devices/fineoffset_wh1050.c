@@ -172,7 +172,7 @@ static int fineoffset_wh1050_callback(r_device *decoder, bitbuffer_t *bitbuffer,
 	        "mic",           "Integrity",    DATA_STRING,    "CRC",
             NULL);
     decoder_output_data(decoder, data, ext);
-	return 1;
+    return 1;
 }
 
 static char *output_fields[] = {

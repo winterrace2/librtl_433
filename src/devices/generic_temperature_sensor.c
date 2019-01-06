@@ -47,7 +47,7 @@ static int generic_temperature_sensor_callback(r_device *decoder, bitbuffer_t *b
 			NULL);
     decoder_output_data(decoder, data, ext);
 
-	return 1;
+    return 1;
 }
 
 static char *output_fields[] = {

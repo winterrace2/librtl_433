@@ -88,7 +88,7 @@ static int tpms_pmv107j_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdat
         NULL);
 
     decoder_output_data(decoder, data, ext);
-	return 1;
+    return 1;
 }
 
 static int tpms_pmv107j_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {

@@ -49,7 +49,7 @@ static int generic_motion_callback(r_device *decoder, bitbuffer_t *bitbuffer, ex
                 NULL);
 
         decoder_output_data(decoder, data, ext);
-		return 1;
+        return 1;
     }
     return 0;
 }

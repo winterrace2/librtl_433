@@ -37,7 +37,7 @@ static int blyss_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *
 
         data = data_make(
                 "model",	"", DATA_STRING, "Blyss-DC5ukwh",
-                "id",    	"", DATA_STRING, id_str,
+                "id",       "", DATA_STRING, id_str,
                 NULL);
         decoder_output_data(decoder, data, ext);
 

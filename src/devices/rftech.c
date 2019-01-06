@@ -62,7 +62,7 @@ static int rftech_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t 
 
     decoder_output_data(decoder, data, ext);
 
-	return 1;
+    return 1;
 }
 
 static char *csv_output_fields[] = {

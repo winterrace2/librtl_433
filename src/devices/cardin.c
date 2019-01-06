@@ -111,7 +111,7 @@ static int cardin_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t 
 
         decoder_output_data(decoder, data, ext);
 
-		return 1;
+        return 1;
 	}
 	return 0;
 }

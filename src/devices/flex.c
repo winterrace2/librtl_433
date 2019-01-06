@@ -398,7 +398,7 @@ static int parse_getter(const char *arg, struct flex_get *getter)
         rtl433_fprintf(stderr, "parse_getter() bit_offset: %d bit_count: %d mask: %lx name: %s\n",
                 getter->bit_offset, getter->bit_count, getter->mask, getter->name);
     */
-	return 1;
+    return 1;
 }
 
 static char *strip_ws(char *str)

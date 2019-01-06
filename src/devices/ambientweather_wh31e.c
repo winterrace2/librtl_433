@@ -97,7 +97,7 @@ static int ambientweather_wh31e_callback(r_device *decoder, bitbuffer_t *bitbuff
                 NULL);
         /* clang-format on */
         decoder_output_data(decoder, data, ext);
-		events++;
+        events++;
     }
     return events;
 }

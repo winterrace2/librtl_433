@@ -95,7 +95,7 @@ static int steelmate_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata
 			NULL);
         decoder_output_data(decoder, data, ext);
 
-		return 1;
+        return 1;
 	}
 
 	//Was not a Steelmate TPMS after all

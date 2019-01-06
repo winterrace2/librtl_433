@@ -48,7 +48,7 @@ static int current_cost_callback(r_device *decoder, bitbuffer_t *bitbuffer, extd
                 //"battery",       "Battery",       DATA_STRING, battery_low ? "LOW" : "OK", //TODO is there some low battery indicator ?
                 NULL);
         decoder_output_data(decoder, data, ext);
-		return 1;
+        return 1;
     }
     // Counter (packet[0] = 0100xxxx) bits 5 and 4 are "unknown", but always 0 to date.
     else if(packet_bits.bits_per_row[0] >= 56 && ((packet[0] & 0xf0) == 64) ){

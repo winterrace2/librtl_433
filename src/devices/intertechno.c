@@ -51,7 +51,7 @@ static int intertechno_callback(r_device *decoder, bitbuffer_t *bitbuffer, extda
         NULL);
 
     decoder_output_data(decoder, data, ext);
-	return 1;
+    return 1;
 }
 
 static char *output_fields[] = {

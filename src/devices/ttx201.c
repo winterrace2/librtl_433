@@ -174,7 +174,7 @@ ttx201_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned row, unsigned 
             NULL);
     decoder_output_data(decoder, data, ext);
 
-	return 1;
+    return 1;
 }
 
 static int

@@ -120,7 +120,7 @@ static int ge_coloreffects_decode(r_device *decoder, bitbuffer_t *bitbuffer, ext
         NULL);
 
     decoder_output_data(decoder, data, ext);
-	return 1;
+    return 1;
 
 }
 

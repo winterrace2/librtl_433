@@ -128,7 +128,7 @@ static int oregon_scientific_sl109h_callback(r_device *decoder, bitbuffer_t *bit
                          "mic",           "Integrity",   DATA_STRING, "CHECKSUM",
                          NULL);
         decoder_output_data(decoder, data, ext);
-		return 1;
+        return 1;
     }
 
     return 0;
