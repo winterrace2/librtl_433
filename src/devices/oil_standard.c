@@ -79,7 +79,7 @@ static int oil_standard_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdat
             "binding_countdown", "", DATA_INT, binding_countdown,
             "depth_cm", "", DATA_INT, depth,
             NULL);
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

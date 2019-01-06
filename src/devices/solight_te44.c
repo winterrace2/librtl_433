@@ -79,7 +79,7 @@ static int solight_te44_callback(r_device *decoder, bitbuffer_t *bitbuffer, extd
             "temperature_C", "Temperature", DATA_FORMAT, "%.02f C", DATA_DOUBLE, temperature,
             "mic",           "Integrity",   DATA_STRING, "CRC",
             NULL);
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

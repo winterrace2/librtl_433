@@ -56,7 +56,7 @@ static int tpms_ford_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t
         "mic",          "",     DATA_STRING, "CHECKSUM",
         NULL);
 
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 	return 1;
 }
 

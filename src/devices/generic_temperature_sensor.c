@@ -45,7 +45,7 @@ static int generic_temperature_sensor_callback(r_device *decoder, bitbuffer_t *b
 			"temperature_C",	"Temperature",		DATA_FORMAT, 	"%.02f C",	DATA_DOUBLE,	fTemp,
 			"battery",      	"Battery?",		DATA_INT,					battery,
 			NULL);
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 
 	return 1;
 }

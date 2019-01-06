@@ -93,7 +93,7 @@ static int steelmate_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata
 			"battery_mV", "", DATA_INT, battery_mV,
 			"mic", "Integrity", DATA_STRING, "CHECKSUM",
 			NULL);
-		decoder_output_data(decoder, data, ext);
+        decoder_output_data(decoder, data, ext);
 
 		return 1;
 	}

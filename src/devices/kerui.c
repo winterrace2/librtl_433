@@ -49,7 +49,7 @@ static int kerui_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *
             "state",    "State",          DATA_STRING, cmd_str,
             NULL);
 
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 	return 1;
 }
 

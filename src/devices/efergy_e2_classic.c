@@ -87,7 +87,7 @@ static int efergy_e2_classic_callback(r_device *decoder, bitbuffer_t *bitbuffer,
                      "mic",      "Integrity",      DATA_STRING, "CHECKSUM",
                      NULL);
 
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

@@ -58,7 +58,7 @@ static int generic_remote_callback(r_device *decoder, bitbuffer_t *bitbuffer, ex
             "tristate",     "Tri-State",    DATA_STRING, tristate,
             NULL);
 
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

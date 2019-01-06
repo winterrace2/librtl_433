@@ -85,7 +85,7 @@ static int maverick_et73x_callback(r_device *decoder, bitbuffer_t *bitbuffer, ex
             "temperature1_C",   "TemperatureSensor1",   DATA_FORMAT, "%.02f C", DATA_DOUBLE, temp1_c,
             "temperature2_C",   "TemperatureSensor2",   DATA_FORMAT, "%.02f C", DATA_DOUBLE, temp2_c,
             NULL);
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

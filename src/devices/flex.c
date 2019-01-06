@@ -152,7 +152,7 @@ static int flex_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *e
                 "model", "", DATA_STRING, params->name,
                 "count", "", DATA_INT, match_count,
                 NULL);
-		decoder_output_data(decoder, data, ext);
+        decoder_output_data(decoder, data, ext);
 
         return 0;
     }
@@ -202,7 +202,7 @@ static int flex_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *e
             "rows", "", DATA_ARRAY, data_array(bitbuffer->num_rows, DATA_DATA, row_data),
             "codes", "", DATA_ARRAY, data_array(bitbuffer->num_rows, DATA_STRING, row_codes),
             NULL);
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 	for (i = 0; i < bitbuffer->num_rows; i++) {
         free(row_codes[i]);
     }

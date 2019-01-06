@@ -41,7 +41,7 @@ validate_checksum(r_device *decoder, uint8_t * msg, int from, int to, int cs_fro
         if (decoder->verbose) {
             rtl433_fprintf(stderr, "Checksum error in Vaillant VRT340f.  Expected: %04x  Calculated: %04x\n", expected, calculated);
             rtl433_fprintf(stderr, "Message (data content of bytes %d-%d): ", from, to);
-			bitrow_print(&msg[from], (to - from + 1) * 8);
+            bitrow_print(&msg[from], (to - from + 1) * 8);
         }
     }
     return expected == calculated;
@@ -159,7 +159,7 @@ vaillant_vrt340_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *e
                          "water",   "Pre-heated Water", DATA_STRING, water_preheated ? "ON" : "off",
                          "battery", "Battery", DATA_STRING, isBatteryLow ? "Low" : "Ok",
                          NULL);
-		decoder_output_data(decoder, data, ext);
+        decoder_output_data(decoder, data, ext);
 
         return 1;
     }
@@ -178,7 +178,7 @@ vaillant_vrt340_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *e
                          "model",   "",	DATA_STRING,	"Vaillant VRT340f Central Heating Thermostat (RF Detection)",
                          "device",  "Device ID", DATA_INT, deviceID,
                          NULL);
-		decoder_output_data(decoder, data, ext);
+        decoder_output_data(decoder, data, ext);
 
         return 1;
     }

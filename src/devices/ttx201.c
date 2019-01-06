@@ -172,7 +172,7 @@ ttx201_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned row, unsigned 
             "temperature_C", "Temperature", DATA_FORMAT, "%.1f C", DATA_DOUBLE, temperature_c,
             "mic",           "MIC",         DATA_STRING, "CHECKSUM",
             NULL);
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 
 	return 1;
 }

@@ -36,7 +36,7 @@
 
     // MSVC has something like C99 restrict as __restrict
     #ifndef restrict
-     #define restrict  __restrict
+        #define restrict  __restrict
     #endif
 #endif
 
@@ -120,7 +120,7 @@ data_t *data_append(data_t *first, const char *key, const char *pretty_key, ...)
 
 /** Adds to a structured data object, by prepending data.
 
-@see data_make()
+    @see data_make()
 */
 data_t *data_prepend(data_t *first, const char *key, const char *pretty_key, ...);
 

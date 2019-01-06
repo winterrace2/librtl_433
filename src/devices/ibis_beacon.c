@@ -68,7 +68,7 @@ static int ibis_beacon_callback(r_device *decoder, bitbuffer_t *bitbuffer, extda
 		"mic",		"Integrity",	DATA_STRING,	"CRC",
 		NULL);
 
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 	return 1;
 }
 

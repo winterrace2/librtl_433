@@ -150,7 +150,7 @@ static int radiohead_ask_callback(r_device *decoder, bitbuffer_t *bitbuffer, ext
             "payload",      "Payload",      DATA_ARRAY, data_array(data_len, DATA_INT, rh_data_payload),
             "mic",          "Integrity",    DATA_STRING, "CRC",
             NULL);
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }
@@ -186,7 +186,7 @@ static int sensible_living_callback(r_device *decoder, bitbuffer_t *bitbuffer, e
              "battery_voltage",  "Battery Voltage",  DATA_INT,     battery_voltage,
              "mic",              "Integrity",        DATA_STRING,  "CRC",
              NULL);
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

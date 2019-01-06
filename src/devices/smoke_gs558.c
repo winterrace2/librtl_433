@@ -100,7 +100,7 @@ static int smoke_gs558_callback(r_device *decoder, bitbuffer_t *bitbuffer, extda
         "learn",         "",            DATA_INT, learn > 1,
         "code",          "Raw Code",    DATA_STRING, code_str,
         NULL);
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

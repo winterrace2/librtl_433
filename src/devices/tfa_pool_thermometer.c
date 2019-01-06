@@ -46,7 +46,7 @@ E: ?
 			"channel",			"Channel",			DATA_INT,	channel,
 			"temperature_C",	"Temperature",		DATA_FORMAT, 	"%.01f C",	DATA_DOUBLE,	fTemp,
 		NULL);
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 
 	return 1;
 

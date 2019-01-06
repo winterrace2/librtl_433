@@ -37,7 +37,7 @@ static int quhwa_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *
             "id", "ID", DATA_INT, id,
             NULL);
 
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

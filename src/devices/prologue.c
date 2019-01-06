@@ -65,7 +65,7 @@ static int prologue_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_
                 "temperature_C", "Temperature", DATA_FORMAT, "%.02f C", DATA_DOUBLE, temp/10.0,
                 "humidity",      "Humidity",    DATA_FORMAT, "%u %%", DATA_INT, humidity,
                 NULL);
-		decoder_output_data(decoder, data, ext);
+        decoder_output_data(decoder, data, ext);
 
         return 1;
     }

@@ -36,7 +36,7 @@ void am_analyze_free(am_analyze_t *a)
 
 void am_analyze_skip(am_analyze_t *a, unsigned n_samples)
 {
-	a->counter += n_samples;
+    a->counter += n_samples;
     a->signal_start = 0;
 }
 
@@ -314,6 +314,6 @@ void am_analyze_classify(am_analyze_t *aa)
     }
 
     // clear signal_pulse_data
-    aa->signal_pulse_counter = 0; 
+    aa->signal_pulse_counter = 0;
 }
 

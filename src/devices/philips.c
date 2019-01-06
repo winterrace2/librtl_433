@@ -102,7 +102,7 @@ static int philips_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t
     /* If debug enabled, print the combined majority-wins packet */
     if (decoder->verbose > 1) {
         rtl433_fprintf(stderr, "%s: combined packet = ", __func__);
-		bitrow_print(packet, PHILIPS_PACKETLEN * 8);
+        bitrow_print(packet, PHILIPS_PACKETLEN * 8);
 	}
 
     /* Correct CRC? */
@@ -141,7 +141,7 @@ static int philips_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t
                      "battery",       "Battery",     DATA_STRING, battery_status ? "LOW" : "OK",
                      NULL);
 
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

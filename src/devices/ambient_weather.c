@@ -54,7 +54,7 @@ ambient_weather_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext
             "humidity",       "Humidity",     DATA_FORMAT, "%u %%", DATA_INT, humidity,
             "mic",            "Integrity",    DATA_STRING, "CRC",
             NULL);
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

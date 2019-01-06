@@ -107,7 +107,7 @@ static int fineoffset_WH2_callback(r_device *decoder, bitbuffer_t *bitbuffer, ex
                          "temperature_C", "Temperature", DATA_FORMAT, "%.01f C", DATA_DOUBLE, temperature,
                          "mic",           "Integrity",   DATA_STRING, "CRC",
                           NULL);
-		decoder_output_data(decoder, data, ext);
+        decoder_output_data(decoder, data, ext);
 	}
     // Thermo/Hygro
     else {
@@ -118,7 +118,7 @@ static int fineoffset_WH2_callback(r_device *decoder, bitbuffer_t *bitbuffer, ex
                          "humidity",      "Humidity",    DATA_FORMAT, "%u %%", DATA_INT, humidity,
                          "mic",           "Integrity",   DATA_STRING, "CRC",
                           NULL);
-		decoder_output_data(decoder, data, ext);
+        decoder_output_data(decoder, data, ext);
 	}
     return 1;
 }
@@ -282,7 +282,7 @@ static int fineoffset_WH24_callback(r_device *decoder, bitbuffer_t *bitbuffer, e
         data_append(data,   "light_lux",        "Light",            DATA_FORMAT, "%.1f lux", DATA_DOUBLE, light_lux, NULL);
     data_append(data,       "battery",          "Battery",          DATA_STRING, low_battery ? "LOW" : "OK",
                             "mic",              "Integrity",        DATA_STRING, "CRC", NULL);
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }
@@ -367,7 +367,7 @@ static int fineoffset_WH25_callback(r_device *decoder, bitbuffer_t *bitbuffer, e
                      "battery",       "Battery",     DATA_STRING, low_battery ? "LOW" : "OK",
                      "mic",           "Integrity",   DATA_STRING, "CHECKSUM",
                       NULL);
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }
@@ -434,7 +434,7 @@ static int fineoffset_WH0530_callback(r_device *decoder, bitbuffer_t *bitbuffer,
                      "battery",       "Battery",     DATA_STRING, battery_low ? "LOW" : "OK",
                      "mic",           "Integrity",   DATA_STRING, "CRC",
                      NULL);
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

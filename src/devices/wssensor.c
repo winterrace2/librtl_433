@@ -60,7 +60,7 @@ static int wssensor_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_
         bitbuffer_print(bitbuffer);
         rtl433_fprintf(stdout, "Sensor ID	= %01d = 0x%02x\n",  sensor_id, sensor_id);
         rtl433_fprintf(stdout, "Bitstream HEX	= ");
-		bitrow_print(b, 24);
+        bitrow_print(b, 24);
         rtl433_fprintf(stdout, "Battery OK	= %0d\n", battery_status);
         rtl433_fprintf(stdout, "Startup		= %0d\n", startup);
         rtl433_fprintf(stdout, "Channel		= %0d\n", channel);
@@ -76,7 +76,7 @@ static int wssensor_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_
             "temperature_C", "Temperature", DATA_FORMAT, "%.02f C", DATA_DOUBLE, temperature_c,
             NULL);
 
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 	return 1;
 }
 

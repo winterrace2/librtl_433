@@ -61,7 +61,7 @@ ss_sensor_parser(r_device *decoder, bitbuffer_t *bitbuffer, int row, extdata_t *
         "extradata",    "Extra Data",   DATA_STRING, extradata,
         NULL
     );
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }
@@ -95,7 +95,7 @@ ss_pinentry_parser(r_device *decoder, bitbuffer_t *bitbuffer, int row, extdata_t
         "extradata",    "Extra Data",   DATA_STRING, extradata,
         NULL
     );
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }
@@ -131,7 +131,7 @@ ss_keypad_commands(r_device *decoder, bitbuffer_t *bitbuffer, int row, extdata_t
         "extradata",    "", DATA_STRING, extradata,
         NULL
     );
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

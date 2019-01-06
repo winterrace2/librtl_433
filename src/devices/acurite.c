@@ -217,7 +217,7 @@ static int acurite_rain_gauge_callback(r_device *decoder, bitbuffer_t *bitbuffer
             "rain",     "Total Rain",    DATA_FORMAT,    "%.1f mm", DATA_DOUBLE, total_rain,
             NULL);
 
-		decoder_output_data(decoder, data, ext);
+        decoder_output_data(decoder, data, ext);
 
         return 1;
     }

@@ -78,7 +78,7 @@ static int bresser_3ch_callback(r_device *decoder, bitbuffer_t *bitbuffer, extda
             "humidity",      "Humidity",    DATA_FORMAT, "%u %%", DATA_INT, humidity,
             "mic",           "Integrity",   DATA_STRING, "CHECKSUM",
             NULL);
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

@@ -80,7 +80,7 @@ static int nexus_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *
 				"battery",       "Battery",     DATA_STRING, battery ? "OK" : "LOW",
 				"temperature_C", "Temperature", DATA_FORMAT, "%.02f C", DATA_DOUBLE, temp/10.0,
 				NULL);
-			decoder_output_data(decoder, data, ext);
+            decoder_output_data(decoder, data, ext);
 		}
         // Thermo/Hygro
         else {
@@ -92,7 +92,7 @@ static int nexus_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *
                 "temperature_C", "Temperature", DATA_FORMAT, "%.02f C", DATA_DOUBLE, temp/10.0,
                 "humidity",      "Humidity",    DATA_FORMAT, "%u %%", DATA_INT, humidity,
                 NULL);
-			decoder_output_data(decoder, data, ext);
+        decoder_output_data(decoder, data, ext);
 		}
         return 1;
     }

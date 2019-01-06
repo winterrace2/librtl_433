@@ -63,10 +63,10 @@ static int proove_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t 
                      "channel",       "Channel",     DATA_INT, channel_code,
                      "state",         "State",       DATA_STRING, on_bit ? "OFF" : "ON",
                      "unit",          "Unit",        DATA_INT, unit_bit,
-		             "group",         "Group",       DATA_INT, group_code,
+                     "group",         "Group",       DATA_INT, group_code,
                       NULL);
 
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 
     return 0;
 }

@@ -113,7 +113,7 @@ static int newkaku_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t
                          "dim",           "Dim",         DATA_STRING, dim,
                          "dim_value",     "Dim Value",   DATA_INT, dv,
                          NULL);
-		decoder_output_data(decoder, data, ext);
+        decoder_output_data(decoder, data, ext);
 
         return 1;
     }

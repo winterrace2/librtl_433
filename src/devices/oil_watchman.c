@@ -33,7 +33,7 @@ static int oil_watchman_callback(r_device *decoder, bitbuffer_t *bitbuffer, extd
 
 	// Find a preamble with enough bits after it that it could be a complete packet
 	while ((bitpos = bitbuffer_search(bitbuffer, 0, bitpos, &preamble_pattern, 6)) + 136 <=
-	       bitbuffer->bits_per_row[0]) {
+           bitbuffer->bits_per_row[0]) {
 
 		// Skip the matched preamble bits to point to the data
 		bitpos += 6;
@@ -85,7 +85,7 @@ static int oil_watchman_callback(r_device *decoder, bitbuffer_t *bitbuffer, extd
 			"binding_countdown", "", DATA_INT, binding_countdown,
 			"depth", "", DATA_INT, depth,
 			NULL);
-		decoder_output_data(decoder, data, ext);
+        decoder_output_data(decoder, data, ext);
 		events++;
 	}
 	return events;

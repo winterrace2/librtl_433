@@ -124,7 +124,7 @@ static int dish_remote_6_3_callback(r_device *decoder, bitbuffer_t *bitbuffer, e
             "button", "", DATA_STRING, button_string,
             NULL);
 
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

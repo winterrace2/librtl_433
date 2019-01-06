@@ -206,7 +206,7 @@ static int interlogix_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdat
             "switch5",     "Switch5 State", DATA_STRING, f5_latch_state,
             NULL);
 
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

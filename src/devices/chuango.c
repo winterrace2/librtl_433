@@ -71,7 +71,7 @@ static int chuango_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t
             "cmd_id",   "CMD_ID",       DATA_INT,    cmd,
             NULL);
 
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 	return 1;
 }
 

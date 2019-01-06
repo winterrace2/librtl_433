@@ -136,7 +136,7 @@ static int lacrosse_it(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext
         }
         // humidity = -1; // The TX29-IT sensor do not have humidity. It is replaced by a special value
 
-		decoder_output_data(decoder, data, ext);
+        decoder_output_data(decoder, data, ext);
 		events++;
 	}
 	return events;

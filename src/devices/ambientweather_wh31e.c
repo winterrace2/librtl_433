@@ -96,7 +96,7 @@ static int ambientweather_wh31e_callback(r_device *decoder, bitbuffer_t *bitbuff
                 "mic",              "Integrity",    DATA_STRING, "CRC",
                 NULL);
         /* clang-format on */
-		decoder_output_data(decoder, data, ext);
+        decoder_output_data(decoder, data, ext);
 		events++;
     }
     return events;

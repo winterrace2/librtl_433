@@ -81,7 +81,7 @@ static int wt1024_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t 
             "data",  "Data", DATA_INT,    value,
             NULL);
 
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 
     // Return 1 if message successfully decoded
     return 1;

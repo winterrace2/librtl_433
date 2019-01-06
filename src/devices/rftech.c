@@ -60,7 +60,7 @@ static int rftech_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t 
 			"temperature_C", "Temperature", DATA_FORMAT, "%.01f C", DATA_DOUBLE, value,
 			NULL);
 
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 
 	return 1;
 }

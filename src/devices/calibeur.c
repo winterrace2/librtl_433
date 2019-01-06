@@ -83,7 +83,7 @@ static int calibeur_rf104_callback(r_device *decoder, bitbuffer_t *bitbuffer, ex
 						"humidity",      "Humidity",    DATA_FORMAT, "%2.0f %%", DATA_DOUBLE, humidity,
 						"mic",           "Integrity",   DATA_STRING,    "CRC",
 						NULL);
-		decoder_output_data(decoder, data, ext);
+        decoder_output_data(decoder, data, ext);
 		return 1;
 	}
 	return 0;

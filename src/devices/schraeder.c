@@ -75,7 +75,7 @@ static int schraeder_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata
 					"mic", "Integrity", DATA_STRING, "CRC",
 					NULL);
 
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 	return 0;
 }
 
@@ -149,7 +149,7 @@ static int schrader_EG53MA4_callback(r_device *decoder, bitbuffer_t *bitbuffer, 
 					"mic", "Integrity", DATA_STRING, "CHECKSUM",
 					NULL);
 
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 	return 0;
 }
 

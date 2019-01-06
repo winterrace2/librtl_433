@@ -34,7 +34,7 @@ static int silvercrest_callback(r_device *decoder, bitbuffer_t *bitbuffer, extda
             "button", "", DATA_INT, cmd,
             NULL);
 
-		decoder_output_data(decoder, data, ext);
+        decoder_output_data(decoder, data, ext);
 
         return 1;
     }

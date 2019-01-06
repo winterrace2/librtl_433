@@ -71,7 +71,7 @@ static int infactory_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata
             "temperature_F", "Temperature",DATA_FORMAT, "%.02f °F", DATA_DOUBLE, temp_f,
             "humidity",      "Humidity",   DATA_FORMAT, "%u %%", DATA_INT, humidity,
             NULL);
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

@@ -64,7 +64,7 @@ static int kedsum_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t 
 
     if (decoder->verbose) {
       rtl433_fprintf(stdout, "Bitstream HEX        = ");
-	  bitrow_print(b, 48);
+      bitrow_print(b, 48);
       rtl433_fprintf(stdout, "Humidity HEX         = %02x\n", b[3]);
       rtl433_fprintf(stdout, "Humidity DEC         = %u\n",   humidity);
       rtl433_fprintf(stdout, "Channel HEX          = %02x\n", b[1]);
@@ -80,7 +80,7 @@ static int kedsum_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t 
             "temperature_F", "Temperature", DATA_FORMAT, "%.02f F", DATA_DOUBLE, temperature_f,
             "humidity",      "Humidity",    DATA_FORMAT, "%u %%", DATA_INT, humidity,
             NULL);
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 	return 1;
 }
 

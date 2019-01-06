@@ -47,7 +47,7 @@ static int tpms_pmv107j_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdat
 	bitbuffer_extract_bytes(&packet_bits, 0, 2, b + 1, 64);
 	if (decoder->verbose > 1) {
         rtl433_fprintf(stderr, "Realigned: ");
-		bitrow_print(b, 72);
+        bitrow_print(b, 72);
 	}
 
     crc = b[8];
@@ -87,7 +87,7 @@ static int tpms_pmv107j_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdat
         "mic",              "",     DATA_STRING,    "CRC",
         NULL);
 
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 	return 1;
 }
 

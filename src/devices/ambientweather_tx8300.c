@@ -101,7 +101,7 @@ static int ambientweather_tx8300_callback(r_device *decoder, bitbuffer_t *bitbuf
     data = data_append(data,
             "mic",           "MIC",         DATA_STRING, "CHECKSUM", // actually a per-bit parity, chksum unknown
             NULL);
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

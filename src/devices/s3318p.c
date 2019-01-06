@@ -118,7 +118,7 @@ static int s3318p_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t 
                      "humidity",      "Humidity",    DATA_FORMAT, "%u %%", DATA_INT, humidity,
                       NULL);
 
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 
     return 0;
 }

@@ -119,7 +119,7 @@ static int ge_coloreffects_decode(r_device *decoder, bitbuffer_t *bitbuffer, ext
         "command",       "",     DATA_STRING, ge_command_name(command),
         NULL);
 
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 	return 1;
 
 }

@@ -237,7 +237,7 @@ static void m_bus_output_data(r_device *decoder, const m_bus_data_t *out, const 
         "mic",      "Integrity",    DATA_STRING,    "CRC",
         NULL);
 	
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 }
 
 

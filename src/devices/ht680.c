@@ -64,7 +64,7 @@ static int ht680_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *
                 "button3",  "Button 3",        	DATA_STRING, button3 == 3 ? "PRESSED" : "",
                 "button4",  "Button 4",        	DATA_STRING, button4 == 3 ? "PRESSED" : "",
                 NULL);
-		decoder_output_data(decoder, data, ext);
+        decoder_output_data(decoder, data, ext);
 
         return 1;
     }

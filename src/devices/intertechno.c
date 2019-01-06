@@ -50,7 +50,7 @@ static int intertechno_callback(r_device *decoder, bitbuffer_t *bitbuffer, extda
         "command",          "",     DATA_INT,       command,
         NULL);
 
-	decoder_output_data(decoder, data, ext);
+    decoder_output_data(decoder, data, ext);
 	return 1;
 }
 

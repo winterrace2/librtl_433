@@ -110,7 +110,7 @@ static int danfoss_cfr_callback(r_device *decoder, bitbuffer_t *bitbuffer, extda
 		// Validate Prefix and CRC
 		uint16_t crc_calc = crc16(bytes, NUM_BYTES-2, 0x1021, 0x0000);
 		if (bytes[0] != 0x02		// Somewhat redundant to header search, but checks last bits
-		 || crc_calc != (((uint16_t)bytes[8] << 8) | bytes[9])
+	    || crc_calc != (((uint16_t)bytes[8] << 8) | bytes[9])
 		) {
 			if (decoder->verbose) rtl433_fprintf(stderr, "Danfoss: Prefix or CRC error.\n");
 			return 0;
@@ -139,7 +139,7 @@ static int danfoss_cfr_callback(r_device *decoder, bitbuffer_t *bitbuffer, extda
 			"switch",		"Switch",	DATA_STRING,	str_sw,
 			"mic",           "Integrity",            DATA_STRING,    "CRC",
 			NULL);
-		decoder_output_data(decoder, data, ext);
+        decoder_output_data(decoder, data, ext);
 
 		return 1;
 	}

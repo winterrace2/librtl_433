@@ -47,7 +47,7 @@ static int current_cost_callback(r_device *decoder, bitbuffer_t *bitbuffer, extd
                 "power2",       "Power 2",       DATA_FORMAT, "%d W", DATA_INT, watt2,
                 //"battery",       "Battery",       DATA_STRING, battery_low ? "LOW" : "OK", //TODO is there some low battery indicator ?
                 NULL);
-		decoder_output_data(decoder, data, ext);
+        decoder_output_data(decoder, data, ext);
 		return 1;
     }
     // Counter (packet[0] = 0100xxxx) bits 5 and 4 are "unknown", but always 0 to date.
@@ -63,8 +63,8 @@ static int current_cost_callback(r_device *decoder, bitbuffer_t *bitbuffer, extd
                //"counter",      "Counter",       DATA_FORMAT, "%d", DATA_INT, c_impulse,
                "power0",       "Counter",       DATA_FORMAT, "%d", DATA_INT, c_impulse,
                NULL);
-	   decoder_output_data(decoder, data, ext);
-	   return 1;
+       decoder_output_data(decoder, data, ext);
+       return 1;
     }
 
     return 0;
