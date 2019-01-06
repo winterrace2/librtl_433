@@ -60,50 +60,50 @@ How to make a decoder : https://enavarro.me/ajouter-un-decodeur-ask-a-rtl_433.ht
  ** Generic decoder for LaCrosse "IT+" (instant transmission) protocol
  ** Param device29or35 contain "29" or "35" depending of the device.
  **/
-static int lacrosse_it(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext, uint8_t device29or35) {
-	data_t *data;
-	int brow;
-	uint8_t out[8];
-	int r_crc, c_crc;
-	int sensor_id, newbatt, battery_low;
-	int humidity;
-	float temp_c;
-	int events = 0;
+static int lacrosse_it(r_device *decoder, bitbuffer_t *bitbuffer, uint8_t device29or35, extdata_t *ext)
+{
+    data_t *data;
+    int brow;
+    uint8_t out[8];
+    int r_crc, c_crc;
+    int sensor_id, newbatt, battery_low;
+    int humidity;
+    float temp_c;
+    int events = 0;
 
-	static const uint8_t preamble[] = {
-		0xaa, // preamble
-		0x2d, // brand identifier
-		0xd4, // brand identifier
-		0x90, // data length (this decoder work only with data length of 9, so we hardcode it on the preamble)
-	};
+    static const uint8_t preamble[] = {
+            0xaa, // preamble
+            0x2d, // brand identifier
+            0xd4, // brand identifier
+            0x90, // data length (this decoder work only with data length of 9, so we hardcode it on the preamble)
+    };
 
-	for (brow = 0; brow < bitbuffer->num_rows; ++brow) {
-		// Validate message and reject it as fast as possible : check for preamble
-		unsigned int start_pos = bitbuffer_search(bitbuffer, brow, 0, preamble, 28);
-		if(start_pos == bitbuffer->bits_per_row[brow])
-			continue; // no preamble detected, move to the next row
-		if (decoder->verbose)
+    for (brow = 0; brow < bitbuffer->num_rows; ++brow) {
+        // Validate message and reject it as fast as possible : check for preamble
+        unsigned int start_pos = bitbuffer_search(bitbuffer, brow, 0, preamble, 28);
+        if (start_pos == bitbuffer->bits_per_row[brow])
+            continue; // no preamble detected, move to the next row
+        if (decoder->verbose)
             rtl433_fprintf(stderr, "LaCrosse TX29/35 detected, buffer is %d bits length, device is TX%d\n", bitbuffer->bits_per_row[brow], device29or35);
-		// remove preamble and keep only 64 bits
-		bitbuffer_extract_bytes(bitbuffer, brow, start_pos, out, 64);
+        // remove preamble and keep only 64 bits
+        bitbuffer_extract_bytes(bitbuffer, brow, start_pos, out, 64);
 
-		/*
+        /*
 		 * Check message integrity (CRC/Checksum/parity)
 		 * Normally, it is computed on the whole message, from byte 0 (preamble) to byte 6,
 		 * but preamble is always the same, so we can speed the process by doing a crc check
 		 * only on byte 3,4,5,6
 		 */
-		r_crc = out[7];
-		c_crc = crc8(&out[3], 4, LACROSSE_TX35_CRC_POLY, LACROSSE_TX35_CRC_INIT);
-		if (r_crc != c_crc) {
-			if (decoder->verbose)
-                rtl433_fprintf(stderr, "LaCrosse TX29/35 bad CRC: calculated %02x, received %02x\n",
-					c_crc, r_crc);
-			// reject row
-			continue;
-		}
+        r_crc = out[7];
+        c_crc = crc8(&out[3], 4, LACROSSE_TX35_CRC_POLY, LACROSSE_TX35_CRC_INIT);
+        if (r_crc != c_crc) {
+            if (decoder->verbose)
+                rtl433_fprintf(stderr, "LaCrosse TX29/35 bad CRC: calculated %02x, received %02x\n", c_crc, r_crc);
+            // reject row
+            continue;
+        }
 
-		/*
+        /*
 		 * Now that message "envelope" has been validated,
 		 * start parsing data.
 		 */
@@ -137,23 +137,23 @@ static int lacrosse_it(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext
         // humidity = -1; // The TX29-IT sensor do not have humidity. It is replaced by a special value
 
         decoder_output_data(decoder, data, ext);
-		events++;
-	}
-	return events;
+        events++;
+    }
+    return events;
 }
 
 /**
  ** Wrapper for the TX29 device
  **/
 static int lacrossetx29_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
-	return lacrosse_it(decoder, bitbuffer, ext, LACROSSE_TX29_MODEL);
+	return lacrosse_it(decoder, bitbuffer, LACROSSE_TX29_MODEL, ext);
 }
 
 /**
  ** Wrapper for the TX35 device
  **/
 static int lacrossetx35_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
-	return lacrosse_it(decoder, bitbuffer, ext, LACROSSE_TX35_MODEL);
+	return lacrosse_it(decoder, bitbuffer, LACROSSE_TX35_MODEL, ext);
 }
 
 static char *output_fields[] = {

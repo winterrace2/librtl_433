@@ -36,29 +36,29 @@
 
 static int infactory_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
-	bitrow_t *bb;
+    bitrow_t *bb;
     data_t *data;
+    uint8_t *b;
+    int id, humidity, temp;
+    float temp_f;
 
-	uint8_t *b;
-	int id, humidity, temp;
-	float temp_f;
-
-	if (bitbuffer->bits_per_row[0] != 4) {
-		return 0;
-	}
-	if (bitbuffer->bits_per_row[1] != 40) {
+    if (bitbuffer->bits_per_row[0] != 4) {
         return 0;
     }
+    if (bitbuffer->bits_per_row[1] != 40) {
+        return 0;
+    }
+    bb = bitbuffer->bb;
 
-	bb = bitbuffer->bb;
-	/* Check that 4 bits of preamble is 0 */
-	b = bb[0];
-	if (b[0] & 0x0F)
-		return 0;
-	/* Check that last 4 bits of message is 0x1 */
-	b = bb[1];
-	if (!(b[4] & 0x0F))
-		return 0;
+    /* Check that 4 bits of preamble is 0 */
+    b = bb[0];
+    if (b[0]&0x0F)
+        return 0;
+
+    /* Check that last 4 bits of message is 0x1 */
+    b = bb[1];
+    if (!(b[4]&0x0F))
+        return 0;
 
     id = b[0];
     humidity = (b[3] & 0x0F) * 10 + (b[4] >> 4); // BCD
@@ -92,7 +92,7 @@ r_device infactory = {
     .gap_limit     = 4000, // Maximum gap size before new row of bits [us]
     .reset_limit   = 8500, // Maximum gap size before End Of Message [us].
     .tolerance     = 1000,
-	.decode_fn     = &infactory_callback,
+    .decode_fn     = &infactory_callback,
     .disabled      = 0,
     .fields        = output_fields
 };
