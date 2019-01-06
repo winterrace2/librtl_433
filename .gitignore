@@ -53,3 +53,4 @@ build/
 *.lastbuildstate
 *.db
 *.opendb
+*.exp
