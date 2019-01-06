@@ -106,11 +106,11 @@ ttx201_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned row, unsigned 
             if (row == 0) {
                 if (bits < MSG_PREAMBLE_BITS) {
                     rtl433_fprintf(stderr, "Short preamble: %d bits (expected %d)\n",
-                                 bits, MSG_PREAMBLE_BITS);
+                            bits, MSG_PREAMBLE_BITS);
                 }
             } else if (row != (unsigned)bitbuffer->num_rows - 1 && bits == 1) {
                 rtl433_fprintf(stderr, "Wrong packet #%d length: %d bits (expected %d)\n",
-                             row, bits, MSG_PACKET_BITS);
+                        row, bits, MSG_PACKET_BITS);
             }
         }
         return 0;
@@ -125,9 +125,9 @@ ttx201_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned row, unsigned 
 
     if (decoder->verbose > 1){
         rtl433_fprintf(stderr, "TTX201 received raw data: ");
-		bitbuffer_print(bitbuffer);
+        bitbuffer_print(bitbuffer);
         rtl433_fprintf(stderr, "Data decoded:\n" \
-			" r  cs    K   ID    S   B  C  X    T    M     J\n");
+            " r  cs    K   ID    S   B  C  X    T    M     J\n");
         rtl433_fprintf(stderr, "%2d  %2d    %2d  %3d  0x%01x  %1d  %1d  %1d  %4d  0x%02x",
                 row,
                 checksum_calculated,
@@ -146,23 +146,23 @@ ttx201_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned row, unsigned 
     }
 
     if (postmark != MSG_PACKET_POSTMARK) {
-		if (decoder->verbose > 1)
+        if (decoder->verbose > 1)
             rtl433_fprintf(stderr, "Packet #%d wrong postmark 0x%02x (expected 0x%02x).\n",
-				row, postmark, MSG_PACKET_POSTMARK);
-		return 0;
-	}
+                row, postmark, MSG_PACKET_POSTMARK);
+        return 0;
+    }
 
-	if (checksum != checksum_calculated) {
-		if (decoder->verbose > 1)
+    if (checksum != checksum_calculated) {
+        if (decoder->verbose > 1)
             rtl433_fprintf(stderr, "Packet #%d checksum error.\n", row);
-		return 0;
-	}
+        return 0;
+    }
     
-	device_id = b[1];
-	battery_low = (b[2] & 0x08) != 0; // if not zero, battery is low
-	channel = (b[2] & 0x07) + 1;
-	temperature = ((int8_t)((b[3] & 0x0f) << 4) << 4) | b[4]; // note the sign extend
-	temperature_c = temperature / 10.0f;
+    device_id = b[1];
+    battery_low = (b[2] & 0x08) != 0; // if not zero, battery is low
+    channel = (b[2] & 0x07) + 1;
+    temperature = ((int8_t)((b[3] & 0x0f) << 4) << 4) | b[4]; // note the sign extend
+    temperature_c = temperature / 10.0f;
 
     data = data_make(
             "model",         "",            DATA_STRING, "Emos TTX201",
@@ -211,7 +211,7 @@ r_device ttx201 = {
     .long_width    = 0, // not used
     .reset_limit   = 1700,
     .tolerance     = 250,
-    .decode_fn = &ttx201_callback,
+    .decode_fn     = &ttx201_callback,
     .disabled      = 0,
     .fields        = output_fields
 };

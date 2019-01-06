@@ -76,6 +76,7 @@ static int efergy_e2_classic_callback(r_device *decoder, bitbuffer_t *bitbuffer,
     uint8_t fact = (-(int8_t)bytes[6] + 15);
     float current_adc = (float)((bytes[4] << 8 | bytes[5])) / (1 << fact);
 
+
     // Output data
     data = data_make(
                      "model",    "",               DATA_STRING, "Efergy e2 CT",
@@ -110,7 +111,7 @@ r_device efergy_e2_classic = {
 	.sync_width     = 500,
 	.gap_limit      = 200,
 	.reset_limit    = 400,
-	.decode_fn      = &efergy_e2_classic_callback,
+    .decode_fn      = &efergy_e2_classic_callback,
     .disabled       = 0,
     .fields         = output_fields
 };

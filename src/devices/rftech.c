@@ -60,9 +60,9 @@ static int rftech_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t 
 			"temperature_C", "Temperature", DATA_FORMAT, "%.01f C", DATA_DOUBLE, value,
 			NULL);
 
-    decoder_output_data(decoder, data, ext);
+	decoder_output_data(decoder, data, ext);
 
-    return 1;
+	return 1;
 }
 
 static char *csv_output_fields[] = {
@@ -75,13 +75,13 @@ static char *csv_output_fields[] = {
 };
 
 r_device rftech = {
-	.name		    = "RF-tech",
-	.modulation	    = OOK_PULSE_PPM,
-	.short_width	= 2000,
+	.name           = "RF-tech",
+	.modulation     = OOK_PULSE_PPM,
+	.short_width    = 2000,
 	.long_width     = 4000,
 	.gap_limit      = 5000,
 	.reset_limit    = 10000,
-	.decode_fn	    = &rftech_callback,
-	.disabled	    = 1,
-	.fields		    = csv_output_fields,
+	.decode_fn      = &rftech_callback,
+	.disabled       = 1,
+	.fields         = csv_output_fields,
 };

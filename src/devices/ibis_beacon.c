@@ -68,8 +68,8 @@ static int ibis_beacon_callback(r_device *decoder, bitbuffer_t *bitbuffer, extda
 		"mic",		"Integrity",	DATA_STRING,	"CRC",
 		NULL);
 
-    decoder_output_data(decoder, data, ext);
-    return 1;
+	decoder_output_data(decoder, data, ext);
+	return 1;
 }
 
 static char *output_fields[] = {
@@ -87,7 +87,7 @@ r_device ibis_beacon = {
 	.short_width	= 30,  // Nominal width of clock half period [us]
 	.long_width		= 0,   // Not used
 	.reset_limit	= 100, // Maximum gap size before End Of Message [us].
-	.decode_fn	= &ibis_beacon_callback,
+	.decode_fn	    = &ibis_beacon_callback,
 	.disabled		= 0,
 	.fields			= output_fields,
 };

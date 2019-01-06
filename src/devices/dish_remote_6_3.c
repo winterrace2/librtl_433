@@ -142,7 +142,7 @@ r_device dish_remote_6_3 = {
     .long_width    = 2812,
     .gap_limit     = 4500,
     .reset_limit   = 9000,
-	.decode_fn     = &dish_remote_6_3_callback,
+    .decode_fn     = &dish_remote_6_3_callback,
     .disabled      = 1,
     .fields        = output_fields,
 };

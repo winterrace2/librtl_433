@@ -58,7 +58,7 @@ struct flex_params {
     unsigned min_repeats;
     unsigned max_repeats;
     unsigned invert;
-	unsigned reflect;
+    unsigned reflect;
     unsigned count_only;
     unsigned match_len;
     bitrow_t match_bits;
@@ -203,7 +203,7 @@ static int flex_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *e
             "codes", "", DATA_ARRAY, data_array(bitbuffer->num_rows, DATA_STRING, row_codes),
             NULL);
     decoder_output_data(decoder, data, ext);
-	for (i = 0; i < bitbuffer->num_rows; i++) {
+    for (i = 0; i < bitbuffer->num_rows; i++) {
         free(row_codes[i]);
     }
 
@@ -223,7 +223,7 @@ static void usage()
 {
     rtl433_fprintf(stderr,
             "Use -X <spec> to add a general purpose decoder. For usage use -X help\n");
-	// exit(1); // handled at caller
+    // exit(1); // handled at caller
 }
 
 static void help()
@@ -264,7 +264,7 @@ static void help()
             "         sync: Nominal width of sync pulse [us] (optional)\n"
             "          gap: Maximum gap size before new row of bits [us]\n"
             "    tolerance: Maximum pulse deviation [us] (optional)\n"
-             "        reset: Maximum gap size before End Of Message [us].\n"
+            "        reset: Maximum gap size before End Of Message [us].\n"
             "Available options are:\n"
             "\tbits=<n> : only match if at least one row has <n> bits\n"
             "\trows=<n> : only match if there are <n> rows\n"
@@ -318,11 +318,11 @@ static unsigned parse_bits(const char *code, bitrow_t bitrow, int *success)
     if (bits.num_rows != 1) {
         rtl433_fprintf(stderr, "Bad flex spec, \"match\" needs exactly one bit row (%d found)!\n", bits.num_rows);
         usage();
-		if (success) *success = 0;
-	}
-	else {
-		if (success) *success = 1;
-	}
+        if (success) *success = 0;
+    }
+    else {
+        if (success) *success = 1;
+    }
     memcpy(bitrow, bits.bb[0], sizeof(bitrow_t));
     return bits.bits_per_row[0];
 }
@@ -379,9 +379,9 @@ static int parse_getter(const char *arg, struct flex_get *getter)
         if (*arg == '@')
             getter->bit_offset = strtol(++arg, NULL, 0);
         else if (*arg == '{' || (*arg >= '0' && *arg <= '9')) {
-			int success = 0;
+            int success = 0;
             getter->bit_count = parse_bits(arg, bitrow, &success);
-			if (!success) return 0;
+            if (!success) return 0;
             getter->mask = extract_number(bitrow, 0, getter->bit_count);
         }
         else
@@ -391,7 +391,7 @@ static int parse_getter(const char *arg, struct flex_get *getter)
     if (!getter->name) {
         rtl433_fprintf(stderr, "Bad flex spec, \"get\" missing name!\n");
         usage();
-		return 0;
+        return 0;
     }
     /*
     if (decoder->verbose)
@@ -439,8 +439,8 @@ r_device *flex_create_device(char *spec)
 {
     if (!spec || !*spec || *spec == '?' || !strncasecmp(spec, "help", strlen(spec))) {
         help();
-		return NULL;
-	}
+        return NULL;
+    }
 
     struct flex_params *params = calloc(1, sizeof(*params));
     r_device *dev = calloc(1, sizeof(*dev));
@@ -459,8 +459,8 @@ r_device *flex_create_device(char *spec)
     if (c == NULL) {
         rtl433_fprintf(stderr, "Bad flex spec, missing name!\n");
         usage();
-		free(spec);
-		return NULL;
+        free(spec);
+        return NULL;
     }
     if (!strncasecmp(c, "n=", 2))
         c += 2;
@@ -479,9 +479,9 @@ r_device *flex_create_device(char *spec)
     if (c == NULL) {
         rtl433_fprintf(stderr, "Bad flex spec, missing modulation!\n");
         usage();
-		free(spec);
-		free(dev);
-		return NULL;
+        free(spec);
+        free(dev);
+        return NULL;
     }
     dev->modulation = parse_modulation(c);
 
@@ -489,30 +489,30 @@ r_device *flex_create_device(char *spec)
     if (c == NULL) {
         rtl433_fprintf(stderr, "Bad flex spec, missing short limit!\n");
         usage();
-		free(spec);
-		free(dev);
-		return NULL;
-	}
+        free(spec);
+        free(dev);
+        return NULL;
+    }
     dev->short_width = atoi(c);
 
     c = strtok(NULL, ":");
     if (c == NULL) {
         rtl433_fprintf(stderr, "Bad flex spec, missing long limit!\n");
         usage();
-		free(spec);
-		free(dev);
-		return NULL;
-	}
+        free(spec);
+        free(dev);
+        return NULL;
+    }
     dev->long_width = atoi(c);
 
     c = strtok(NULL, ":");
     if (c == NULL) {
         rtl433_fprintf(stderr, "Bad flex spec, missing reset limit!\n");
         usage();
-		free(spec);
-		free(dev);
-		return NULL;
-	}
+        free(spec);
+        free(dev);
+        return NULL;
+    }
     dev->reset_limit = atoi(c);
 
     if (dev->modulation == OOK_PULSE_PWM) {
@@ -520,10 +520,10 @@ r_device *flex_create_device(char *spec)
         if (c == NULL) {
             rtl433_fprintf(stderr, "Bad flex spec, missing gap limit!\n");
             usage();
-			free(spec);
-			free(dev);
-			return NULL;
-		}
+            free(spec);
+            free(dev);
+            return NULL;
+        }
         dev->gap_limit = atoi(c);
 
         o = strtok(NULL, ":");
@@ -546,10 +546,10 @@ r_device *flex_create_device(char *spec)
         if (c == NULL) {
             rtl433_fprintf(stderr, "Bad flex spec, missing tolerance limit!\n");
             usage();
-			free(spec);
-			free(dev);
-			return NULL;
-		}
+            free(spec);
+            free(dev);
+            return NULL;
+        }
         dev->tolerance = atoi(c);
     }
 
@@ -605,25 +605,25 @@ r_device *flex_create_device(char *spec)
         else if (!strcasecmp(key, "reflect"))
             params->reflect = val ? atoi(val) : 1;
 
-		else if (!strcasecmp(key, "match")) {
-			int success = 0;
-			params->match_len = parse_bits(val, params->match_bits, &success);
-			if (!success) {
-				free(spec);
-				free(dev);
-				return NULL;
-			}
-		}
+        else if (!strcasecmp(key, "match")) {
+            int success = 0;
+            params->match_len = parse_bits(val, params->match_bits, &success);
+            if (!success) {
+                free(spec);
+                free(dev);
+                return NULL;
+            }
+        }
 
-		else if (!strcasecmp(key, "preamble")) {
-			int success = 0;
-			params->preamble_len = parse_bits(val, params->preamble_bits, &success);
-			if (!success) {
-				free(spec);
-				free(dev);
-				return NULL;
-			}
-		}
+        else if (!strcasecmp(key, "preamble")) {
+            int success = 0;
+            params->preamble_len = parse_bits(val, params->preamble_bits, &success);
+            if (!success) {
+                free(spec);
+                free(dev);
+                return NULL;
+            }
+        }
 
         else if (!strcasecmp(key, "countonly"))
             params->count_only = val ? atoi(val) : 1;
@@ -634,18 +634,18 @@ r_device *flex_create_device(char *spec)
             else {
                 rtl433_fprintf(stderr, "Maximum getter slots exceeded (%d)!\n", GETTER_SLOTS);
                 usage();
-				free(spec);
-				free(dev);
-				return NULL;
-			}
+                free(spec);
+                free(dev);
+                return NULL;
+            }
 
         } else {
             rtl433_fprintf(stderr, "Bad flex spec, unknown keyword (%s)!\n", key);
             usage();
-			free(spec);
-			free(dev);
-			return NULL;
-		}
+            free(spec);
+            free(dev);
+            return NULL;
+        }
     }
 
     if (params->min_bits < params->match_len)
@@ -659,53 +659,53 @@ r_device *flex_create_device(char *spec)
     if (!params->name || !*params->name) {
         rtl433_fprintf(stderr, "Bad flex spec, missing name!\n");
         usage();
-		free(spec);
-		free(dev);
-		return NULL;
-	}
+        free(spec);
+        free(dev);
+        return NULL;
+    }
 
     if (!dev->modulation) {
         rtl433_fprintf(stderr, "Bad flex spec, missing modulation!\n");
         usage();
-		free(spec);
-		free(dev);
-		return NULL;
-	}
+        free(spec);
+        free(dev);
+        return NULL;
+    }
 
     if (!dev->short_width) {
         rtl433_fprintf(stderr, "Bad flex spec, missing short limit!\n");
         usage();
-		free(spec);
-		free(dev);
-		return NULL;
-	}
+        free(spec);
+        free(dev);
+        return NULL;
+    }
 
     if (dev->modulation != OOK_PULSE_MANCHESTER_ZEROBIT) {
         if (!dev->long_width) {
             rtl433_fprintf(stderr, "Bad flex spec, missing long limit!\n");
             usage();
-			free(spec);
-			free(dev);
-			return NULL;
-		}
+            free(spec);
+            free(dev);
+            return NULL;
+        }
     }
 
     if (!dev->reset_limit) {
         rtl433_fprintf(stderr, "Bad flex spec, missing reset limit!\n");
         usage();
-		free(spec);
-		free(dev);
-		return NULL;
-	}
+        free(spec);
+        free(dev);
+        return NULL;
+    }
 
     if (dev->modulation == OOK_PULSE_PWM) {
         if (!dev->gap_limit) {
             rtl433_fprintf(stderr, "Bad flex spec, missing gap limit!\n");
             usage();
-			free(spec);
-			free(dev);
-			return NULL;
-		}
+            free(spec);
+            free(dev);
+            return NULL;
+        }
     }
 
     if (dev->modulation == OOK_PULSE_DMC
@@ -714,10 +714,10 @@ r_device *flex_create_device(char *spec)
         if (!dev->tolerance) {
             rtl433_fprintf(stderr, "Bad flex spec, missing tolerance limit!\n");
             usage();
-			free(spec);
-			free(dev);
-			return NULL;
-		}
+            free(spec);
+            free(dev);
+            return NULL;
+        }
     }
 
     /*

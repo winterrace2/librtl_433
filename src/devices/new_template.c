@@ -201,6 +201,7 @@ static int template_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_
         return 0;
     }
 
+
     data = data_make(
             "model", "", DATA_STRING, "New Template",
             "id",    "", DATA_INT,    sensor_id,
@@ -254,7 +255,7 @@ r_device new_template = {
     .long_width    = 224, // long gap is 224 us
     .gap_limit     = 300, // some distance above long
     .reset_limit   = 1000, // a bit longer than packet gap
-	.decode_fn = &template_callback,
+    .decode_fn     = &template_callback,
     .disabled      = 2, // disabled and hidden, use 0 if there is a MIC, 1 otherwise
-	.fields        = output_fields,
+    .fields        = output_fields,
 };

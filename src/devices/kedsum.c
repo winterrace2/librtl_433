@@ -80,6 +80,7 @@ static int kedsum_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t 
             "temperature_F", "Temperature", DATA_FORMAT, "%.02f F", DATA_DOUBLE, temperature_f,
             "humidity",      "Humidity",    DATA_FORMAT, "%u %%", DATA_INT, humidity,
             NULL);
+
     decoder_output_data(decoder, data, ext);
     return 1;
 }
@@ -98,7 +99,7 @@ r_device kedsum = {
     .short_width    = 2000,
     .long_width     = 4000,
     .gap_limit      = 4400,
-	.reset_limit    = 9400,
+    .reset_limit    = 9400,
     .decode_fn      = &kedsum_callback,
     .disabled       = 0,
     .fields         = output_fields

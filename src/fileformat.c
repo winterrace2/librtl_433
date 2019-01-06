@@ -16,7 +16,7 @@
 #ifndef strncasecmp // Microsoft Visual Studio
 #define strncasecmp  _strnicmp
 #endif
-#else 
+#else
 #include <strings.h>
 #endif
 //#include "optparse.h"
@@ -30,11 +30,11 @@
 
 char const *file_basename(char const *path)
 {
-	char const *p = strrchr(path, PATH_SEPARATOR);
-	if (p)
-		return p + 1;
-	else
-		return path;
+    char const *p = strrchr(path, PATH_SEPARATOR);
+    if (p)
+        return p + 1;
+    else
+        return path;
 }
 
 int check_read_file_info(file_info_t *info)

@@ -34,32 +34,32 @@ ss_sensor_parser(r_device *decoder, bitbuffer_t *bitbuffer, int row, extdata_t *
     char id[6];
     char extradata[30] = "";
 
-    // each row needs to have exactly 92 bits 
+    // each row needs to have exactly 92 bits
     if (bitbuffer->bits_per_row[row] != 92)
         return 0;
 
-        uint8_t seq = reverse8(b[8]);
-        uint8_t state = reverse8(b[9]);
-        uint8_t csum = reverse8(b[10]);
-        if (((seq + state) & 0xff) != csum) return 0;
+    uint8_t seq = reverse8(b[8]);
+    uint8_t state = reverse8(b[9]);
+    uint8_t csum = reverse8(b[10]);
+    if (((seq + state) & 0xff) != csum) return 0;
 
     ss_get_id(id, b);
 
-        if (state == 1) {
-                strcpy(extradata,"Contact Open");
-        } else if (state == 2) {
+    if (state == 1) {
+        strcpy(extradata,"Contact Open");
+    } else if (state == 2) {
         strcpy(extradata,"Contact Closed");
-        } else if (state == 3) {
+    } else if (state == 3) {
         strcpy(extradata,"Alarm Off");
     }
 
     data = data_make(
-        "model",    "", DATA_STRING, "SimpliSafe Sensor",
-        "device",   "Device ID",    DATA_STRING, id,
-        "seq",      "Sequence", DATA_INT, seq,
-        "state",    "State",    DATA_INT, state,
-        "extradata",    "Extra Data",   DATA_STRING, extradata,
-        NULL
+    	"model",    "", DATA_STRING, "SimpliSafe Sensor",
+    	"device",   "Device ID",    DATA_STRING, id,
+    	"seq",      "Sequence", DATA_INT, seq,
+    	"state",    "State",    DATA_INT, state,
+    	"extradata",    "Extra Data",   DATA_STRING, extradata,
+    	NULL
     );
     decoder_output_data(decoder, data, ext);
 
@@ -125,11 +125,11 @@ ss_keypad_commands(r_device *decoder, bitbuffer_t *bitbuffer, int row, extdata_t
     ss_get_id(id, b);
 
     data = data_make(
-        "model",    "", DATA_STRING, "SimpliSafe Keypad",
-        "device",   "", DATA_STRING, id,
-        "seq",  "Sequence",DATA_INT, b[9],
-        "extradata",    "", DATA_STRING, extradata,
-        NULL
+    	"model",    "", DATA_STRING, "SimpliSafe Keypad",
+    	"device",   "", DATA_STRING, id,
+    	"seq",  "Sequence",DATA_INT, b[9],
+    	"extradata",    "", DATA_STRING, extradata,
+    	NULL
     );
     decoder_output_data(decoder, data, ext);
 
@@ -139,12 +139,12 @@ ss_keypad_commands(r_device *decoder, bitbuffer_t *bitbuffer, int row, extdata_t
 static int
 ss_sensor_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
-        // Require two identical rows.
-        int row = bitbuffer_find_repeated_row(bitbuffer, 2, 90);
-        if (row < 0) return 0;
+    // Require two identical rows.
+    int row = bitbuffer_find_repeated_row(bitbuffer, 2, 90);
+    if (row < 0) return 0;
 
-        // The row must start with 0xcc5f (0x33a0 inverted).
-        uint8_t *b = bitbuffer->bb[row];
+    // The row must start with 0xcc5f (0x33a0 inverted).
+    uint8_t *b = bitbuffer->bb[row];
     if (b[0] != 0xcc || b[1] != 0x5f) return 0;
 
     bitbuffer_invert(bitbuffer);

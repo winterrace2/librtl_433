@@ -44,6 +44,7 @@ static int rubicson_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_
         return 0;
 
     if (rubicson_crc_check(bb)) {
+        
         /* Nibble 3,4,5 contains 12 bits of temperature
          * The temperature is signed and scaled by 10 */
         temp = (int16_t)((uint16_t)(bb[0][1] << 12) | (bb[0][2] << 4));
@@ -88,7 +89,7 @@ r_device rubicson = {
     .long_width     = 2000, // Pulse: 500µs (Initial pulse in each package is 388µs)
     .gap_limit      = 3000,
     .reset_limit    = 4800, // Two initial pulses and a gap of 9120µs is filtered out
-	.decode_fn      = &rubicson_callback,
+    .decode_fn      = &rubicson_callback,
     .disabled       = 0,
     .fields         = output_fields,
 };

@@ -57,6 +57,8 @@ static int proove_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t 
     uint32_t channel_code = (b[3] >> 2) & 0x03;
     uint32_t unit_bit = (b[3] & 0x03);
 
+    /* Get time now */
+    
     data = data_make(
                      "model",         "",            DATA_STRING, "Proove",
                      "id",            "House Code",  DATA_INT, sensor_id,
@@ -77,7 +79,7 @@ static char *output_fields[] = {
     "channel",
     "state",
     "unit",
-	"group",
+    "group",
     NULL
 };
 
@@ -87,7 +89,7 @@ r_device proove = {
     .short_width    = 270,
     .long_width     = 1300,
     .gap_limit      = 1500,
-	.reset_limit    = 2800,
+    .reset_limit    = 2800,
     .decode_fn      = &proove_callback,
     .disabled       = 0,
     .fields         = output_fields

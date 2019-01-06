@@ -36,7 +36,7 @@
 
     // MSVC has something like C99 restrict as __restrict
     #ifndef restrict
-        #define restrict  __restrict
+		#define restrict  __restrict
     #endif
 #endif
 
@@ -53,13 +53,13 @@
 #endif
 
 typedef enum {
-    DATA_DATA,      /* pointer to data is stored */
-    DATA_INT,       /* pointer to integer is stored */
-    DATA_DOUBLE,    /* pointer to a double is stored */
-    DATA_STRING,    /* pointer to a string is stored */
-    DATA_ARRAY,     /* pointer to an array of values is stored */
-    DATA_COUNT,     /* invalid */
-    DATA_FORMAT     /* indicates the following value is formatted */
+    DATA_DATA,        /* pointer to data is stored */
+    DATA_INT,        /* pointer to integer is stored */
+    DATA_DOUBLE,        /* pointer to a double is stored */
+    DATA_STRING,        /* pointer to a string is stored */
+    DATA_ARRAY,        /* pointer to an array of values is stored */
+    DATA_COUNT,        /* invalid */
+    DATA_FORMAT        /* indicates the following value is formatted */
 } data_type_t;
 
 typedef struct data_array {

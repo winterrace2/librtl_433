@@ -978,7 +978,7 @@ int sdr_stop(sdr_dev_t *dev)
 {
     if (!dev)
         return -1;
-    
+
     if (dev->rtl_tcp) {
         dev->running = 0;
         return 0;

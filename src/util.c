@@ -250,21 +250,21 @@ int add_bytes(uint8_t const message[], unsigned num_bytes)
 // moved from optparse:
 char *asepc(char **stringp, char delim)
 {
-	if (!stringp || !*stringp) return NULL;
-	char *s = strchr(*stringp, delim);
-	if (s) *s++ = '\0';
-	char *p = *stringp;
-	*stringp = s;
-	return p;
+    if (!stringp || !*stringp) return NULL;
+    char *s = strchr(*stringp, delim);
+    if (s) *s++ = '\0';
+    char *p = *stringp;
+    *stringp = s;
+    return p;
 }
 
 char *getkwargs(char **s, char **key, char **val)
 {
-	char *v = asepc(s, ',');
-	char *k = asepc(&v, '=');
-	if (key) *key = k;
-	if (val) *val = v;
-	return k;
+    char *v = asepc(s, ',');
+    char *k = asepc(&v, '=');
+    if (key) *key = k;
+    if (val) *val = v;
+    return k;
 }
 
 // Unit testing

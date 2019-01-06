@@ -25,30 +25,30 @@
 static const unsigned char preamble_pattern[1] = {0xf8}; // 6 bits
 
 static int tpms_pmv107j_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext, unsigned row, unsigned bitpos) {
-	data_t *data;
-	unsigned int start_pos;
-	bitbuffer_t packet_bits = { 0 };
-	uint8_t b[9];
-	unsigned id;
-	char id_str[9];
-	unsigned status, pressure1, pressure2, temp, battery_low, counter, failed;
-	float pressure_kpa, temperature_c;
-	int crc;
+    data_t *data;
+    unsigned int start_pos;
+    bitbuffer_t packet_bits = { 0 };
+    uint8_t b[9];
+    unsigned id;
+    char id_str[9];
+    unsigned status, pressure1, pressure2, temp, battery_low, counter, failed;
+    float pressure_kpa, temperature_c;
+    int crc;
 
-	start_pos = bitbuffer_differential_manchester_decode(bitbuffer, row, bitpos, &packet_bits, 70); // 67 bits expected
-	if (start_pos - bitpos < 67 * 2) {
-		return 0;
-	}
-	if (decoder->verbose > 1)
-		bitbuffer_print(&packet_bits);
+    start_pos = bitbuffer_differential_manchester_decode(bitbuffer, row, bitpos, &packet_bits, 70); // 67 bits expected
+    if (start_pos - bitpos < 67 * 2) {
+        return 0;
+    }
+    if (decoder->verbose > 1)
+        bitbuffer_print(&packet_bits);
 
-	// realign the buffer, prepending 6 bits of 0.
-	b[0] = packet_bits.bb[0][0] >> 6;
-	bitbuffer_extract_bytes(&packet_bits, 0, 2, b + 1, 64);
-	if (decoder->verbose > 1) {
+    // realign the buffer, prepending 6 bits of 0.
+    b[0] = packet_bits.bb[0][0] >> 6;
+    bitbuffer_extract_bytes(&packet_bits, 0, 2, b + 1, 64);
+    if (decoder->verbose > 1) {
         rtl433_fprintf(stderr, "Realigned: ");
         bitrow_print(b, 72);
-	}
+    }
 
     crc = b[8];
     if (crc8(b, 8, 0x13, 0x00) != crc) {

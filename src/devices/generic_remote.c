@@ -13,7 +13,8 @@
  */
 #include "decoder.h"
 
-static int generic_remote_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
+static int generic_remote_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
+{
     data_t *data;
     bitrow_t *bb = bitbuffer->bb;
     uint8_t *b = bb[0];

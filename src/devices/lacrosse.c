@@ -156,7 +156,7 @@ static int lacrossetx_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdat
                 continue;
             }
 
-			switch (msg_type) {
+            switch (msg_type) {
             case 0x00:
                 temp_c = msg_value - 50.0;
                 data = data_make(
@@ -165,7 +165,7 @@ static int lacrossetx_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdat
                                  "temperature_C", "Temperature", DATA_FORMAT, "%.1f C", DATA_DOUBLE, temp_c,
                                  NULL);
                 decoder_output_data(decoder, data, ext);
-				events++;
+                events++;
                 break;
 
             case 0x0E:
@@ -175,7 +175,7 @@ static int lacrossetx_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdat
                                  "humidity",      "Humidity", DATA_FORMAT, "%.1f %%", DATA_DOUBLE, msg_value,
                                  NULL);
                 decoder_output_data(decoder, data, ext);
-				events++;
+                events++;
                 break;
 
             default:

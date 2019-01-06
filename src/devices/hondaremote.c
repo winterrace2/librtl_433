@@ -49,7 +49,6 @@ static int hondaremote_callback(r_device *decoder, bitbuffer_t *bitbuffer, extda
                 NULL);
 
         decoder_output_data(decoder, data, ext);
-
         return 1;
     }
     return 0;
@@ -68,7 +67,7 @@ r_device hondaremote = {
     .short_width    = 250,
     .long_width     = 500,
     .reset_limit    = 2000,
-    .decode_fn	= &hondaremote_callback,
+    .decode_fn	    = &hondaremote_callback,
     .disabled       = 0,
     .fields         = output_fields
 };

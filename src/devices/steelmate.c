@@ -93,9 +93,9 @@ static int steelmate_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata
 			"battery_mV", "", DATA_INT, battery_mV,
 			"mic", "Integrity", DATA_STRING, "CHECKSUM",
 			NULL);
-        decoder_output_data(decoder, data, ext);
+		decoder_output_data(decoder, data, ext);
 
-        return 1;
+		return 1;
 	}
 
 	//Was not a Steelmate TPMS after all
@@ -119,7 +119,7 @@ r_device steelmate = {
 	.short_width	= 12*4,
 	.long_width     = 0,
 	.reset_limit    = 27*4,
-	.decode_fn	= &steelmate_callback,
+	.decode_fn	    = &steelmate_callback,
 	.disabled		= 0,
 	.fields			= output_fields,
 };

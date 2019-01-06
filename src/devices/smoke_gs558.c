@@ -121,7 +121,7 @@ r_device smoke_gs558 = {
     .long_width     = 1202, // Maximum gap size before new row of bits [us]
     .gap_limit      = 1299 * 1.5f, // Maximum gap size before new row of bits [us]
     .reset_limit    = 11764 * 1.2f, // Maximum gap size before End Of Message [us]
-	.decode_fn      = &smoke_gs558_callback,
+    .decode_fn      = &smoke_gs558_callback,
     .disabled       = 0,
     .fields         = output_fields
 };

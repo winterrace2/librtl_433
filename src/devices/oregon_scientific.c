@@ -8,7 +8,6 @@
  * (at your option) any later version.
  */
 #include "decoder.h"
-
 /// Documentation for Oregon Scientific protocols can be found here:
 /// http://wmrx00.sourceforge.net/Arduino/OregonScientific-RF-Protocols.pdf
 // Sensors ID
@@ -42,7 +41,7 @@ float get_os_temperature(unsigned char *message, unsigned int sensor_id) {
 }
 
 float get_os_rain_rate(unsigned char *message, unsigned int sensor_id) {
-  float rain_rate = 0;  // Nibbles 11..8 rain rate, LSD = 0.01 inches per hour
+  float rain_rate = 0;	// Nibbles 11..8 rain rate, LSD = 0.01 inches per hour
   rain_rate = (((message[5]&0x0f) * 1000) +((message[5]>>4)*100)+((message[4]&0x0f)*10) + ((message[4]>>4)&0x0f)) / 100.0F;
   return rain_rate;
 }
@@ -146,7 +145,7 @@ static int validate_os_checksum(r_device *decoder, unsigned char *msg, int check
   if (sum_of_nibbles == checksum) {
     return 0;
   } else {
-    if (decoder->verbose) {
+    if(decoder->verbose) {
       rtl433_fprintf(stderr, "Checksum error in Oregon Scientific message.  Expected: %02x  Calculated: %02x\n", checksum, sum_of_nibbles);
       rtl433_fprintf(stderr, "Message: ");
       bitrow_print(msg, ((checksum_nibble_idx + 4) >> 1) * 8);
@@ -161,7 +160,7 @@ static int validate_os_v2_message(r_device *decoder, unsigned char * msg, int bi
   if (bits_expected == valid_v2_bits_received) {
     return (validate_os_checksum(decoder, msg, nibbles_in_checksum));
   } else {
-    if (decoder->verbose) {
+    if(decoder->verbose) {
       rtl433_fprintf(stderr, "Bit validation error on Oregon Scientific message.  Expected %d bits, received error after bit %d \n",        bits_expected, valid_v2_bits_received);
       rtl433_fprintf(stderr, "Message: ");
       bitrow_print(msg, bits_expected);
@@ -190,7 +189,7 @@ static int oregon_scientific_v2_1_parser(r_device *decoder, bitbuffer_t *bitbuff
       unsigned int pattern  = (unsigned int)(0x55990000>>pattern_index);
       unsigned int pattern2 = (unsigned int)(0xaa990000>>pattern_index);
 
-      if (decoder->verbose) {
+      if(decoder->verbose) {
         rtl433_fprintf(stdout, "OS v2.1 sync byte search - test_val=%08x pattern=%08x  mask=%08x\n", sync_test_val, pattern, mask);
       }
 
@@ -201,7 +200,7 @@ static int oregon_scientific_v2_1_parser(r_device *decoder, bitbuffer_t *bitbuff
         // pattern_index indicates  where sync nibble starts, so now we can find the start of the payload
         int start_byte = 5 + (pattern_index>>3);
         int start_bit = pattern_index & 0x07;
-        if (decoder->verbose) {
+        if(decoder->verbose) {
           rtl433_fprintf(stdout, "OS v2.1 Sync test val %08x found, starting decode at byte index %d bit %d\n", sync_test_val, start_byte, start_bit);
         }
         int bits_processed = 0;
@@ -419,27 +418,27 @@ static int oregon_scientific_v2_1_parser(r_device *decoder, bitbuffer_t *bitbuff
         //}
 
       return 1;
-    } else if (sensor_id == ID_UVR128 && num_valid_v2_bits==297) {
-        if ((validate_os_v2_message(decoder, msg, 297, num_valid_v2_bits, 12) == 0)) {
-        int uvidx = get_os_uv(msg, sensor_id);
-        data = data_make(
-          "model",          "",           DATA_STRING, "Oregon Scientific UVR128",
-          "id",             "House Code", DATA_INT,    get_os_rollingcode(msg, sensor_id),
-          "uv",             "UV Index",   DATA_FORMAT, "%u", DATA_INT, uvidx,
-          "battery",        "Battery",    DATA_STRING, get_os_battery(msg, sensor_id)?"LOW":"OK",
-          //"channel",        "Channel",    DATA_INT,    get_os_channel(msg, sensor_id),
-          NULL);
-        decoder_output_data(decoder, data, ext);
-        }
-     return 1;
+	} else if (sensor_id == ID_UVR128 && num_valid_v2_bits==297) {
+		if ((validate_os_v2_message(decoder, msg, 297, num_valid_v2_bits, 12) == 0)) {
+		int uvidx = get_os_uv(msg, sensor_id);
+		data = data_make(
+		  "model",          "",           DATA_STRING, "Oregon Scientific UVR128",
+		  "id",             "House Code", DATA_INT,    get_os_rollingcode(msg, sensor_id),
+		  "uv",             "UV Index",   DATA_FORMAT, "%u", DATA_INT, uvidx,
+		  "battery",        "Battery",    DATA_STRING, get_os_battery(msg, sensor_id)?"LOW":"OK",
+		  //"channel",        "Channel",    DATA_INT,    get_os_channel(msg, sensor_id),
+		  NULL);
+		decoder_output_data(decoder, data, ext);
+		}
+	 return 1;
     }else if (num_valid_v2_bits > 16) {
-      if (decoder->verbose) {
+      if(decoder->verbose) {
         rtl433_fprintf(stdout, "%d bit message received from unrecognized Oregon Scientific v2.1 sensor with device ID %x.\n", num_valid_v2_bits, sensor_id);
         rtl433_fprintf(stdout, "Message: ");
         bitrow_print(msg, 20 * 8);
       }
     } else {
-      if (decoder->verbose) {
+      if(decoder->verbose) {
         rtl433_fprintf(stdout, "\nPossible Oregon Scientific v2.1 message, but sync nibble wasn't found\n");
         rtl433_fprintf(stdout, "Raw Data: ");
         bitrow_print(bb[0], bitbuffer->bits_per_row[0]);
@@ -447,7 +446,7 @@ static int oregon_scientific_v2_1_parser(r_device *decoder, bitbuffer_t *bitbuff
     }
   } else {
     if (bb[0][3] != 0) {
-      if (decoder->verbose) {
+      if(decoder->verbose) {
         rtl433_fprintf(stdout, "\nBadly formatted OS v2.1 message encountered.\n");
         bitrow_print(bb[0], bitbuffer->bits_per_row[0]);
       }
@@ -566,8 +565,8 @@ static int oregon_scientific_v3_parser(r_device *decoder, bitbuffer_t *bitbuffer
           "rain_total", "Total Rain", DATA_FORMAT, "%3.1f in", DATA_DOUBLE, total_rain,
           NULL);
         decoder_output_data(decoder, data, ext);
-      }
-    return 1;
+    }
+	return 1;
 } else if (sensor_id == ID_PCR800a) {
   if (validate_os_checksum(decoder, msg, 18) == 0) {
     float rain_rate=get_os_rain_rate(msg, sensor_id);
@@ -582,7 +581,7 @@ static int oregon_scientific_v3_parser(r_device *decoder, bitbuffer_t *bitbuffer
       "rain_total", "Total Rain", DATA_FORMAT, "%3.1f in", DATA_DOUBLE, total_rain,
       NULL);
     decoder_output_data(decoder, data, ext);
-  }
+    }
 return 1;
     } else if (sensor_id == ID_WGR800) {
       if (validate_os_checksum(decoder, msg, 17) == 0) {
@@ -613,7 +612,7 @@ return 1;
             "id",     "House Code", DATA_INT, msg[1]&0x0F,
             "power_W", "Power",     DATA_FORMAT,  "%d W", DATA_INT, ipower,
             NULL);
-        decoder_output_data(decoder, data, ext);
+          decoder_output_data(decoder, data, ext);
       }
     } else if (msg[0] == 0x26) { //  Owl CM180 readings
         msg[0]=msg[0] & 0x0f;
@@ -644,7 +643,7 @@ return 1;
             decoder_output_data(decoder, data, ext);
         }
     } else if ((msg[0] != 0) && (msg[1]!= 0)) { //  sync nibble was found  and some data is present...
-      if (decoder->verbose) {
+      if(decoder->verbose) {
         rtl433_fprintf(stderr, "Message received from unrecognized Oregon Scientific v3 sensor.\n");
         rtl433_fprintf(stderr, "Message: ");
         bitrow_print(msg, bitbuffer->bits_per_row[0]);
@@ -652,7 +651,7 @@ return 1;
         bitrow_print(bb[0], bitbuffer->bits_per_row[0]);
       }
     } else if (bb[0][3] != 0 ) {
-      if (decoder->verbose) {
+      if(decoder->verbose) {
         rtl433_fprintf(stdout, "\nPossible Oregon Scientific v3 message, but sync nibble wasn't found\n");
         rtl433_fprintf(stdout, "Raw Data: ");
         bitrow_print(bb[0], bitbuffer->bits_per_row[0]);
@@ -660,10 +659,10 @@ return 1;
     }
   }
   else { // Based on first couple of bytes, either corrupt message or something other than an Oregon Scientific v3 message
-    if (decoder->verbose) {
+    if(decoder->verbose) {
       if (bb[0][3] != 0) {
-          rtl433_fprintf(stdout, "\nUnrecognized Msg in v3: ");
-          bitrow_print(bb[0], bitbuffer->bits_per_row[0]);
+        rtl433_fprintf(stdout, "\nUnrecognized Msg in v3: ");
+        bitrow_print(bb[0], bitbuffer->bits_per_row[0]);
       }
     }
   }

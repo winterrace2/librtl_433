@@ -115,8 +115,8 @@ r_device esperanza_ews = {
     .short_width   = 2000,
     .long_width    = 4000,
     .gap_limit     = 4400,
-	.reset_limit   = 9400,
-    .decode_fn = &esperanza_ews_callback,
+    .reset_limit   = 9400,
+    .decode_fn     = &esperanza_ews_callback,
     .disabled      = 0,
-	.fields = output_fields, 
+    .fields        = output_fields, 
 };

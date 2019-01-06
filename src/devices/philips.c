@@ -103,7 +103,7 @@ static int philips_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t
     if (decoder->verbose > 1) {
         rtl433_fprintf(stderr, "%s: combined packet = ", __func__);
         bitrow_print(packet, PHILIPS_PACKETLEN * 8);
-	}
+    }
 
     /* Correct CRC? */
     c_crc = crc4(packet, PHILIPS_PACKETLEN, 0x9, 1); /* Including the CRC nibble */
@@ -160,7 +160,7 @@ r_device philips = {
     .short_width   = 2000,
     .long_width    = 6000,
     .reset_limit   = 30000,
-    .decode_fn = &philips_callback,
+    .decode_fn     = &philips_callback,
     .disabled      = 0,
     .fields        = philips_output_fields,
 };

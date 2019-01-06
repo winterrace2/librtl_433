@@ -29,6 +29,7 @@ static int silvercrest_callback(r_device *decoder, bitbuffer_t *bitbuffer, extda
         if ((b[3]&0xF) != cmd_lu_tab[cmd])
             return 0;
 
+
         data = data_make(
             "model", "", DATA_STRING, "Silvercrest Remote Control",
             "button", "", DATA_INT, cmd,

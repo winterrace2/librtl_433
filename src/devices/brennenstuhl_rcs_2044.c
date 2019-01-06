@@ -119,8 +119,8 @@ r_device brennenstuhl_rcs_2044 = {
     .short_width   = 320,
     .long_width    = 968,
     .gap_limit     = 1500,
-	.reset_limit   = 4000,
-    .decode_fn = &brennenstuhl_rcs_2044_callback,
+    .reset_limit   = 4000,
+    .decode_fn     = &brennenstuhl_rcs_2044_callback,
     .disabled      = 1,
     .fields        = output_fields,
 };

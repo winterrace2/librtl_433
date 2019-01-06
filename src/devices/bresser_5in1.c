@@ -147,7 +147,7 @@ r_device bresser_5in1 = {
     .short_width   = 124,
     .long_width    = 124,
     .reset_limit   = 25000,
-	.decode_fn     = &bresser_5in1_callback,
+    .decode_fn     = &bresser_5in1_callback,
     .disabled      = 0,
     .fields        = output_fields,
 };

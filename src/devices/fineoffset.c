@@ -99,6 +99,8 @@ static int fineoffset_WH2_callback(r_device *decoder, bitbuffer_t *bitbuffer, ex
     // Nibble 8,9 contains humidity
     humidity = b[3];
 
+    /* Get time now */
+
     // Thermo
     if (b[3] == 0xFF) {
         data = data_make(
@@ -119,7 +121,7 @@ static int fineoffset_WH2_callback(r_device *decoder, bitbuffer_t *bitbuffer, ex
                          "mic",           "Integrity",   DATA_STRING, "CRC",
                           NULL);
         decoder_output_data(decoder, data, ext);
-	}
+    }
     return 1;
 }
 

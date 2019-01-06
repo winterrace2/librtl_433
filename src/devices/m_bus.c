@@ -131,7 +131,8 @@ typedef struct {
 } m_bus_data_t;
 
 
-static int m_bus_decode_format_a(r_device *decoder, const m_bus_data_t *in, m_bus_data_t *out, m_bus_block1_t *block1) {
+static int m_bus_decode_format_a(r_device *decoder, const m_bus_data_t *in, m_bus_data_t *out, m_bus_block1_t *block1)
+{
     static const uint16_t BLOCK1A_SIZE = 12;     // Size of Block 1, format A
 
     // Get Block 1
@@ -171,7 +172,8 @@ static int m_bus_decode_format_a(r_device *decoder, const m_bus_data_t *in, m_bu
 }
 
 
-static int m_bus_decode_format_b(r_device *decoder, const m_bus_data_t *in, m_bus_data_t *out, m_bus_block1_t *block1) {
+static int m_bus_decode_format_b(r_device *decoder, const m_bus_data_t *in, m_bus_data_t *out, m_bus_block1_t *block1)
+{
     static const uint16_t BLOCK1B_SIZE  = 10;   // Size of Block 1, format B
     static const uint16_t BLOCK2B_SIZE  = 118;  // Maximum size of Block 2, format B
     static const uint16_t BLOCK1_2B_SIZE  = 128;
@@ -213,11 +215,13 @@ static int m_bus_decode_format_b(r_device *decoder, const m_bus_data_t *in, m_bu
     return 1;
 }
 
-
-static void m_bus_output_data(r_device *decoder, const m_bus_data_t *out, const m_bus_block1_t *block1, bitbuffer_t *bitbuffer, extdata_t *ext) {
+static void m_bus_output_data(r_device *decoder, const m_bus_data_t *out, const m_bus_block1_t *block1, bitbuffer_t *bitbuffer, extdata_t *ext)
+{
     data_t  *data;
     char    str_buf[1024];
 
+    // Get time now
+    
     // Make data string
     str_buf[0] = 0;
     for (unsigned n=0; n<out->length; n++) { sprintf(str_buf+n*2, "%02x", out->data[n]); }
@@ -236,7 +240,6 @@ static void m_bus_output_data(r_device *decoder, const m_bus_data_t *out, const 
         "data",     "Data",         DATA_STRING,    str_buf,
         "mic",      "Integrity",    DATA_STRING,    "CRC",
         NULL);
-	
     decoder_output_data(decoder, data, ext);
 }
 
@@ -434,7 +437,7 @@ r_device m_bus_mode_s = {
 r_device m_bus_mode_r = {
     .name           = "Wireless M-Bus, Mode R, 4.8kbps (-f 868330000)",
     .modulation     = FSK_PULSE_MANCHESTER_ZEROBIT,
-    .short_width    = (1000.0f / 4.8f /2),   // ~208 us per bit -> clock half period ~104 us
+    .short_width    = (1000.0f / 4.8f / 2),   // ~208 us per bit -> clock half period ~104 us
     .long_width     = 0,    // Unused
     .reset_limit    = (1000.0f / 4.8f * 1.5f), // 3 clock half periods
     .decode_fn      = &m_bus_mode_r_callback,

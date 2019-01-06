@@ -79,7 +79,7 @@ static WORD _term_get_win_color(BOOL fore, term_color_t color)
        case TERM_COLOR_BRIGHT_WHITE:
             return (7 + FOREGROUND_INTENSITY);
     }
-    rtl433_fprintf(stderr, "FATAL: No mapping for TERM_COLOR_x=%d (fore: %d)\n", color, fore);
+    rtl433_fprintf(stderr,"FATAL: No mapping for TERM_COLOR_x=%d (fore: %d)\n", color, fore);
     return (0);
 }
 

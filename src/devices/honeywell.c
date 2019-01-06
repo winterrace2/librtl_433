@@ -47,6 +47,7 @@ static int honeywell_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata
     state = (event & 0x80) >> 7;
     heartbeat = (event & 0x04) >> 2;
 
+
     data_t *data = data_make(
           "model", "", DATA_STRING, "Honeywell Door/Window Sensor",
           "id",       "", DATA_FORMAT, "%05x", DATA_INT, device_id,

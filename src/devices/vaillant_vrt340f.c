@@ -130,10 +130,10 @@ vaillant_vrt340_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *e
     bb = bits.bb;
 
     /* DEBUG: print out the received packet */
-	//rtl433_fprintf(stderr, "Vaillant ");
-	//bitrow_print(bb[0], bitcount);
+    //rtl433_fprintf(stderr, "Vaillant ");
+    //bitrow_print(bb[0], bitcount);
 
-	// A correct message has 128 bits plus potentially two extra bits for clock sync at the end
+    // A correct message has 128 bits plus potentially two extra bits for clock sync at the end
     if(!(128 <= bitcount && bitcount <= 131) && !(168 <= bitcount && bitcount <= 171))
         return 0;
 

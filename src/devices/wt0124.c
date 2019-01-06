@@ -30,6 +30,7 @@ X = xor checksum
 
 #include "decoder.h"
 
+
 static int wt1024_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
@@ -113,7 +114,7 @@ r_device wt1024 = {
     .reset_limit   = 30000,
     .gap_limit     = 4000,
     .sync_width    = 10000,
-    .decode_fn = &wt1024_callback,
+    .decode_fn     = &wt1024_callback,
     .disabled      = 0,
     .fields        = output_fields,
 };

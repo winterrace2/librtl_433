@@ -108,6 +108,7 @@ static int oregon_scientific_sl109h_callback(r_device *decoder, bitbuffer_t *bit
         if( !((bitbuffer->bits_per_row[row_index] == SL109H_MESSAGE_LENGTH)
               && calculate_checksum(decoder, bitbuffer, row_index, channel_bits)) ) continue;
 
+
         temp_c = calculate_centigrade_decidegrees(bitbuffer, row_index) / 10.0;
 
         humidity = calculate_humidity(bitbuffer, row_index);
@@ -152,7 +153,7 @@ r_device oregon_scientific_sl109h = {
     .long_width     = 4000,
     .gap_limit      = 5000,
     .reset_limit    = 10000, // packet gap is 8900
-	.decode_fn      = &oregon_scientific_sl109h_callback,
+    .decode_fn      = &oregon_scientific_sl109h_callback,
     .disabled       = 0,
     .fields         = output_fields
 };

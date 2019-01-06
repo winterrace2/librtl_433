@@ -55,11 +55,11 @@ char *usecs_time_str(struct timeval *tv, char *buf)
     time_t t_secs = tv->tv_sec;
     tm_info = localtime(&t_secs); // note: win32 doesn't have localtime_r()
 
-	if (tm_info) {
-		size_t l = strftime(buf, LOCAL_TIME_BUFLEN, "%Y-%m-%d %H:%M:%S", tm_info);
-		snprintf(buf + l, LOCAL_TIME_BUFLEN - l, ".%06ld", (long)tv->tv_usec);
-	}
-	else strcpy(buf, "n/a");
+    if (tm_info) {
+        size_t l = strftime(buf, LOCAL_TIME_BUFLEN, "%Y-%m-%d %H:%M:%S", tm_info);
+        snprintf(buf + l, LOCAL_TIME_BUFLEN - l, ".%06ld", (long)tv->tv_usec);
+    }
+    else strcpy(buf, "n/a");
     return buf;
 }
 

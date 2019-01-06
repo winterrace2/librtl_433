@@ -96,7 +96,7 @@ static int s3318p_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t 
       bitbuffer_print(bitbuffer);
       rtl433_fprintf(stderr, "Sensor ID            = %2x\n",  sensor_id);
       rtl433_fprintf(stdout, "Bitstream HEX        = ");
-	  bitrow_print(b, 48);
+      bitrow_print(b, 48);
       rtl433_fprintf(stdout, "Humidity HEX         = %02x\n", b[3]);
       rtl433_fprintf(stdout, "Humidity DEC         = %u\n",   humidity);
       rtl433_fprintf(stdout, "Button               = %d\n",   button);
@@ -140,7 +140,7 @@ r_device s3318p = {
     .short_width    = 1900,
     .long_width     = 3800,
     .gap_limit      = 4400,
-	.reset_limit    = 9400,
+    .reset_limit    = 9400,
     .decode_fn      = &s3318p_callback,
     .disabled       = 0,
     .fields         = output_fields

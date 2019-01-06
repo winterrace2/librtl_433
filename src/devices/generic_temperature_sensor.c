@@ -45,9 +45,9 @@ static int generic_temperature_sensor_callback(r_device *decoder, bitbuffer_t *b
 			"temperature_C",	"Temperature",		DATA_FORMAT, 	"%.02f C",	DATA_DOUBLE,	fTemp,
 			"battery",      	"Battery?",		DATA_INT,					battery,
 			NULL);
-    decoder_output_data(decoder, data, ext);
+	decoder_output_data(decoder, data, ext);
 
-    return 1;
+	return 1;
 }
 
 static char *output_fields[] = {
@@ -65,7 +65,7 @@ r_device generic_temperature_sensor = {
 	.long_width    = 4000,
 	.gap_limit     = 4800,
 	.reset_limit   = 10000,
-	.decode_fn = &generic_temperature_sensor_callback,
+	.decode_fn     = &generic_temperature_sensor_callback,
 	.disabled      = 0,
 	.fields        = output_fields,
 };

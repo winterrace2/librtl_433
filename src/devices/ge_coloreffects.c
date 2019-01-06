@@ -28,7 +28,7 @@ static inline int bit(const uint8_t *bytes, unsigned bit)
 /*
  * Decodes the following encoding scheme:
  * 10 = 0
- * 1100 = 1
+ *  1100 = 1
  */
 unsigned ge_decode(r_device *decoder, bitbuffer_t *inbuf, unsigned row, unsigned start, bitbuffer_t *outbuf)
 {
@@ -75,7 +75,8 @@ char *ge_command_name(uint8_t command) {
     }
 }
 
-static int ge_coloreffects_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext, unsigned row, unsigned start_pos) {
+static int ge_coloreffects_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext, unsigned row, unsigned start_pos)
+{
     data_t *data;
     bitbuffer_t packet_bits = {0};
     uint8_t device_id;

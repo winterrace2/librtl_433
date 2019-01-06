@@ -45,10 +45,10 @@ E: ?
 			"id",				"Id",				DATA_INT,	device,
 			"channel",			"Channel",			DATA_INT,	channel,
 			"temperature_C",	"Temperature",		DATA_FORMAT, 	"%.01f C",	DATA_DOUBLE,	fTemp,
-		NULL);
-    decoder_output_data(decoder, data, ext);
+			NULL);
+	decoder_output_data(decoder, data, ext);
 
-    return 1;
+	return 1;
 
 }
 
@@ -67,7 +67,7 @@ r_device tfa_pool_thermometer = {
 	.long_width    = 4600,
 	.gap_limit     = 7800,
 	.reset_limit   = 10000,
-	.decode_fn = &pool_temperature_sensor_callback,
+	.decode_fn     = &pool_temperature_sensor_callback,
 	.disabled      = 0,
 	.fields        = output_fields,
 };

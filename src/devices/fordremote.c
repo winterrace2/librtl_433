@@ -51,7 +51,7 @@ static int fordremote_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdat
 				"id",		"device-id",	DATA_INT, device_id,
 				"code", 	"data",		DATA_INT, code,
 				NULL);
-        decoder_output_data(decoder, data, ext);
+		decoder_output_data(decoder, data, ext);
 
 		found++;
 	}
@@ -72,7 +72,7 @@ r_device fordremote = {
 	.long_width		= 500,	// bit width is 500 us
 	.reset_limit	= 4000, // sync gap is 3500 us, preamble gap is 38400 us, packet gap is 52000 us
 	.tolerance		= 50,
-	.decode_fn	= &fordremote_callback,
+	.decode_fn      = &fordremote_callback,
 	.disabled		= 0,
 	.fields			= output_fields
 };

@@ -41,8 +41,8 @@ RTL_433_API void list_push(list_t *list, void *p)
 
 RTL_433_API void list_push_all(list_t *list, void **p)
 {
-	for (void **iter = p; iter && *iter; ++iter)
-		list_push(list, *iter);
+    for (void **iter = p; iter && *iter; ++iter)
+        list_push(list, *iter);
 }
 
 RTL_433_API void list_clear(list_t *list, list_elem_free_fn elem_free)
@@ -60,8 +60,8 @@ RTL_433_API void list_clear(list_t *list, list_elem_free_fn elem_free)
 
 RTL_433_API void list_free_elems(list_t *list, list_elem_free_fn elem_free)
 {
-	list_clear(list, elem_free);
-	free(list->elems);
-	list->elems = NULL;
-	list->size = 0;
+    list_clear(list, elem_free);
+    free(list->elems);
+    list->elems = NULL;
+    list->size = 0;
 }

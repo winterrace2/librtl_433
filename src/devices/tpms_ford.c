@@ -21,7 +21,8 @@
 // full preamble is 55 55 55 56 (inverted: aa aa aa a9)
 static const uint8_t preamble_pattern[2] = { 0xaa, 0xa9 }; // 16 bits
 
-static int tpms_ford_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext, unsigned row, unsigned bitpos) {
+static int tpms_ford_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext, unsigned row, unsigned bitpos)
+{
     data_t *data;
     unsigned int start_pos;
     bitbuffer_t packet_bits = {0};

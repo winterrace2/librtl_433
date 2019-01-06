@@ -81,7 +81,7 @@ static int x10_sec_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t
                 break;
         }
 
-        /* get x10_id_str and x10_code_str ready for output */
+        /* get x10_id_str, x10_code_str ready for output */
         sprintf(x10_id_str, "%02x%02x", b[0], b[4]);
         sprintf(x10_code_str, "%02x", b[2]);
 
@@ -119,7 +119,7 @@ r_device x10_sec = {
     .short_width    = 500,  // Short gap 500µs
     .long_width     = 1680, // Long gap 1680µs
     .gap_limit      = 2200, // Gap after sync is 4.5ms (1125)
-	.reset_limit    = 6000,
+    .reset_limit    = 6000,
     .decode_fn      = &x10_sec_callback,
     .disabled       = 0,
     .fields         = output_fields

@@ -1,10 +1,10 @@
 /* LaCrosse WS-2310 433 Mhz Weather Station
 
-    long pulse 1464 us
-    short pulse 368 us
-    fixed gap 1336 us
+	long pulse 1464 us
+	short pulse 368 us
+	fixed gap 1336 us
 
-    Packet Format is 53 bits/ 13 nibbles
+	Packet Format is 53 bits/ 13 nibbles
 
 	 bits	nibble
 	 0- 3	0 - 0000
@@ -61,16 +61,16 @@ static int lacrossews_detect(r_device *decoder, uint8_t *pRow, uint8_t *msg_nybb
 			msg_nybbles[8] == (~msg_nybbles[11] & 0xF) &&
 			(parity & 0x1) == 0x1 &&
 			checksum == msg_nybbles[12])
-            return 1;
+			return 1;
 		else {
             if (decoder->verbose) {
-            rtl433_fprintf(stdout,
+			rtl433_fprintf(stdout,
 				"LaCrosse Packet Validation Failed error: Checksum Comp. %d != Recv. %d, Parity %d\n",
 				checksum, msg_nybbles[12], parity);
 			for (i = 0; i < (LACROSSE_WS_BITLEN / 4); i++) {
-                rtl433_fprintf(stderr, "%X", msg_nybbles[i]);
+				rtl433_fprintf(stderr, "%X", msg_nybbles[i]);
 			}
-            rtl433_fprintf(stderr, "\n");
+			rtl433_fprintf(stderr, "\n");
             }
 			return 0;
 		}
@@ -105,8 +105,9 @@ static int lacrossews_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdat
 			msg_value_bin = (msg_nybbles[7] * 256 + msg_nybbles[8] * 16 + msg_nybbles[9]);
 			msg_checksum = msg_nybbles[12];
 
+
 			if (decoder->verbose)
-                rtl433_fprintf(stderr, "%1X%1X%1X%1X%1X%1X%1X%1X%1X%1X%1X%1X%1X   ",
+				rtl433_fprintf(stderr, "%1X%1X%1X%1X%1X%1X%1X%1X%1X%1X%1X%1X%1X   ",
 									msg_nybbles[0], msg_nybbles[1], msg_nybbles[2], msg_nybbles[3],
 									msg_nybbles[4], msg_nybbles[5], msg_nybbles[6], msg_nybbles[7],
 									msg_nybbles[8], msg_nybbles[9], msg_nybbles[10], msg_nybbles[11],
@@ -122,14 +123,14 @@ static int lacrossews_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdat
 													"id",            "",            DATA_INT, sensor_id,
 													"temperature_C", "Temperature", DATA_FORMAT, "%.1f C", DATA_DOUBLE, temp_c,
 													NULL);
-                decoder_output_data(decoder, data, ext);
+				decoder_output_data(decoder, data, ext);
 				events++;
 
 				break;
 			// Humidity
 			case 1:
 				if(msg_nybbles[7] == 0xA && msg_nybbles[8] == 0xA)
-                    rtl433_fprintf(stderr, "LaCrosse WS %02X-%02X: Humidity Error\n",
+				rtl433_fprintf(stderr, "LaCrosse WS %02X-%02X: Humidity Error\n",
 						ws_id, sensor_id);
 				else {
 					data = data_make(
@@ -138,7 +139,7 @@ static int lacrossews_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdat
 														"id",            "",            DATA_INT, sensor_id,
 														"humidity",      "Humidity",    DATA_INT, msg_value_bcd2,
 														NULL);
-                    decoder_output_data(decoder, data, ext);
+					decoder_output_data(decoder, data, ext);
 					events++;
 				}
 				break;
@@ -150,7 +151,7 @@ static int lacrossews_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdat
 													"ws_id",          "",           DATA_INT, ws_id,
 													"id",             "",           DATA_INT, sensor_id,
 													"rainfall_mm",    "Rainfall",   DATA_FORMAT, "%3.2f mm", DATA_DOUBLE, rain_mm, NULL);
-                decoder_output_data(decoder, data, ext);
+				decoder_output_data(decoder, data, ext);
 				events++;
 				break;
 			// Wind
@@ -161,7 +162,7 @@ static int lacrossews_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdat
 				wind_spd = (msg_nybbles[7] * 16 + msg_nybbles[8])/ 10.0;
 				if(msg_nybbles[7] == 0xF && msg_nybbles[8] == 0xE) {
 					if (decoder->verbose) {
-                    rtl433_fprintf(stderr, "LaCrosse WS %02X-%02X: %s Not Connected\n",
+						rtl433_fprintf(stderr, "LaCrosse WS %02X-%02X: %s Not Connected\n",
 						ws_id, sensor_id, msg_type == 3 ? "Wind":"Gust");
 					}
 				} else {
@@ -173,13 +174,13 @@ static int lacrossews_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdat
 														"id",             "",           DATA_INT, sensor_id,
 														wind_key,         wind_label,   DATA_FORMAT, "%3.1f m/s", DATA_DOUBLE, wind_spd,
 														"wind_direction", "Direction",  DATA_DOUBLE, wind_dir, NULL);
-                    decoder_output_data(decoder, data, ext);
+					decoder_output_data(decoder, data, ext);
 					events++;
 				}
 				break;
 			default:
 			if (decoder->verbose) {
-                rtl433_fprintf(stderr,
+				rtl433_fprintf(stderr,
 					"LaCrosse WS %02X-%02X: Unknown data type %d, bcd %d bin %d\n",
 					ws_id, sensor_id, msg_type, msg_value_bcd, msg_value_bin);
 				}

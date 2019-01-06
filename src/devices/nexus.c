@@ -21,7 +21,7 @@
 
 #include "decoder.h"
 
- // NOTE: this should really not be here
+// NOTE: this should really not be here
 int rubicson_crc_check(bitrow_t *bb);
 
 static int nexus_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
@@ -56,6 +56,8 @@ static int nexus_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *
         if ((bb[r][3]&0xF0) != 0xF0)
             return 0;
 
+        /* Get time now */
+
         /* Nibble 0,1 contains id */
         id = bb[r][0];
 
@@ -73,18 +75,18 @@ static int nexus_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *
 
         // Thermo
         if (bb[r][3] == 0xF0) {
-			data = data_make(
-				"model",         "",            DATA_STRING, "Nexus Temperature",
-				"id",            "House Code",  DATA_INT, id,
-				"channel",       "Channel",     DATA_INT, channel,
-				"battery",       "Battery",     DATA_STRING, battery ? "OK" : "LOW",
-				"temperature_C", "Temperature", DATA_FORMAT, "%.02f C", DATA_DOUBLE, temp/10.0,
-				NULL);
+            data = data_make(
+                "model",         "",            DATA_STRING, "Nexus Temperature",
+                "id",            "House Code",  DATA_INT, id,
+                "channel",       "Channel",     DATA_INT, channel,
+                "battery",       "Battery",     DATA_STRING, battery ? "OK" : "LOW",
+                "temperature_C", "Temperature", DATA_FORMAT, "%.02f C", DATA_DOUBLE, temp/10.0,
+                NULL);
             decoder_output_data(decoder, data, ext);
-		}
+        }
         // Thermo/Hygro
         else {
-			data = data_make(
+            data = data_make(
                 "model",         "",            DATA_STRING, "Nexus Temperature/Humidity",
                 "id",            "House Code",  DATA_INT, id,
                 "channel",       "Channel",     DATA_INT, channel,
@@ -93,7 +95,7 @@ static int nexus_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *
                 "humidity",      "Humidity",    DATA_FORMAT, "%u %%", DATA_INT, humidity,
                 NULL);
         decoder_output_data(decoder, data, ext);
-		}
+        }
         return 1;
     }
     return 0;
@@ -115,7 +117,7 @@ r_device nexus = {
     .short_width    = 1000,
     .long_width     = 2000,
     .gap_limit      = 3000,
-	.reset_limit    = 5000,
+    .reset_limit    = 5000,
     .decode_fn      = &nexus_callback,
     .disabled       = 0,
     .fields         = output_fields

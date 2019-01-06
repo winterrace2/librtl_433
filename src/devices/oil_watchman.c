@@ -12,6 +12,7 @@
  */
 #include "decoder.h"
 
+
 // Start of frame preamble is 111000xx
 static const unsigned char preamble_pattern = 0xe0;
 
@@ -31,9 +32,10 @@ static int oil_watchman_callback(r_device *decoder, bitbuffer_t *bitbuffer, extd
 	bitbuffer_t databits = {0};
 	int events = 0;
 
+
 	// Find a preamble with enough bits after it that it could be a complete packet
 	while ((bitpos = bitbuffer_search(bitbuffer, 0, bitpos, &preamble_pattern, 6)) + 136 <=
-           bitbuffer->bits_per_row[0]) {
+	       bitbuffer->bits_per_row[0]) {
 
 		// Skip the matched preamble bits to point to the data
 		bitpos += 6;
@@ -85,7 +87,7 @@ static int oil_watchman_callback(r_device *decoder, bitbuffer_t *bitbuffer, extd
 			"binding_countdown", "", DATA_INT, binding_countdown,
 			"depth", "", DATA_INT, depth,
 			NULL);
-        decoder_output_data(decoder, data, ext);
+		decoder_output_data(decoder, data, ext);
 		events++;
 	}
 	return events;
@@ -108,7 +110,7 @@ r_device oil_watchman = {
 	.short_width	= 1000,
 	.long_width     = 1000, // NRZ
 	.reset_limit    = 4000,
-	.decode_fn	= &oil_watchman_callback,
+	.decode_fn	    = &oil_watchman_callback,
 	.disabled		= 0,
 	.fields			= output_fields,
 };

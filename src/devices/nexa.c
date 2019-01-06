@@ -26,7 +26,7 @@ static int nexa_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *e
 
 
     bitbuffer_t databits = {0};
-	unsigned pos = bitbuffer_manchester_decode(bitbuffer, 1, 0, &databits, 80);
+    unsigned pos = bitbuffer_manchester_decode(bitbuffer, 1, 0, &databits, 80);
 
     /* Reject codes when Manchester decoding fails */
     if (pos != 64 && pos != 72)
@@ -40,6 +40,8 @@ static int nexa_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *e
     uint32_t on_bit = (b[3] >> 4) & 1;
     uint32_t channel_code = (b[3] >> 2) & 0x03;
     uint32_t unit_bit = (b[3] & 0x03);
+
+    /* Get time now */
 
     data = data_make(
                      "model",         "",            DATA_STRING, "Nexa",
@@ -70,7 +72,7 @@ r_device nexa = {
     .short_width    = 270,
     .long_width     = 1300,
     .gap_limit      = 1500,
-	.reset_limit    = 2800,
+    .reset_limit    = 2800,
     .decode_fn      = &nexa_callback,
     .disabled       = 0,
     .fields         = output_fields

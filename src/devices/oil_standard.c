@@ -35,7 +35,8 @@ static const unsigned char preamble_pattern1[2] = { 0x55, 0x62 };
 
 // End of frame is the last half-bit repeated additional 4 times
 
-static int oil_standard_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext, unsigned row, unsigned bitpos) {
+static int oil_standard_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext, unsigned row, unsigned bitpos)
+{
     data_t *data;
     uint8_t *b;
     uint16_t unit_id;
@@ -44,11 +45,13 @@ static int oil_standard_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdat
     uint8_t flags;
     uint8_t alarm;
     bitbuffer_t databits = {0};
-     bitpos = bitbuffer_manchester_decode(bitbuffer, row, bitpos, &databits, 41);
-     if (databits.bits_per_row[0] < 32 || databits.bits_per_row[0] > 40 || (databits.bb[0][4] & 0xfe) != 0)
+    
+    bitpos = bitbuffer_manchester_decode(bitbuffer, row, bitpos, &databits, 41);
+    
+    if (databits.bits_per_row[0] < 32 || databits.bits_per_row[0] > 40 || (databits.bb[0][4] & 0xfe) != 0)
         return 0;
-     b = databits.bb[0];
-     // The unit ID changes when you rebind by holding a magnet to the
+    b = databits.bb[0];
+    // The unit ID changes when you rebind by holding a magnet to the
     // sensor for long enough.
     unit_id = (b[0] << 8) | b[1];
      // 0x01: Rebinding (magnet held to sensor)
@@ -61,7 +64,7 @@ static int oil_standard_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdat
     // 0x80: (always zero?)
     flags = b[2] & ~0x0A;
     alarm = (b[2] & 0x08) >> 3;
-     if (flags & 1)
+    if (flags & 1)
         // When binding, the countdown counts up from 0x40 to 0x4a
         // (as long as you hold the magnet to it for long enough)
         // before the device ID changes. The receiver unit needs
@@ -71,6 +74,7 @@ static int oil_standard_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdat
     else
         // A depth reading of zero indicates no reading.
         depth = ((b[2] & 0x02) << 7) | b[3];
+    
     data = data_make(
             "model", "", DATA_STRING, "Oil Ultrasonic STANDARD",
             "id", "", DATA_FORMAT, "%04x", DATA_INT, unit_id,
@@ -120,7 +124,7 @@ r_device oil_standard = {
 	.short_width	= 500,
 	.long_width		= 500,
 	.reset_limit	= 2000,
-	.decode_fn	= &oil_standard_callback,
+	.decode_fn      = &oil_standard_callback,
 	.disabled		= 0,
 	.fields			= output_fields,
 };
@@ -131,7 +135,7 @@ r_device oil_standard_ask = {
 	.short_width	= 500,
 	.long_width		= 500,
 	.reset_limit	= 2000,
-	.decode_fn	= &oil_standard_callback,
+	.decode_fn      = &oil_standard_callback,
 	.disabled		= 0,
 	.fields			= output_fields,
 };

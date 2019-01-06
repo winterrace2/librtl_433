@@ -93,5 +93,5 @@ r_device chuango = {
     .tolerance      = 160,  // us
     .decode_fn      = &chuango_callback,
     .disabled       = 0,
-	.fields         = output_fields,
+    .fields         = output_fields,
 };

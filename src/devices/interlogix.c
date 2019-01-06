@@ -193,6 +193,7 @@ static int interlogix_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdat
         f5_latch_state = (message[4] & 0x04) ? "OPEN" : "CLOSED";
     }
 
+
     data = data_make(
             "model",       "Model",         DATA_STRING, "Interlogix",
             "id",          "ID",            DATA_STRING, device_serial,
@@ -227,11 +228,11 @@ static char *output_fields[] = {
 
 r_device interlogix = {
     .name          = "Interlogix GE UTC Security Devices",
-	.modulation    = OOK_PULSE_PPM,
+    .modulation    = OOK_PULSE_PPM,
     .short_width   = 122,
     .long_width    = 244,
     .reset_limit   = 500, // Maximum gap size before End Of Message
-    .decode_fn = &interlogix_callback,
+    .decode_fn     = &interlogix_callback,
     .disabled      = 0,
     .fields        = output_fields,
 };

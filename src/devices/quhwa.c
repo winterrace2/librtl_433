@@ -32,6 +32,7 @@ static int quhwa_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *
 
     uint32_t id = (b[0] << 8) | b[1];
 
+
     data_t *data = data_make(
             "model", "", DATA_STRING, "Quhwa doorbell",
             "id", "ID", DATA_INT, id,
@@ -57,7 +58,7 @@ r_device quhwa = {
     .gap_limit     = 1200, // Long Gap 1120µs
     .sync_width    = 0,    // No sync bit used
     .tolerance     = 80,   // us
-    .decode_fn = &quhwa_callback,
+    .decode_fn     = &quhwa_callback,
     .disabled      = 0,
     .fields        = output_fields
 };
