@@ -28,7 +28,7 @@ int rtl433_fprintf(FILE *stream, const char* aFormat, ...) {
 	va_start(argptr, aFormat);
 	// if a callback is registered, pass stderr/stdout data to it
 	if (print_cb && (stream == stdout || stream == stderr)) {
-		static char printbuf[512]; // local default buffer (stack). Suffient size for most use cases.
+		static char printbuf[512]; // local default buffer (stack). Sufficient size for most use cases.
 		char *buf = printbuf; // we use the local buffer if possible
 		rv = vsnprintf(NULL, 0, aFormat, argptr) + 1; // test how much space we really need
 		int needed_cap = rv;

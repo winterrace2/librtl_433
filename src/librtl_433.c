@@ -97,7 +97,14 @@ RTL_433_API SdrDriverType getDriverType() {
 }
 
 static void print_version(void) {
-    rtl433_fprintf(stderr, "rtl_433 " VERSION "\n");
+    rtl433_fprintf(stderr, "rtl_433 " VERSION " inputs file rtl_tcp"
+#ifdef RTLSDR
+            " RTL-SDR"
+#endif
+#ifdef SOAPYSDR
+            " SoapySDR"
+#endif
+            "\n");
 }
 
 RTL_433_API int rtl_433_init(rtl_433_t **out_rtl) {
@@ -456,6 +463,7 @@ static int InitSdr(rtl_433_t *rtl) {
     
     r = sdr_open(&rtl->dev, &rtl->demod->sample_size, (rtl->cfg->dev_query[0]?rtl->cfg->dev_query:NULL), rtl->cfg->verbosity);
     if (r < 0) {
+		rtl433_fprintf(stderr, "InitSdr: sdr_open failed.\n");
         return 0;
     }
     /* Set the sample rate */
