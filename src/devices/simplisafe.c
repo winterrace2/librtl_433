@@ -27,7 +27,7 @@ ss_get_id(char *id, uint8_t *b)
 }
 
 static int
-ss_sensor_parser(r_device *decoder, bitbuffer_t *bitbuffer, int row)
+ss_sensor_parser(r_device *decoder, bitbuffer_t *bitbuffer, int row, extdata_t *ext)
 {
     data_t *data;
     uint8_t *b = bitbuffer->bb[row];
@@ -46,28 +46,28 @@ ss_sensor_parser(r_device *decoder, bitbuffer_t *bitbuffer, int row)
     ss_get_id(id, b);
 
     if (state == 1) {
-		strcpy(extradata,"Contact Open");
+        strcpy(extradata,"Contact Open");
     } else if (state == 2) {
-    	strcpy(extradata,"Contact Closed");
+        strcpy(extradata,"Contact Closed");
     } else if (state == 3) {
-    	strcpy(extradata,"Alarm Off");
+        strcpy(extradata,"Alarm Off");
     }
 
     data = data_make(
-        	"model",    "",    DATA_STRING, "SimpliSafe Sensor",
-        	"device",    "Device ID",    DATA_STRING, id,
-        	"seq",        "Sequence",    DATA_INT, seq,
-        	"state",    "State",    DATA_INT, state,
-        	"extradata",    "Extra Data",    DATA_STRING, extradata,
-        	NULL
+    	"model",    "", DATA_STRING, "SimpliSafe Sensor",
+    	"device",   "Device ID",    DATA_STRING, id,
+    	"seq",      "Sequence", DATA_INT, seq,
+    	"state",    "State",    DATA_INT, state,
+    	"extradata",    "Extra Data",   DATA_STRING, extradata,
+    	NULL
     );
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }
 
-static int
-ss_pinentry_parser(r_device *decoder, bitbuffer_t *bitbuffer, int row)
+static int 
+ss_pinentry_parser(r_device *decoder, bitbuffer_t *bitbuffer, int row, extdata_t *ext)
 {
     data_t *data;
     uint8_t *b = bitbuffer->bb[row];
@@ -89,19 +89,19 @@ ss_pinentry_parser(r_device *decoder, bitbuffer_t *bitbuffer, int row)
     sprintf(extradata, "Disarm Pin: %x%x%x%x", digits[0], digits[1], digits[2], digits[3]);
 
     data = data_make(
-        	"model",    "",    DATA_STRING, "SimpliSafe Keypad",
-        	"device",    "Device ID",    DATA_STRING, id,
-        	"seq",        "Sequence",    DATA_INT, b[9],
-        	"extradata",    "Extra Data",    DATA_STRING, extradata,
-        	NULL
+        "model",    "", DATA_STRING, "SimpliSafe Keypad",
+        "device",   "Device ID",    DATA_STRING, id,
+        "seq",      "Sequence", DATA_INT, b[9],
+        "extradata",    "Extra Data",   DATA_STRING, extradata,
+        NULL
     );
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }
 
-static int
-ss_keypad_commands(r_device *decoder, bitbuffer_t *bitbuffer, int row)
+static int 
+ss_keypad_commands(r_device *decoder, bitbuffer_t *bitbuffer, int row, extdata_t *ext)
 {
     data_t *data;
     uint8_t *b = bitbuffer->bb[row];
@@ -125,19 +125,19 @@ ss_keypad_commands(r_device *decoder, bitbuffer_t *bitbuffer, int row)
     ss_get_id(id, b);
 
     data = data_make(
-        	"model",    "",    DATA_STRING, "SimpliSafe Keypad",
-        	"device",    "",    DATA_STRING, id,
-        	"seq",    "Sequence",DATA_INT, b[9],
-        	"extradata",    "",    DATA_STRING, extradata,
-        	NULL
+    	"model",    "", DATA_STRING, "SimpliSafe Keypad",
+    	"device",   "", DATA_STRING, id,
+    	"seq",  "Sequence",DATA_INT, b[9],
+    	"extradata",    "", DATA_STRING, extradata,
+    	NULL
     );
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }
 
 static int
-ss_sensor_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+ss_sensor_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     // Require two identical rows.
     int row = bitbuffer_find_repeated_row(bitbuffer, 2, 90);
@@ -150,14 +150,14 @@ ss_sensor_callback(r_device *decoder, bitbuffer_t *bitbuffer)
     bitbuffer_invert(bitbuffer);
 
     if (b[2] == 0x88) {
-        return ss_sensor_parser(decoder, bitbuffer, row);
+        return ss_sensor_parser(decoder, bitbuffer, row, ext);
     } else if (b[2] == 0x66) {
-        return ss_pinentry_parser(decoder, bitbuffer, row);
+        return ss_pinentry_parser(decoder, bitbuffer, row, ext);
     } else if (b[2] == 0x44) {
-        return ss_keypad_commands(decoder, bitbuffer, row);
+        return ss_keypad_commands(decoder, bitbuffer, row, ext);
     } else {
         if (decoder->verbose)
-            fprintf(stderr, "Unknown Message Type: %02x\n", b[2]);
+            rtl433_fprintf(stderr, "Unknown Message Type: %02x\n", b[2]);
         return 0;
     }
 }

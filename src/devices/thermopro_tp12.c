@@ -44,7 +44,7 @@ Layout appears to be:
 
 #define BITS_IN_VALID_ROW 40
 
-static int thermopro_tp12_sensor_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int thermopro_tp12_sensor_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     int temp1_raw, temp2_raw, row;
     float temp1_c, temp2_c;
     uint8_t *bytes;
@@ -84,7 +84,7 @@ static int thermopro_tp12_sensor_callback(r_device *decoder, bitbuffer_t *bitbuf
 
         // This format is easily usable by bruteforce-crc, after piping through | grep raw_data | cut -d':' -f2 
         // bruteforce-crc didn't find anything, though - this may not be a CRC algorithm specifically.
-        fprintf(stderr,"thermopro_tp12_raw_data:");
+        rtl433_fprintf(stderr,"thermopro_tp12_raw_data:");
         bitrow_print(bytes, 40);
     }
 
@@ -100,7 +100,7 @@ static int thermopro_tp12_sensor_callback(r_device *decoder, bitbuffer_t *bitbuf
             "temperature_1_C",  "Temperature 1 (Food)", DATA_FORMAT, "%.01f C", DATA_DOUBLE, temp1_c,
             "temperature_2_C",  "Temperature 2 (Barbecue)", DATA_FORMAT, "%.01f C", DATA_DOUBLE, temp2_c,
             NULL);
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
     return 1;
 }
 

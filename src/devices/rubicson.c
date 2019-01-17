@@ -17,7 +17,7 @@
 
 #include "decoder.h"
 
-// NOTE: this is used in nexus.c and solight_te44.c
+ // NOTE: this is used in nexus.c and solight_te44.c
 int rubicson_crc_check(bitrow_t *bb) {
     uint8_t tmp[5];
     tmp[0] = bb[1][0];            // Byte 0 is nibble 0 and 1
@@ -29,7 +29,7 @@ int rubicson_crc_check(bitrow_t *bb) {
     return crc8(tmp, 5, 0x31, 0x6c) == 0;
 }
 
-static int rubicson_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int rubicson_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     bitrow_t *bb = bitbuffer->bb;
     unsigned bits = bitbuffer->bits_per_row[0];
     data_t *data;
@@ -44,7 +44,7 @@ static int rubicson_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
         return 0;
 
     if (rubicson_crc_check(bb)) {
-
+        
         /* Nibble 3,4,5 contains 12 bits of temperature
          * The temperature is signed and scaled by 10 */
         temp = (int16_t)((uint16_t)(bb[0][1] << 12) | (bb[0][2] << 4));
@@ -63,7 +63,7 @@ static int rubicson_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
                         "temperature_C", "Temperature", DATA_FORMAT, "%.1f C", DATA_DOUBLE, temp_c,
                         "mic",           "Integrity",   DATA_STRING, "CRC",
                         NULL);
-        decoder_output_data(decoder, data);
+        decoder_output_data(decoder, data, ext);
 
         return 1;
     }

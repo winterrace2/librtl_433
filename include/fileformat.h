@@ -14,6 +14,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <librtl_433_export.h>
 
 char const *file_basename(char const *path);
 
@@ -79,11 +80,11 @@ typedef struct {
     FILE *file;
 } file_info_t;
 
-int parse_file_info(const char *filename, file_info_t *info);
+RTL_433_API int parse_file_info(const char *filename, file_info_t *info);
 
-void check_read_file_info(file_info_t *info);
+RTL_433_API int check_read_file_info(file_info_t *info);
 
-void check_write_file_info(file_info_t *info);
+RTL_433_API int check_write_file_info(file_info_t *info);
 
 char const *file_info_string(file_info_t *info);
 

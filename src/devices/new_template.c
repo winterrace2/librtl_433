@@ -45,7 +45,7 @@
 #define MYDEVICE_CRC_POLY    0x07
 #define MYDEVICE_CRC_INIT    0x00
 
-static int template_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int template_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     int r; // a row index
@@ -64,8 +64,8 @@ static int template_callback(r_device *decoder, bitbuffer_t *bitbuffer)
      * 1. Enable with -D -D (debug level of 2)
      * 2. Delete this block when your decoder is working
      */
-    //    if (decoder->verbose > 1) {
-    //        fprintf(stderr,"new_tmplate callback:\n");
+    //    if (verbose > 1) {
+    //        rtl433_fprintf(stderr,"new_tmplate callback:\n");
     //        bitbuffer_print(bitbuffer);
     //    }
 
@@ -151,7 +151,7 @@ static int template_callback(r_device *decoder, bitbuffer_t *bitbuffer)
 
     if (!parity) {
         if (decoder->verbose) {
-            fprintf(stderr, "new_template parity check failed\n");
+            rtl433_fprintf(stderr, "new_template parity check failed\n");
         }
         return 0;
     }
@@ -161,7 +161,7 @@ static int template_callback(r_device *decoder, bitbuffer_t *bitbuffer)
      */
     if (((b[0] + b[1] + b[2] + b[3] - b[4]) & 0xFF) != 0) {
         if (decoder->verbose) {
-            fprintf(stderr, "new_template checksum error\n");
+            rtl433_fprintf(stderr, "new_template checksum error\n");
         }
         return 0;
     }
@@ -176,7 +176,7 @@ static int template_callback(r_device *decoder, bitbuffer_t *bitbuffer)
     if (r_crc != c_crc) {
         // example debugging output
         if (decoder->verbose) {
-            fprintf(stderr, "new_template bad CRC: calculated %02x, received %02x\n",
+            rtl433_fprintf(stderr, "new_template bad CRC: calculated %02x, received %02x\n",
                     c_crc, r_crc);
         }
 
@@ -209,7 +209,7 @@ static int template_callback(r_device *decoder, bitbuffer_t *bitbuffer)
             "mic",   "", DATA_STRING, "CHECKSUM", // CRC, CHECKSUM, or PARITY
             NULL);
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     // Return 1 if message successfully decoded
     return 1;
@@ -248,7 +248,7 @@ static char *output_fields[] = {
  *
  * This device is disabled by default. Enable it with -R 61 on the commandline
  */
-r_device template = {
+r_device new_template = {
     .name          = "Template decoder",
     .modulation    = OOK_PULSE_PPM,
     .short_width   = 132, // short gap is 132 us

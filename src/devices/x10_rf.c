@@ -12,7 +12,7 @@
 
 #include "decoder.h"
 
-static int x10_rf_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int x10_rf_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     data_t *data;
     uint8_t *b = bitbuffer->bb[1];
 
@@ -75,7 +75,7 @@ static int x10_rf_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
             "data",     "", DATA_FORMAT, "%08x", DATA_INT, code,
             NULL);
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

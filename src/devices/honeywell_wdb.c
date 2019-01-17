@@ -37,7 +37,7 @@
 
 #include "decoder.h"
 
-static int honeywell_wdb_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int honeywell_wdb_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     int row, secret_knock, relay, battery, parity;
     uint8_t *bytes;
     data_t *data;
@@ -63,7 +63,7 @@ static int honeywell_wdb_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
     if (parity) { // ODD parity detected
         if (decoder->verbose > 1) {
             bitbuffer_print(bitbuffer);
-            fprintf(stderr, "honeywell_wdb: Parity check on row %d failed (%d)\n", row, parity);
+            rtl433_fprintf(stderr, "honeywell_wdb: Parity check on row %d failed (%d)\n", row, parity);
         }
         return 0;
     }
@@ -96,7 +96,7 @@ static int honeywell_wdb_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
             "battery",       "Battery",     DATA_STRING, battery ? "LOW" : "OK",
             "mic",           "Integrity",   DATA_STRING, "PARITY",
             NULL);
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

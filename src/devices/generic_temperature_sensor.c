@@ -11,7 +11,7 @@
 
 #include "decoder.h"
 
-static int generic_temperature_sensor_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int generic_temperature_sensor_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
 	data_t *data;
 	uint8_t *b = bitbuffer->bb[1];
 	int i,device,battery;
@@ -45,7 +45,7 @@ static int generic_temperature_sensor_callback(r_device *decoder, bitbuffer_t *b
 			"temperature_C",	"Temperature",		DATA_FORMAT, 	"%.02f C",	DATA_DOUBLE,	fTemp,
 			"battery",      	"Battery?",		DATA_INT,					battery,
 			NULL);
-	decoder_output_data(decoder, data);
+	decoder_output_data(decoder, data, ext);
 
 	return 1;
 }

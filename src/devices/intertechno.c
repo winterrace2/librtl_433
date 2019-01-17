@@ -8,7 +8,7 @@
 
 #include "decoder.h"
 
-static int intertechno_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int intertechno_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     bitrow_t *bb = bitbuffer->bb;
@@ -22,19 +22,19 @@ static int intertechno_callback(r_device *decoder, bitbuffer_t *bitbuffer)
         return 0;
 
     if (decoder->verbose > 1) {
-        fprintf(stdout, "Switch event:\n");
-        fprintf(stdout, "protocol       = Intertechno\n");
-        fprintf(stdout, "rid            = %x\n", b[0]);
-        fprintf(stdout, "rid            = %x\n", b[1]);
-        fprintf(stdout, "rid            = %x\n", b[2]);
-        fprintf(stdout, "rid            = %x\n", b[3]);
-        fprintf(stdout, "rid            = %x\n", b[4]);
-        fprintf(stdout, "rid            = %x\n", b[5]);
-        fprintf(stdout, "rid            = %x\n", b[6]);
-        fprintf(stdout, "rid            = %x\n", b[7]);
-        fprintf(stdout, "ADDR Slave     = %i\n", b[7] & 0x0f);
-        fprintf(stdout, "ADDR Master    = %i\n",( b[7] & 0xf0) >> 4);
-        fprintf(stdout, "command        = %i\n",( b[6] & 0x07));
+        rtl433_fprintf(stdout, "Switch event:\n");
+        rtl433_fprintf(stdout, "protocol       = Intertechno\n");
+        rtl433_fprintf(stdout, "rid            = %x\n", b[0]);
+        rtl433_fprintf(stdout, "rid            = %x\n", b[1]);
+        rtl433_fprintf(stdout, "rid            = %x\n", b[2]);
+        rtl433_fprintf(stdout, "rid            = %x\n", b[3]);
+        rtl433_fprintf(stdout, "rid            = %x\n", b[4]);
+        rtl433_fprintf(stdout, "rid            = %x\n", b[5]);
+        rtl433_fprintf(stdout, "rid            = %x\n", b[6]);
+        rtl433_fprintf(stdout, "rid            = %x\n", b[7]);
+        rtl433_fprintf(stdout, "ADDR Slave     = %i\n", b[7] & 0x0f);
+        rtl433_fprintf(stdout, "ADDR Master    = %i\n",( b[7] & 0xf0) >> 4);
+        rtl433_fprintf(stdout, "command        = %i\n",( b[6] & 0x07));
     }
 
     sprintf(id_str, "%02x%02x%02x%02x%02x", b[0], b[1], b[2], b[3], b[4]);
@@ -50,7 +50,7 @@ static int intertechno_callback(r_device *decoder, bitbuffer_t *bitbuffer)
         "command",          "",     DATA_INT,       command,
         NULL);
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
     return 1;
 }
 

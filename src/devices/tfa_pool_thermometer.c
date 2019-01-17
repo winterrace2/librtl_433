@@ -11,7 +11,7 @@
 
 #include "decoder.h"
 
-static int pool_temperature_sensor_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int pool_temperature_sensor_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
 	bitrow_t *bb = bitbuffer->bb;
 	data_t *data;
 	int i,device,channel;
@@ -46,7 +46,7 @@ E: ?
 			"channel",			"Channel",			DATA_INT,	channel,
 			"temperature_C",	"Temperature",		DATA_FORMAT, 	"%.01f C",	DATA_DOUBLE,	fTemp,
 			NULL);
-	decoder_output_data(decoder, data);
+	decoder_output_data(decoder, data, ext);
 
 	return 1;
 

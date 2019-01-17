@@ -13,7 +13,7 @@
 
 #include "decoder.h"
 
-static int ht680_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int ht680_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     uint8_t b[5]; // 36 bits
@@ -65,7 +65,7 @@ static int ht680_callback(r_device *decoder, bitbuffer_t *bitbuffer)
                 "button3",  "Button 3",        	DATA_STRING, button3 == 3 ? "PRESSED" : "",
                 "button4",  "Button 4",        	DATA_STRING, button4 == 3 ? "PRESSED" : "",
                 NULL);
-        decoder_output_data(decoder, data);
+        decoder_output_data(decoder, data, ext);
 
         return 1;
     }

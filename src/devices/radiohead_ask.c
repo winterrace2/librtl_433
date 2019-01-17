@@ -69,7 +69,7 @@ static int radiohead_ask_extract(r_device *decoder, bitbuffer_t *bitbuffer, uint
     pos = bitbuffer_search(bitbuffer, row, 0, init_pattern, init_pattern_len);
     if (pos == len) {
         if (decoder->verbose > 1) {
-            fprintf(stderr, "RH ASK preamble not found\n");
+            rtl433_fprintf(stdout, "RH ASK preamble not found\n");
         }
         return 0;
     }
@@ -87,14 +87,14 @@ static int radiohead_ask_extract(r_device *decoder, bitbuffer_t *bitbuffer, uint
         uint8_t hi_nibble = symbol_6to4(rxBits[0]);
         if (hi_nibble > 0xF) {
             if (decoder->verbose) {
-                fprintf(stderr, "Error on 6to4 decoding high nibble: %X\n", rxBits[0]);
+                rtl433_fprintf(stderr, "Error on 6to4 decoding high nibble: %X\n", rxBits[0]);
             }
             return 0;
         }
         uint8_t lo_nibble = symbol_6to4(rxBits[1]);
         if (lo_nibble > 0xF) {
             if (decoder->verbose) {
-                fprintf(stderr, "Error on 6to4 decoding low nibble: %X\n", rxBits[1]);
+                rtl433_fprintf(stderr, "Error on 6to4 decoding low nibble: %X\n", rxBits[1]);
             }
             return 0;
         }
@@ -111,7 +111,7 @@ static int radiohead_ask_extract(r_device *decoder, bitbuffer_t *bitbuffer, uint
     crc_recompute = ~crc16lsb(payload, msg_len - 2, 0x8408, 0xFFFF);
     if (crc_recompute != crc) {
         if (decoder->verbose) {
-            fprintf(stderr, "CRC error: %04X != %04X\n", crc_recompute, crc);
+            rtl433_fprintf(stderr, "CRC error: %04X != %04X\n", crc_recompute, crc);
         }
         return 0;
     }
@@ -119,7 +119,7 @@ static int radiohead_ask_extract(r_device *decoder, bitbuffer_t *bitbuffer, uint
     return msg_len;
 }
 
-static int radiohead_ask_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int radiohead_ask_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     uint8_t row = 0; // we are considering only first row
@@ -150,12 +150,12 @@ static int radiohead_ask_callback(r_device *decoder, bitbuffer_t *bitbuffer)
             "payload",      "Payload",      DATA_ARRAY, data_array(data_len, DATA_INT, rh_data_payload),
             "mic",          "Integrity",    DATA_STRING, "CRC",
             NULL);
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }
 
-static int sensible_living_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int sensible_living_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     uint8_t row = 0; // we are considering only first row
@@ -186,7 +186,7 @@ static int sensible_living_callback(r_device *decoder, bitbuffer_t *bitbuffer)
              "battery_voltage",  "Battery Voltage",  DATA_INT,     battery_voltage,
              "mic",              "Integrity",        DATA_STRING,  "CRC",
              NULL);
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

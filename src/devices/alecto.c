@@ -66,14 +66,14 @@ int alecto_checksum(r_device *decoder, bitrow_t *bb) {
     csum2 = reverse8((csum2 & 0xf) << 4);
     /* Quit if checksum does not work out */
     if (csum != (bb[1][4] >> 4) || csum2 != (bb[5][4] >> 4)) {
-        //fprintf(stdout, "\nAlectoV1 CRC error");
+        //rtl433_fprintf(stdout, "\nAlectoV1 CRC error");
         if(decoder->verbose) {
-            fprintf(stderr, "AlectoV1 Checksum/Parity error\n");
+            rtl433_fprintf(stderr, "AlectoV1 Checksum/Parity error\n");
         }
         return 0;
     } //Invalid checksum
     if (decoder->verbose){
-        fprintf(stdout, "Checksum      = %01x (calculated %01x)\n", bb[1][4] >> 4, csum);
+        rtl433_fprintf(stdout, "Checksum      = %01x (calculated %01x)\n", bb[1][4] >> 4, csum);
     }
 
     return 1;
@@ -84,7 +84,7 @@ static uint8_t bcd_decode8(uint8_t x) {
     return ((x & 0xF0) >> 4) * 10 + (x & 0x0F);
 }
 
-static int alectov1_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int alectov1_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     bitrow_t *bb = bitbuffer->bb;
     int16_t temp;
     uint8_t humidity;
@@ -115,8 +115,8 @@ static int alectov1_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
 
             //left out data (not needed):
             //bb[1][1]&0x10 ? "timed event":"Button generated ");
-            //fprintf(stdout, "Protocol      = AlectoV1 bpr1: %d bpr2: %d\n", bits_per_row[1], bits_per_row[5]);
-            //fprintf(stdout, "Button        = %d\n", bb[1][1]&0x10 ? 1 : 0);
+            //rtl433_fprintf(stdout, "Protocol      = AlectoV1 bpr1: %d bpr2: %d\n", bits_per_row[1], bits_per_row[5]);
+            //rtl433_fprintf(stdout, "Button        = %d\n", bb[1][1]&0x10 ? 1 : 0);
 
             if (wind) {
                 // Wind sensor
@@ -142,7 +142,7 @@ static int alectov1_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
                                     "wind_direction", "Direction",  DATA_INT,    direction,
                                     "mic",           "Integrity",   DATA_STRING,    "CHECKSUM",
                                     NULL);
-                    decoder_output_data(decoder, data);
+                    decoder_output_data(decoder, data, ext);
                 }
             } else {
                 // Rain sensor
@@ -156,7 +156,7 @@ static int alectov1_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
                                 "rain_total",    "Total Rain", DATA_FORMAT, "%.02f mm", DATA_DOUBLE, rain_mm,
                                 "mic",           "Integrity",  DATA_STRING,    "CHECKSUM",
                                 NULL);
-                decoder_output_data(decoder, data);
+                decoder_output_data(decoder, data, ext);
             }
         } else if (bb[2][0] == bb[3][0] && bb[3][0] == bb[4][0] && bb[4][0] == bb[5][0] &&
                 bb[5][0] == bb[6][0] && (bb[3][4] & 0xf) == 0 && (bb[5][4] & 0xf) == 0) {
@@ -177,17 +177,17 @@ static int alectov1_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
                             "humidity",      "Humidity",    DATA_FORMAT, "%u %%",   DATA_INT, humidity,
                             "mic",           "Integrity",   DATA_STRING,    "CHECKSUM",
                             NULL);
-            decoder_output_data(decoder, data);
+            decoder_output_data(decoder, data, ext);
         }
         if (decoder->verbose){
-            fprintf(stdout, "Received Data = ");
+            rtl433_fprintf(stdout, "Received Data = ");
             bitrow_print(bb[1], 40);
             if (wind) {
-                fprintf(stdout, "Rcvd Data 2   = ");
+                rtl433_fprintf(stdout, "Rcvd Data 2   = ");
                 bitrow_print(bb[5], 40);
             }
             /*
-         * fprintf(stdout, "L2M: %02x %02x %02x %02x %02x\n",reverse8(bb[1][0]),reverse8(bb[1][1]),reverse8(bb[1][2]),reverse8(bb[1][3]),reverse8(bb[1][4]));
+         * rtl433_fprintf(stdout, "L2M: %02x %02x %02x %02x %02x\n",reverse8(bb[1][0]),reverse8(bb[1][1]),reverse8(bb[1][2]),reverse8(bb[1][3]),reverse8(bb[1][4]));
          */
         }
         return 1;

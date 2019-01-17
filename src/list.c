@@ -12,7 +12,14 @@
 #include "list.h"
 #include <stdlib.h>
 
-void list_ensure_size(list_t *list, size_t min_size)
+RTL_433_API void list_initialize(list_t *list)
+{
+	list->elems = NULL;
+	list->size = 0;
+	list->len = 0;
+}
+
+RTL_433_API void list_ensure_size(list_t *list, size_t min_size)
 {
     if (!list->elems || list->size < min_size) {
         list->elems = realloc(list->elems, min_size * sizeof(*list->elems));
@@ -22,7 +29,7 @@ void list_ensure_size(list_t *list, size_t min_size)
     }
 }
 
-void list_push(list_t *list, void *p)
+RTL_433_API void list_push(list_t *list, void *p)
 {
     if (list->len + 1 >= list->size) // account for terminating NULL
         list_ensure_size(list, list->size < 8 ? 8 : list->size + list->size / 2);
@@ -32,13 +39,13 @@ void list_push(list_t *list, void *p)
     list->elems[list->len] = NULL; // ensure a terminating NULL
 }
 
-void list_push_all(list_t *list, void **p)
+RTL_433_API void list_push_all(list_t *list, void **p)
 {
     for (void **iter = p; iter && *iter; ++iter)
         list_push(list, *iter);
 }
 
-void list_clear(list_t *list, list_elem_free_fn elem_free)
+RTL_433_API void list_clear(list_t *list, list_elem_free_fn elem_free)
 {
     if (elem_free) {
         for (size_t i = 0; i < list->len; ++i) { // list might contain NULLs
@@ -51,10 +58,10 @@ void list_clear(list_t *list, list_elem_free_fn elem_free)
     }
 }
 
-void list_free_elems(list_t *list, list_elem_free_fn elem_free)
+RTL_433_API void list_free_elems(list_t *list, list_elem_free_fn elem_free)
 {
     list_clear(list, elem_free);
     free(list->elems);
     list->elems = NULL;
-    list->size  = 0;
+    list->size = 0;
 }

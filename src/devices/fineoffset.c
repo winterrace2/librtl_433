@@ -31,7 +31,7 @@
  * Based on reverse engineering with gnu-radio and the nice article here:
  *  http://lucsmall.com/2012/04/29/weather-station-hacking-part-2/
  */
-static int fineoffset_WH2_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int fineoffset_WH2_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     bitrow_t *bb = bitbuffer->bb;
     uint8_t b[6] = {0};
     data_t *data;
@@ -74,7 +74,7 @@ static int fineoffset_WH2_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
     type = b[0] >> 4;
     if (type != 4) {
         if (decoder->verbose) {
-            fprintf(stderr, "%s: Unknown type: %d\n", model, type);
+            rtl433_fprintf(stderr, "%s: Unknown type: %d\n", model, type);
         }
         return 0;
     }
@@ -109,8 +109,8 @@ static int fineoffset_WH2_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
                          "temperature_C", "Temperature", DATA_FORMAT, "%.01f C", DATA_DOUBLE, temperature,
                          "mic",           "Integrity",   DATA_STRING, "CRC",
                           NULL);
-        decoder_output_data(decoder, data);
-    }
+        decoder_output_data(decoder, data, ext);
+	}
     // Thermo/Hygro
     else {
         data = data_make(
@@ -120,7 +120,7 @@ static int fineoffset_WH2_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
                          "humidity",      "Humidity",    DATA_FORMAT, "%u %%", DATA_INT, humidity,
                          "mic",           "Integrity",   DATA_STRING, "CRC",
                           NULL);
-        decoder_output_data(decoder, data);
+        decoder_output_data(decoder, data, ext);
     }
     return 1;
 }
@@ -160,7 +160,7 @@ static int fineoffset_WH2_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
  */
 #define MODEL_WH24 24 /* internal identifier for model WH24, family code is always 0x24 */
 #define MODEL_WH65B 65 /* internal identifier for model WH65B, family code is always 0x24 */
-static int fineoffset_WH24_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int fineoffset_WH24_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     static uint8_t const preamble[] = {0xAA, 0x2D, 0xD4}; // part of preamble and sync word
@@ -177,7 +177,7 @@ static int fineoffset_WH24_callback(r_device *decoder, bitbuffer_t *bitbuffer)
     bit_offset = bitbuffer_search(bitbuffer, 0, 0, preamble, sizeof(preamble) * 8) + sizeof(preamble) * 8;
     if (bit_offset + sizeof(b) * 8 > bitbuffer->bits_per_row[0]) { // Did not find a big enough package
         if (decoder->verbose) {
-            fprintf(stderr, "Fineoffset_WH24: short package. Header index: %u\n", bit_offset);
+            rtl433_fprintf(stderr, "Fineoffset_WH24: short package. Header index: %u\n", bit_offset);
             bitbuffer_print(bitbuffer);
         }
         return 0;
@@ -193,7 +193,7 @@ static int fineoffset_WH24_callback(r_device *decoder, bitbuffer_t *bitbuffer)
         for (unsigned n = 0; n < sizeof(b); n++) {
             sprintf(raw_str + n * 3, "%02x ", b[n]);
         }
-        fprintf(stderr, "Fineoffset_WH24: Raw: %s @ bit_offset [%u]\n", raw_str, bit_offset);
+        rtl433_fprintf(stderr, "Fineoffset_WH24: Raw: %s @ bit_offset [%u]\n", raw_str, bit_offset);
     }
 
     if (b[0] != 0x24) // Check for family code 0x24
@@ -207,7 +207,7 @@ static int fineoffset_WH24_callback(r_device *decoder, bitbuffer_t *bitbuffer)
     }
     if (crc != b[15] || checksum != b[16]) {
         if (decoder->verbose) {
-            fprintf(stderr, "Fineoffset_WH24: Checksum error: %02x %02x\n", crc, checksum);
+            rtl433_fprintf(stderr, "Fineoffset_WH24: Checksum error: %02x %02x\n", crc, checksum);
         }
         return 0;
     }
@@ -284,7 +284,7 @@ static int fineoffset_WH24_callback(r_device *decoder, bitbuffer_t *bitbuffer)
         data_append(data,   "light_lux",        "Light",            DATA_FORMAT, "%.1f lux", DATA_DOUBLE, light_lux, NULL);
     data_append(data,       "battery",          "Battery",          DATA_STRING, low_battery ? "LOW" : "OK",
                             "mic",              "Integrity",        DATA_STRING, "CRC", NULL);
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }
@@ -309,7 +309,7 @@ static int fineoffset_WH24_callback(r_device *decoder, bitbuffer_t *bitbuffer)
  * BB = Bitsum (XOR) of the 6 data bytes (high and low nibble exchanged)
  *
  */
-static int fineoffset_WH25_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int fineoffset_WH25_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     data_t *data;
     static uint8_t const preamble[] = {0xAA, 0x2D, 0xD4};
     uint8_t b[8];
@@ -317,14 +317,14 @@ static int fineoffset_WH25_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
 
     // Validate package
     if (bitbuffer->bits_per_row[0] < 440 || bitbuffer->bits_per_row[0] > 510) {  // Nominal size is 488 bit periods
-        return fineoffset_WH24_callback(decoder, bitbuffer); // abort and try WH24, WH65B, HP1000
+        return fineoffset_WH24_callback(decoder, bitbuffer, ext); // abort and try WH24, WH65B, HP1000
     }
 
     // Find a data package and extract data payload
     bit_offset = bitbuffer_search(bitbuffer, 0, 320, preamble, sizeof(preamble) * 8) + sizeof(preamble) * 8; // Normal index is 367, skip some bytes to find faster
     if (bit_offset + sizeof(b) * 8 > bitbuffer->bits_per_row[0]) {  // Did not find a big enough package
         if (decoder->verbose) {
-            fprintf(stderr, "Fineoffset_WH25: short package. Header index: %u\n", bit_offset);
+            rtl433_fprintf(stderr, "Fineoffset_WH25: short package. Header index: %u\n", bit_offset);
             bitbuffer_print(bitbuffer);
         }
         return 0;
@@ -334,7 +334,7 @@ static int fineoffset_WH25_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
     if (decoder->verbose) {
         char raw_str[8 * 3 + 1];
         for (unsigned n=0; n<sizeof(b); n++) { sprintf(raw_str+n*3, "%02x ", b[n]); }
-        fprintf(stderr, "Fineoffset_WH25: Raw: %s @ bit_offset [%u]\n", raw_str, bit_offset);
+        rtl433_fprintf(stderr, "Fineoffset_WH25: Raw: %s @ bit_offset [%u]\n", raw_str, bit_offset);
     }
 
     // Verify checksum
@@ -346,7 +346,7 @@ static int fineoffset_WH25_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
     bitsum = (bitsum << 4) | (bitsum >> 4);     // Swap nibbles
     if (checksum != b[6] || bitsum != b[7]) {
         if (decoder->verbose) {
-            fprintf(stderr, "Fineoffset_WH25: Checksum error: %02x %02x\n", checksum, bitsum);
+            rtl433_fprintf(stderr, "Fineoffset_WH25: Checksum error: %02x %02x\n", checksum, bitsum);
         }
         return 0;
     }
@@ -369,7 +369,7 @@ static int fineoffset_WH25_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
                      "battery",       "Battery",     DATA_STRING, low_battery ? "LOW" : "OK",
                      "mic",           "Integrity",   DATA_STRING, "CHECKSUM",
                       NULL);
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }
@@ -393,7 +393,7 @@ static int fineoffset_WH25_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
  * CC = CRC8 with polynomium 0x31
  * CC = Checksum of previous 7 bytes (binary sum truncated to 8 bit)
  */
-static int fineoffset_WH0530_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int fineoffset_WH0530_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     data_t *data;
     bitrow_t *bb = bitbuffer->bb;
 
@@ -409,7 +409,7 @@ static int fineoffset_WH0530_callback(r_device *decoder, bitbuffer_t *bitbuffer)
     if (decoder->verbose) {
         char raw_str[8 * 3 + 1];
         for (unsigned n=0; n<sizeof(buffer); n++) { sprintf(raw_str + n * 3, "%02x ", buffer[n]); }
-        fprintf(stderr, "Fineoffset_WH0530: Raw %s\n", raw_str);
+        rtl433_fprintf(stderr, "Fineoffset_WH0530: Raw %s\n", raw_str);
     }
 
     // Verify checksum
@@ -417,7 +417,7 @@ static int fineoffset_WH0530_callback(r_device *decoder, bitbuffer_t *bitbuffer)
     uint8_t checksum = buffer[0] + buffer[1] + buffer[2] + buffer[3] + buffer[4] + buffer[5] + buffer[6];
     if (crc != buffer[6] || checksum != buffer[7]) {
         if (decoder->verbose) {
-            fprintf(stderr, "Fineoffset_WH0530: Checksum error: %02x %02x\n", crc, checksum);
+            rtl433_fprintf(stderr, "Fineoffset_WH0530: Checksum error: %02x %02x\n", crc, checksum);
         }
         return 0;
     }
@@ -436,7 +436,7 @@ static int fineoffset_WH0530_callback(r_device *decoder, bitbuffer_t *bitbuffer)
                      "battery",       "Battery",     DATA_STRING, battery_low ? "LOW" : "OK",
                      "mic",           "Integrity",   DATA_STRING, "CRC",
                      NULL);
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

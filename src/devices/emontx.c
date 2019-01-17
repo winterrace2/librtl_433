@@ -36,7 +36,7 @@ static unsigned char preamble[3] = { 0xaa, 0xaa, 0xaa };
 static unsigned char pkt_hdr_inverted[3] = { 0xd2, 0x2d, 0xc0 };
 static unsigned char pkt_hdr[3] = { 0x2d, 0xd2, 0x00 };
 
-static int emontx_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int emontx_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
 	bitrow_t *bb = bitbuffer->bb;
 	unsigned bitpos = 0;
 	unsigned bits = bitbuffer->bits_per_row[0];
@@ -124,7 +124,7 @@ static int emontx_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
 				 words[9] == 3000 ? NULL : "temp5_C", "", DATA_FORMAT, "%.1f", DATA_DOUBLE, (double)words[9] / 10.0,
 				 words[10] == 3000 ? NULL : "temp6_C", "", DATA_FORMAT, "%.1f", DATA_DOUBLE, (double)words[10] / 10.0,
 				 NULL);
-		decoder_output_data(decoder, data);
+		decoder_output_data(decoder, data, ext);
 		events++;
 	}
 	return events;

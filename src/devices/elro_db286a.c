@@ -19,7 +19,7 @@
 
 #include "decoder.h"
 
-static int elro_db286a_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int elro_db286a_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     uint8_t *b;
@@ -41,7 +41,7 @@ static int elro_db286a_callback(r_device *decoder, bitbuffer_t *bitbuffer)
             "id",       "ID",      DATA_STRING, id_str,
             NULL);
 
-	decoder_output_data(decoder, data);
+	decoder_output_data(decoder, data, ext);
 
     return 1;
 

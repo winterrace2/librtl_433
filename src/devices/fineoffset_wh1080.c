@@ -250,7 +250,7 @@ static int get_day(const uint8_t* br) {
 #define EPB 0
 #define SPB 1
 
-static int fineoffset_wh1080_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int fineoffset_wh1080_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     data_t *data;
     const uint8_t *br;
     int msg_type; // 0=Weather 1=Datetime 2=UV/Light
@@ -399,7 +399,7 @@ static int fineoffset_wh1080_callback(r_device *decoder, bitbuffer_t *bitbuffer)
                 "battery",    "Battery",    DATA_STRING,                    battery,
                 "mic",             "Integrity",    DATA_STRING,    "CRC",
                 NULL);
-        decoder_output_data(decoder, data);
+        decoder_output_data(decoder, data, ext);
         return 1;
 
     } else if (msg_type == 1) {
@@ -417,7 +417,7 @@ static int fineoffset_wh1080_callback(r_device *decoder, bitbuffer_t *bitbuffer)
                 "day",        "Day",    DATA_FORMAT,    "%02d",    DATA_INT,    day,
                 "mic",       "Integrity",    DATA_STRING,    "CRC",
                 NULL);
-        decoder_output_data(decoder, data);
+        decoder_output_data(decoder, data, ext);
         return 1;
 
     } else {
@@ -433,7 +433,7 @@ static int fineoffset_wh1080_callback(r_device *decoder, bitbuffer_t *bitbuffer)
                 "fc",        "Foot-candles",    DATA_FORMAT,    "%.2f",    DATA_DOUBLE,    fc,
                 "mic",             "Integrity",    DATA_STRING,    "CRC",
                 NULL);
-        decoder_output_data(decoder, data);
+        decoder_output_data(decoder, data, ext);
         return 1;
     }
 }

@@ -13,7 +13,7 @@
  */
 #include "decoder.h"
 
-static int quhwa_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int quhwa_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     int r = bitbuffer_find_repeated_row(bitbuffer, 5, 18);
     if (r < 0)
@@ -38,7 +38,7 @@ static int quhwa_callback(r_device *decoder, bitbuffer_t *bitbuffer)
             "id", "ID", DATA_INT, id,
             NULL);
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }
@@ -52,10 +52,10 @@ static char *output_fields[] = {
 r_device quhwa = {
     .name          = "Quhwa",
     .modulation    = OOK_PULSE_PWM,
-    .short_width   = 360,  // Pulse: Short 360Âµs, Long 1070Âµs
-    .long_width    = 1070, // Gaps: Short 360Âµs, Long 1070Âµs
-    .reset_limit   = 6600, // Intermessage Gap 6500Âµs
-    .gap_limit     = 1200, // Long Gap 1120Âµs
+    .short_width   = 360,  // Pulse: Short 360µs, Long 1070µs
+    .long_width    = 1070, // Gaps: Short 360µs, Long 1070µs
+    .reset_limit   = 6600, // Intermessage Gap 6500µs
+    .gap_limit     = 1200, // Long Gap 1120µs
     .sync_width    = 0,    // No sync bit used
     .tolerance     = 80,   // us
     .decode_fn     = &quhwa_callback,

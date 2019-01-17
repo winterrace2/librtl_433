@@ -14,7 +14,7 @@
 
 #define	OSV1_BITS	32
 
-static int oregon_scientific_v1_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int oregon_scientific_v1_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
 	int ret = 0;
 	int row;
 	int cs;
@@ -63,7 +63,7 @@ static int oregon_scientific_v1_callback(r_device *decoder, bitbuffer_t *bitbuff
 				"battery",		"Battery",		DATA_STRING,	battery ? "LOW" : "OK",
 				"temperature_C","Temperature",	DATA_FORMAT,	"%.01f C",				DATA_DOUBLE,	tempC,
 				NULL);
-		decoder_output_data(decoder, data);
+		decoder_output_data(decoder, data, ext);
 		ret++;
 	}
 	return ret;

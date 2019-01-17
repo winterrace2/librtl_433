@@ -1,6 +1,6 @@
 #include "decoder.h"
 
-static int mebus433_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int mebus433_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     bitrow_t *bb = bitbuffer->bb;
     int16_t temp;
     int8_t  hum;
@@ -41,7 +41,7 @@ static int mebus433_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
                 "temperature_C", "Temperature", DATA_FORMAT, "%.02f C", DATA_DOUBLE, temp / 10.0,
                 "humidity",      "Humidity",    DATA_FORMAT, "%u %%", DATA_INT, hum,
                 NULL);
-        decoder_output_data(decoder, data);
+        decoder_output_data(decoder, data, ext);
 
 
         return 1;

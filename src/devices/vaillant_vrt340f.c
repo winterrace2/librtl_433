@@ -35,12 +35,12 @@ validate_checksum(r_device *decoder, uint8_t * msg, int from, int to, int cs_fro
 {
     // Fields cs_from and cs_to hold the 2-byte checksum as signed int
     int16_t expected = msg[cs_from]*0x100+ msg[cs_to];
-    int16_t calculated = calculate_checksum(msg, from, to);
+    int16_t calculated = calculate_checksum (msg, from, to);
 
     if (expected != calculated) {
         if (decoder->verbose) {
-            fprintf(stderr, "Checksum error in Vaillant VRT340f.  Expected: %04x  Calculated: %04x\n", expected, calculated);
-            fprintf(stderr, "Message (data content of bytes %d-%d): ", from, to);
+            rtl433_fprintf(stderr, "Checksum error in Vaillant VRT340f.  Expected: %04x  Calculated: %04x\n", expected, calculated);
+            rtl433_fprintf(stderr, "Message (data content of bytes %d-%d): ", from, to);
             bitrow_print(&msg[from], (to - from + 1) * 8);
         }
     }
@@ -92,7 +92,7 @@ get_battery_status(uint8_t * msg)
 }
 
 static int
-vaillant_vrt340_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+vaillant_vrt340_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     bitrow_t *bb = bitbuffer->bb;
 
@@ -130,7 +130,7 @@ vaillant_vrt340_callback(r_device *decoder, bitbuffer_t *bitbuffer)
     bb = bits.bb;
 
     /* DEBUG: print out the received packet */
-    //fprintf (stderr, "Vaillant ");
+    //rtl433_fprintf(stderr, "Vaillant ");
     //bitrow_print(bb[0], bitcount);
 
     // A correct message has 128 bits plus potentially two extra bits for clock sync at the end
@@ -140,7 +140,7 @@ vaillant_vrt340_callback(r_device *decoder, bitbuffer_t *bitbuffer)
     // "Normal package":
     if ((bb[0][0] == 0x00) && (bb[0][1] == 0x00) && (bb[0][2] == 0x7e) && (128 <= bitcount && bitcount <= 131)) {
 
-        if (!validate_checksum(decoder, bb[0], /* Data from-to: */3,11, /*Checksum from-to:*/12,13)) {
+        if (!validate_checksum (decoder, bb[0], /* Data from-to: */3,11, /*Checksum from-to:*/12,13)) {
             return 0;
         }
 
@@ -159,7 +159,7 @@ vaillant_vrt340_callback(r_device *decoder, bitbuffer_t *bitbuffer)
                          "water",   "Pre-heated Water", DATA_STRING, water_preheated ? "ON" : "off",
                          "battery", "Battery", DATA_STRING, isBatteryLow ? "Low" : "Ok",
                          NULL);
-        decoder_output_data(decoder, data);
+        decoder_output_data(decoder, data, ext);
 
         return 1;
     }
@@ -178,7 +178,7 @@ vaillant_vrt340_callback(r_device *decoder, bitbuffer_t *bitbuffer)
                          "model",   "",	DATA_STRING,	"Vaillant VRT340f Central Heating Thermostat (RF Detection)",
                          "device",  "Device ID", DATA_INT, deviceID,
                          NULL);
-        decoder_output_data(decoder, data);
+        decoder_output_data(decoder, data, ext);
 
         return 1;
     }

@@ -65,7 +65,7 @@ static uint8_t danfoss_decode_nibble(uint8_t byte) {
 }
 
 
-static int danfoss_cfr_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int danfoss_cfr_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
 	uint8_t bytes[NUM_BYTES];	// Decoded bytes with two 4 bit nibbles in each
 	data_t *data;
@@ -78,7 +78,7 @@ static int danfoss_cfr_callback(r_device *decoder, bitbuffer_t *bitbuffer)
 		unsigned bit_offset = bitbuffer_search(bitbuffer, 0, 112, HEADER, sizeof(HEADER)*8);	// Normal index is 128, skip first 14 bytes to find faster
 		if (bits-bit_offset < 126) {	// Package should be at least 126 bits
 			if (decoder->verbose) {
-				fprintf(stderr, "Danfoss: short package. Header index: %u\n", bit_offset);
+				rtl433_fprintf(stderr, "Danfoss: short package. Header index: %u\n", bit_offset);
 				bitbuffer_print(bitbuffer);
 			}
 			return 0;
@@ -91,7 +91,7 @@ static int danfoss_cfr_callback(r_device *decoder, bitbuffer_t *bitbuffer)
 			uint8_t nibble_l = danfoss_decode_nibble(bitrow_get_byte(bitbuffer->bb[0], n*12+bit_offset+6) >> 2);
 			if (nibble_h > 0xF || nibble_l > 0xF) {
 				if (decoder->verbose) {
-					fprintf(stderr, "Danfoss: 6b/4b decoding error\n");
+					rtl433_fprintf(stderr, "Danfoss: 6b/4b decoding error\n");
 					bitbuffer_print(bitbuffer);
 				}
 				return 0;
@@ -105,7 +105,7 @@ static int danfoss_cfr_callback(r_device *decoder, bitbuffer_t *bitbuffer)
 			for (unsigned n=0; n<NUM_BYTES; ++n) {
 				sprintf(str_raw+n*2, "%02X", bytes[n]);
 			}
-			fprintf(stderr, "Danfoss: Raw 6b/4b decoded = %s\n", str_raw);
+			rtl433_fprintf(stderr, "Danfoss: Raw 6b/4b decoded = %s\n", str_raw);
 		}
 
 		// Validate Prefix and CRC
@@ -113,7 +113,7 @@ static int danfoss_cfr_callback(r_device *decoder, bitbuffer_t *bitbuffer)
 		if (bytes[0] != 0x02		// Somewhat redundant to header search, but checks last bits
 		 || crc_calc != (((uint16_t)bytes[8] << 8) | bytes[9])
 		) {
-			if (decoder->verbose) fprintf(stderr, "Danfoss: Prefix or CRC error.\n");
+			if (decoder->verbose) rtl433_fprintf(stderr, "Danfoss: Prefix or CRC error.\n");
 			return 0;
 		}
 
@@ -140,7 +140,7 @@ static int danfoss_cfr_callback(r_device *decoder, bitbuffer_t *bitbuffer)
 			"switch",		"Switch",	DATA_STRING,	str_sw,
 			"mic",           "Integrity",            DATA_STRING,    "CRC",
 			NULL);
-		decoder_output_data(decoder, data);
+		decoder_output_data(decoder, data, ext);
 
 		return 1;
 	}

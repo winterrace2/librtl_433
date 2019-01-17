@@ -60,7 +60,7 @@ How to make a decoder : https://enavarro.me/ajouter-un-decodeur-ask-a-rtl_433.ht
  ** Generic decoder for LaCrosse "IT+" (instant transmission) protocol
  ** Param device29or35 contain "29" or "35" depending of the device.
  **/
-static int lacrosse_it(r_device *decoder, bitbuffer_t *bitbuffer, uint8_t device29or35)
+static int lacrosse_it(r_device *decoder, bitbuffer_t *bitbuffer, uint8_t device29or35, extdata_t *ext)
 {
     data_t *data;
     int brow;
@@ -84,7 +84,7 @@ static int lacrosse_it(r_device *decoder, bitbuffer_t *bitbuffer, uint8_t device
         if (start_pos == bitbuffer->bits_per_row[brow])
             continue; // no preamble detected, move to the next row
         if (decoder->verbose)
-            fprintf(stderr, "LaCrosse TX29/35 detected, buffer is %d bits length, device is TX%d\n", bitbuffer->bits_per_row[brow], device29or35);
+            rtl433_fprintf(stderr, "LaCrosse TX29/35 detected, buffer is %d bits length, device is TX%d\n", bitbuffer->bits_per_row[brow], device29or35);
         // remove preamble and keep only 64 bits
         bitbuffer_extract_bytes(bitbuffer, brow, start_pos, out, 64);
 
@@ -98,7 +98,7 @@ static int lacrosse_it(r_device *decoder, bitbuffer_t *bitbuffer, uint8_t device
         c_crc = crc8(&out[3], 4, LACROSSE_TX35_CRC_POLY, LACROSSE_TX35_CRC_INIT);
         if (r_crc != c_crc) {
             if (decoder->verbose)
-                fprintf(stderr, "LaCrosse TX29/35 bad CRC: calculated %02x, received %02x\n", c_crc, r_crc);
+                rtl433_fprintf(stderr, "LaCrosse TX29/35 bad CRC: calculated %02x, received %02x\n", c_crc, r_crc);
             // reject row
             continue;
         }
@@ -136,7 +136,7 @@ static int lacrosse_it(r_device *decoder, bitbuffer_t *bitbuffer, uint8_t device
         }
         // humidity = -1; // The TX29-IT sensor do not have humidity. It is replaced by a special value
 
-        decoder_output_data(decoder, data);
+        decoder_output_data(decoder, data, ext);
         events++;
     }
     return events;
@@ -145,15 +145,15 @@ static int lacrosse_it(r_device *decoder, bitbuffer_t *bitbuffer, uint8_t device
 /**
  ** Wrapper for the TX29 device
  **/
-static int lacrossetx29_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
-	return lacrosse_it(decoder, bitbuffer, LACROSSE_TX29_MODEL);
+static int lacrossetx29_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
+	return lacrosse_it(decoder, bitbuffer, LACROSSE_TX29_MODEL, ext);
 }
 
 /**
  ** Wrapper for the TX35 device
  **/
-static int lacrossetx35_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
-	return lacrosse_it(decoder, bitbuffer, LACROSSE_TX35_MODEL);
+static int lacrossetx35_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
+	return lacrosse_it(decoder, bitbuffer, LACROSSE_TX35_MODEL, ext);
 }
 
 static char *output_fields[] = {

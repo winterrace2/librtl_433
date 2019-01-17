@@ -12,7 +12,7 @@
 
 #include "decoder.h"
 
-static int cardin_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int cardin_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
 	bitrow_t *bb = bitbuffer->bb;
 	unsigned char dip[10] = {'-','-','-','-','-','-','-','-','-', '\0'};
 
@@ -33,19 +33,19 @@ static int cardin_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
 				(bb[0][2] & 0x0f) == 6) ) {
 
 /*
-		fprintf(stdout, "------------------------------\n");
-		fprintf(stdout, "protocol       = Cardin S466\n");
-		fprintf(stdout, "message        = ");
+		rtl433_fprintf(stdout, "------------------------------\n");
+		rtl433_fprintf(stdout, "protocol       = Cardin S466\n");
+		rtl433_fprintf(stdout, "message        = ");
 		for (i=0 ; i<3 ; i++) {
 			for (k = 7; k >= 0; k--) {
 				if (bb[0][i] & 1 << k)
-					fprintf(stdout, "1");
+					rtl433_fprintf(stdout, "1");
 				else
-					fprintf(stdout, "0");
+					rtl433_fprintf(stdout, "0");
 			}
-			fprintf(stdout, " ");
+			rtl433_fprintf(stdout, " ");
 		}
-		fprintf(stdout, "\n\n");
+		rtl433_fprintf(stdout, "\n\n");
 */
 
 		// Dip 1
@@ -109,7 +109,7 @@ static int cardin_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
 			"rbutton",    "right button switches",  DATA_STRING, rbutton[((bb[0][2] & 15) / 3)-1],
 			NULL);
 
-		decoder_output_data(decoder, data);
+		decoder_output_data(decoder, data, ext);
 
 		return 1;
 	}

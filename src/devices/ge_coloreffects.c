@@ -75,7 +75,7 @@ char *ge_command_name(uint8_t command) {
     }
 }
 
-static int ge_coloreffects_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned row, unsigned start_pos)
+static int ge_coloreffects_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext, unsigned row, unsigned start_pos)
 {
     data_t *data;
     bitbuffer_t packet_bits = {0};
@@ -120,12 +120,12 @@ static int ge_coloreffects_decode(r_device *decoder, bitbuffer_t *bitbuffer, uns
         "command",       "",     DATA_STRING, ge_command_name(command),
         NULL);
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
     return 1;
 
 }
 
-static int ge_coloreffects_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int ge_coloreffects_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     unsigned bitpos = 0;
     int events = 0;
 
@@ -133,7 +133,7 @@ static int ge_coloreffects_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
     // (if the device id and command were all zeros)
     while ((bitpos = bitbuffer_search(bitbuffer, 0, bitpos, (uint8_t *)&preamble_pattern, 24)) + 57 <=
             bitbuffer->bits_per_row[0]) {
-        events += ge_coloreffects_decode(decoder, bitbuffer, 0, bitpos + 24);
+        events += ge_coloreffects_decode(decoder, bitbuffer, ext, 0, bitpos + 24);
         bitpos++;
     }
 

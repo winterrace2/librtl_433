@@ -34,7 +34,7 @@
 
 #include "decoder.h"
 
-static int proove_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int proove_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     data_t *data;
 
     /* Reject codes of wrong length */
@@ -58,7 +58,7 @@ static int proove_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
     uint32_t unit_bit = (b[3] & 0x03);
 
     /* Get time now */
-
+    
     data = data_make(
                      "model",         "",            DATA_STRING, "Proove",
                      "id",            "House Code",  DATA_INT, sensor_id,
@@ -68,7 +68,7 @@ static int proove_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
                      "group",         "Group",       DATA_INT, group_code,
                       NULL);
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     return 0;
 }

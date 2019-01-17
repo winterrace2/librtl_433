@@ -13,7 +13,7 @@
  */
 #include "decoder.h"
 
-static int waveman_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int waveman_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     uint8_t *b = bitbuffer->bb[0];
@@ -60,7 +60,7 @@ static int waveman_callback(r_device *decoder, bitbuffer_t *bitbuffer)
         "button",   "",     DATA_INT,       (nb[1] & 3) + 1,
         "state",    "",     DATA_STRING,    (nb[2] == 0xe) ? "on" : "off",
         NULL);
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

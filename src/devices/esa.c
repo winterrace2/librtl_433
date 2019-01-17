@@ -34,7 +34,7 @@ static uint8_t decrypt_esa(uint8_t *b)
     return crc;
 }
 
-static int esa_cost_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int esa_cost_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     uint8_t b[MAXMSG];
@@ -74,7 +74,7 @@ static int esa_cost_callback(r_device *decoder, bitbuffer_t *bitbuffer)
             "is_retry",         "Is Retry",         DATA_INT, is_retry,
             "mic",              "Integrity",        DATA_STRING, "CRC",
             NULL);
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
     return 1;
 }
 

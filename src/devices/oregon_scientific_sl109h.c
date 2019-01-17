@@ -79,8 +79,8 @@ static int calculate_checksum(r_device *decoder, bitbuffer_t *bitbuffer, unsigne
     actual_expected_comparison = (calculated_checksum == actual_checksum);
 
     if(decoder->verbose & !actual_expected_comparison) {
-        fprintf(stderr, "Checksum error in Oregon Scientific SL109H message.  Expected: %01x  Calculated: %01x\n", actual_checksum, calculated_checksum);
-        fprintf(stderr, "Message: ");
+        rtl433_fprintf(stderr, "Checksum error in Oregon Scientific SL109H message.  Expected: %01x  Calculated: %01x\n", actual_checksum, calculated_checksum);
+        rtl433_fprintf(stderr, "Message: ");
         bitbuffer_print(bitbuffer);
     }
 
@@ -88,7 +88,7 @@ static int calculate_checksum(r_device *decoder, bitbuffer_t *bitbuffer, unsigne
 }
 
 
-static int oregon_scientific_sl109h_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int oregon_scientific_sl109h_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     uint8_t *msg;
@@ -128,7 +128,7 @@ static int oregon_scientific_sl109h_callback(r_device *decoder, bitbuffer_t *bit
                          "status",        "Status",                             DATA_INT,    status,
                          "mic",           "Integrity",   DATA_STRING, "CHECKSUM",
                          NULL);
-        decoder_output_data(decoder, data);
+        decoder_output_data(decoder, data, ext);
         return 1;
     }
 

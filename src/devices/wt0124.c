@@ -31,7 +31,7 @@ X = xor checksum
 #include "decoder.h"
 
 
-static int wt1024_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int wt1024_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     uint8_t *b; // bits of a row
@@ -69,7 +69,7 @@ static int wt1024_callback(r_device *decoder, bitbuffer_t *bitbuffer)
     value = b[5];
 
     if (decoder->verbose) {
-        fprintf(stderr, "wt1024_callback:");
+        rtl433_fprintf(stderr, "wt1024_callback:");
         bitbuffer_print(bitbuffer);
     }
 
@@ -82,7 +82,7 @@ static int wt1024_callback(r_device *decoder, bitbuffer_t *bitbuffer)
             "data",  "Data", DATA_INT,    value,
             NULL);
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     // Return 1 if message successfully decoded
     return 1;

@@ -95,7 +95,7 @@
 // preamble message.  only searching for 0000 0001 (bottom 8 bits of the 13 bits preamble)
 static unsigned char preamble[1] = {0x01};
 
-static int interlogix_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int interlogix_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     unsigned int row = 0;
@@ -114,7 +114,7 @@ static int interlogix_callback(r_device *decoder, bitbuffer_t *bitbuffer)
     unsigned int bit_offset = bitbuffer_search(bitbuffer, row, 0, preamble, (sizeof preamble) * 8);
     if (bit_offset == bitbuffer->bits_per_row[row] || bitbuffer->num_rows != 1) {
         if (decoder->verbose > 1)
-            fprintf(stderr, "Interlogix: Preamble not found, bit_offset: %d\n", bit_offset);
+            rtl433_fprintf(stderr, "Interlogix: Preamble not found, bit_offset: %d\n", bit_offset);
         return 0;
     }
 
@@ -123,13 +123,13 @@ static int interlogix_callback(r_device *decoder, bitbuffer_t *bitbuffer)
 
     if (bitbuffer->bits_per_row[row] - bit_offset < INTERLOGIX_MSG_BIT_LEN - 1) {
         if (decoder->verbose > 1)
-            fprintf(stderr, "Interlogix: Found valid preamble but message size (%d) too small\n", bitbuffer->bits_per_row[row] - bit_offset);
+            rtl433_fprintf(stderr, "Interlogix: Found valid preamble but message size (%d) too small\n", bitbuffer->bits_per_row[row] - bit_offset);
         return 0;
     }
 
     if (bitbuffer->bits_per_row[row] - bit_offset > INTERLOGIX_MSG_BIT_LEN + 7) {
         if (decoder->verbose > 1)
-            fprintf(stderr, "Interlogix: Found valid preamble but message size (%d) too long\n", bitbuffer->bits_per_row[row] - bit_offset);
+            rtl433_fprintf(stderr, "Interlogix: Found valid preamble but message size (%d) too long\n", bitbuffer->bits_per_row[row] - bit_offset);
         return 0;
     }
 
@@ -157,7 +157,7 @@ static int interlogix_callback(r_device *decoder, bitbuffer_t *bitbuffer)
 
     if (parity_error) {
         if (decoder->verbose)
-            fprintf(stderr, "Interlogix: Parity check failed (%d %d)\n", parity >> 1, parity & 1);
+            rtl433_fprintf(stderr, "Interlogix: Parity check failed (%d %d)\n", parity >> 1, parity & 1);
         return 0;
     }
 
@@ -207,7 +207,7 @@ static int interlogix_callback(r_device *decoder, bitbuffer_t *bitbuffer)
             "switch5",     "Switch5 State", DATA_STRING, f5_latch_state,
             NULL);
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

@@ -18,7 +18,7 @@
 
 #include "decoder.h"
 
-static int honeywell_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int honeywell_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     const uint8_t *bb;
     int channel;
     int device_id;
@@ -57,7 +57,7 @@ static int honeywell_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
           "heartbeat" , "", DATA_STRING, heartbeat ? "yes" : "no",
           NULL);
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
     return 1;
 }
 

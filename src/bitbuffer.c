@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "redir_print.h"
 
 
 void bitbuffer_clear(bitbuffer_t *bits) {
@@ -34,7 +35,7 @@ void bitbuffer_add_bit(bitbuffer_t *bits, int bit) {
 		bits->bits_per_row[bits->num_rows-1]++;
 	}
 	else {
-//		fprintf(stderr, "ERROR: bitbuffer:: Could not add more columns\n");	// Some decoders may add many columns...
+//		rtl433_fprintf(stderr, "ERROR: bitbuffer:: Could not add more columns\n");	// Some decoders may add many columns...
 	}
 }
 
@@ -46,7 +47,7 @@ void bitbuffer_add_row(bitbuffer_t *bits) {
 	}
 	else {
 		bits->bits_per_row[bits->num_rows-1] = 0;	// Clear last row to handle overflow somewhat gracefully
-//		fprintf(stderr, "ERROR: bitbuffer:: Could not add more rows\n");	// Some decoders may add many rows...
+//		rtl433_fprintf(stderr, "ERROR: bitbuffer:: Could not add more rows\n");	// Some decoders may add many rows...
 	}
 }
 
@@ -210,24 +211,24 @@ static void print_bitrow(bitrow_t const bitrow, unsigned bit_len, unsigned highe
 {
     unsigned row_len = 0;
 
-    fprintf(stderr, "{%2d} ", bit_len);
+    rtl433_fprintf(stderr, "{%2d} ", bit_len);
     for (unsigned col = 0; col < (bit_len + 7) / 8; ++col) {
-        row_len += fprintf(stderr, "%02x ", bitrow[col]);
+        row_len += rtl433_fprintf(stderr, "%02x ", bitrow[col]);
     }
     // Print binary values also?
     if (always_binary || bit_len <= BITBUF_MAX_PRINT_BITS) {
-        fprintf(stderr, "%-*s: ", highest_indent > row_len ? highest_indent - row_len : 0, "");
+        rtl433_fprintf(stderr, "%-*s: ", highest_indent > row_len ? highest_indent - row_len : 0, "");
         for (unsigned bit = 0; bit < bit_len; ++bit) {
             if (bitrow[bit / 8] & (0x80 >> (bit % 8))) {
-                fprintf(stderr, "1");
+                rtl433_fprintf(stderr, "1");
             } else {
-                fprintf(stderr, "0");
+                rtl433_fprintf(stderr, "0");
             }
             if ((bit % 8) == 7) // Add byte separators
-                fprintf(stderr, " ");
+                rtl433_fprintf(stderr, " ");
         }
     }
-    fprintf(stderr, "\n");
+    rtl433_fprintf(stderr, "\n");
 }
 
 static void print_bitbuffer(const bitbuffer_t *bits, int always_binary)
@@ -247,13 +248,13 @@ static void print_bitbuffer(const bitbuffer_t *bits, int always_binary)
             highest_indent = indent_this_row;
     }
 
-    fprintf(stderr, "bitbuffer:: Number of rows: %d \n", bits->num_rows);
+    rtl433_fprintf(stderr, "bitbuffer:: Number of rows: %d \n", bits->num_rows);
     for (row = 0; row < bits->num_rows; ++row) {
-        fprintf(stderr, "[%02d] ", row);
+        rtl433_fprintf(stderr, "[%02d] ", row);
         print_bitrow(bits->bb[row], bits->bits_per_row[row], highest_indent, always_binary);
     }
     if (bits->num_rows >= BITBUF_ROWS) {
-        fprintf(stderr, "... Maximum number of rows reached. Message is likely truncated.\n");
+        rtl433_fprintf(stderr, "... Maximum number of rows reached. Message is likely truncated.\n");
     }
 }
 
@@ -365,43 +366,43 @@ int bitbuffer_find_repeated_row(bitbuffer_t *bits, unsigned min_repeats, unsigne
 // Unit testing
 #ifdef _TEST
 int main(int argc, char **argv) {
-	fprintf(stderr, "bitbuffer:: test\n");
+	rtl433_fprintf(stderr, "bitbuffer:: test\n");
 
 	bitbuffer_t bits = {0};
 
-	fprintf(stderr, "TEST: bitbuffer:: The empty buffer\n");
+	rtl433_fprintf(stderr, "TEST: bitbuffer:: The empty buffer\n");
 	bitbuffer_print(&bits);
 
-	fprintf(stderr, "TEST: bitbuffer:: Add 1 bit\n");
+	rtl433_fprintf(stderr, "TEST: bitbuffer:: Add 1 bit\n");
 	bitbuffer_add_bit(&bits, 1);
 	bitbuffer_print(&bits);
 
-	fprintf(stderr, "TEST: bitbuffer:: Add 1 new row\n");
+	rtl433_fprintf(stderr, "TEST: bitbuffer:: Add 1 new row\n");
 	bitbuffer_add_row(&bits);
 	bitbuffer_print(&bits);
 
-	fprintf(stderr, "TEST: bitbuffer:: Fill row\n");
+	rtl433_fprintf(stderr, "TEST: bitbuffer:: Fill row\n");
 	for (int i=0; i < BITBUF_COLS*8; ++i) {
 		bitbuffer_add_bit(&bits, i%2);
 	}
 	bitbuffer_print(&bits);
 
-	fprintf(stderr, "TEST: bitbuffer:: Add row and fill 1 column too many\n");
+	rtl433_fprintf(stderr, "TEST: bitbuffer:: Add row and fill 1 column too many\n");
 	bitbuffer_add_row(&bits);
 	for (int i=0; i <= BITBUF_COLS*8; ++i) {
 		bitbuffer_add_bit(&bits, i%2);
 	}
 	bitbuffer_print(&bits);
 
-	fprintf(stderr, "TEST: bitbuffer:: invert\n");
+	rtl433_fprintf(stderr, "TEST: bitbuffer:: invert\n");
 	bitbuffer_invert(&bits);
 	bitbuffer_print(&bits);
 
-	fprintf(stderr, "TEST: bitbuffer:: Clear\n");
+	rtl433_fprintf(stderr, "TEST: bitbuffer:: Clear\n");
 	bitbuffer_clear(&bits);
 	bitbuffer_print(&bits);
 
-	fprintf(stderr, "TEST: bitbuffer:: Add 1 row too many\n");
+	rtl433_fprintf(stderr, "TEST: bitbuffer:: Add 1 row too many\n");
 	for (int i=0; i <= BITBUF_ROWS; ++i) {
 		bitbuffer_add_row(&bits);
 	}

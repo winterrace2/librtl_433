@@ -39,7 +39,7 @@
 // NOTE: this should really not be here
 int rubicson_crc_check(bitrow_t *bb);
 
-static int solight_te44_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int solight_te44_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     uint8_t id;
@@ -79,7 +79,7 @@ static int solight_te44_callback(r_device *decoder, bitbuffer_t *bitbuffer)
             "temperature_C", "Temperature", DATA_FORMAT, "%.02f C", DATA_DOUBLE, temperature,
             "mic",           "Integrity",   DATA_STRING, "CRC",
             NULL);
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }
@@ -99,7 +99,7 @@ r_device solight_te44 = {
     .long_width    = 1932, // long gap = 1932 us
     .gap_limit     = 3000, // packet gap = 3880 us
     .reset_limit   = 6000,
-    .decode_fn     = &solight_te44_callback,
+    .decode_fn = &solight_te44_callback,
     .disabled      = 0,
     .fields        = output_fields,
 };

@@ -27,7 +27,7 @@
 #define WS_MINREPEATS	4
 #define WS_REPEATS	23
 
-static int wssensor_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int wssensor_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     uint8_t *b;
     data_t *data;
 
@@ -56,16 +56,16 @@ static int wssensor_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
     temperature_c = temperature / 10.0f;
 
     if (decoder->verbose) {
-        fprintf(stdout, "Hyundai WS SENZOR received raw data:\n");
+        rtl433_fprintf(stdout, "Hyundai WS SENZOR received raw data:\n");
         bitbuffer_print(bitbuffer);
-        fprintf(stdout, "Sensor ID	= %01d = 0x%02x\n",  sensor_id, sensor_id);
-        fprintf(stdout, "Bitstream HEX	= ");
+        rtl433_fprintf(stdout, "Sensor ID	= %01d = 0x%02x\n",  sensor_id, sensor_id);
+        rtl433_fprintf(stdout, "Bitstream HEX	= ");
         bitrow_print(b, 24);
-        fprintf(stdout, "Battery OK	= %0d\n", battery_status);
-        fprintf(stdout, "Startup		= %0d\n", startup);
-        fprintf(stdout, "Channel		= %0d\n", channel);
-        fprintf(stdout, "temp		= %d = 0x%02x\n", temperature, temperature);
-        fprintf(stdout, "TemperatureC	= %.1f\n", temperature_c);
+        rtl433_fprintf(stdout, "Battery OK	= %0d\n", battery_status);
+        rtl433_fprintf(stdout, "Startup		= %0d\n", startup);
+        rtl433_fprintf(stdout, "Channel		= %0d\n", channel);
+        rtl433_fprintf(stdout, "temp		= %d = 0x%02x\n", temperature, temperature);
+        rtl433_fprintf(stdout, "TemperatureC	= %.1f\n", temperature_c);
     }
 
     data = data_make(
@@ -76,7 +76,7 @@ static int wssensor_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
             "temperature_C", "Temperature", DATA_FORMAT, "%.02f C", DATA_DOUBLE, temperature_c,
             NULL);
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
     return 1;
 }
 

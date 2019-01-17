@@ -91,7 +91,7 @@ char *button_map[] = {
 /* 63 */ "Info"
 };
 
-static int dish_remote_6_3_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int dish_remote_6_3_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     int r; // a row index
@@ -100,7 +100,7 @@ static int dish_remote_6_3_callback(r_device *decoder, bitbuffer_t *bitbuffer)
     char *button_string;
 
     if (decoder->verbose > 1) {
-        fprintf(stderr,"dish_remote_6_3_callback callback:\n");
+        rtl433_fprintf(stderr,"dish_remote_6_3_callback callback:\n");
         bitbuffer_print(bitbuffer);
     }
 
@@ -119,13 +119,12 @@ static int dish_remote_6_3_callback(r_device *decoder, bitbuffer_t *bitbuffer)
     button = b[0] >> 2;
     button_string = button_map[button];
 	
-
     data = data_make(
             "model", "", DATA_STRING, "Dish remote 6.3",
             "button", "", DATA_STRING, button_string,
             NULL);
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

@@ -34,7 +34,7 @@
 
 #include "decoder.h"
 
-static int infactory_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int infactory_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     bitrow_t *bb;
     data_t *data;
@@ -71,7 +71,7 @@ static int infactory_callback(r_device *decoder, bitbuffer_t *bitbuffer)
             "temperature_F", "Temperature",DATA_FORMAT, "%.02f °F", DATA_DOUBLE, temp_f,
             "humidity",      "Humidity",   DATA_FORMAT, "%u %%", DATA_INT, humidity,
             NULL);
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

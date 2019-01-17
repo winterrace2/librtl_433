@@ -18,6 +18,7 @@
 #endif
 
 #include "term_ctl.h"
+#include "redir_print.h"
 
 #ifdef _WIN32
 #include <stdlib.h>
@@ -78,7 +79,7 @@ static WORD _term_get_win_color(BOOL fore, term_color_t color)
        case TERM_COLOR_BRIGHT_WHITE:
             return (7 + FOREGROUND_INTENSITY);
     }
-    fprintf(stderr,"FATAL: No mapping for TERM_COLOR_x=%d (fore: %d)\n", color, fore);
+    rtl433_fprintf(stderr,"FATAL: No mapping for TERM_COLOR_x=%d (fore: %d)\n", color, fore);
     return (0);
 }
 
@@ -291,7 +292,7 @@ int term_puts(void *ctx, char const *buf)
     FILE *fp;
 
     if (!ctx)
-        fprintf(stderr, "%s", buf);
+        rtl433_fprintf(stderr, "%s", buf);
 
 #ifdef _WIN32
     console_t *console = (console_t *)ctx;

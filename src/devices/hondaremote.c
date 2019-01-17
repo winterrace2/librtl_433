@@ -25,7 +25,7 @@ static char const *get_command_codes(const uint8_t *bytes)
     }
 }
 
-static int hondaremote_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int hondaremote_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     uint8_t *b;
@@ -48,7 +48,7 @@ static int hondaremote_callback(r_device *decoder, bitbuffer_t *bitbuffer)
                 "code",         "",    DATA_STRING, code,
                 NULL);
 
-        decoder_output_data(decoder, data);
+        decoder_output_data(decoder, data, ext);
         return 1;
     }
     return 0;
@@ -67,7 +67,7 @@ r_device hondaremote = {
     .short_width    = 250,
     .long_width     = 500,
     .reset_limit    = 2000,
-    .decode_fn    	= &hondaremote_callback,
+    .decode_fn	    = &hondaremote_callback,
     .disabled       = 0,
     .fields         = output_fields
 };

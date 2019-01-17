@@ -44,7 +44,7 @@ void am_analyze_free(am_analyze_t *a);
 
 void am_analyze_skip(am_analyze_t *a, unsigned n_samples);
 
-void am_analyze(am_analyze_t *a, int16_t *am_buf, unsigned n_samples, int debug_output, samp_grab_t *g);
+void am_analyze(am_analyze_t *a, int16_t *am_buf, unsigned n_samples, int debug_output/*, samp_grab_t *g, const char *path_sigdmp, int ovr_ok*/);
 
 void am_analyze_classify(am_analyze_t *aa);
 

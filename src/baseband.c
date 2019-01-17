@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include "redir_print.h"
 
 
 static uint16_t scaled_squares[256];
@@ -143,7 +144,7 @@ void baseband_low_pass_filter(uint16_t const *x_buf, int16_t *y_buf, uint32_t le
     /* Save last samples */
     memcpy(state->x, &x_buf[len - FILTER_ORDER], FILTER_ORDER * sizeof (int16_t));
     memcpy(state->y, &y_buf[len - FILTER_ORDER], FILTER_ORDER * sizeof (int16_t));
-    //fprintf(stderr, "%d\n", y_buf[0]);
+    //rtl433_fprintf(stderr, "%d\n", y_buf[0]);
 }
 
 

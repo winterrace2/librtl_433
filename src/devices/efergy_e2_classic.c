@@ -24,7 +24,7 @@
 
 #include "decoder.h"
 
-static int efergy_e2_classic_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int efergy_e2_classic_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     unsigned num_bits = bitbuffer->bits_per_row[0];
     uint8_t *bytes = bitbuffer->bb[0];
     data_t *data;
@@ -88,7 +88,7 @@ static int efergy_e2_classic_callback(r_device *decoder, bitbuffer_t *bitbuffer)
                      "mic",      "Integrity",      DATA_STRING, "CHECKSUM",
                      NULL);
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

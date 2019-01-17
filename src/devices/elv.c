@@ -13,7 +13,7 @@ static uint16_t AD_POP(uint8_t *bb, uint8_t bits, uint8_t bit)
 }
 
 // based on fs20.c
-static int em1000_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int em1000_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     bitrow_t *bb = bitbuffer->bb;
@@ -39,7 +39,7 @@ static int em1000_callback(r_device *decoder, bitbuffer_t *bitbuffer)
         dec[i] = AD_POP (bb_p, 8, bit); bit+=8;
         stopbit=AD_POP (bb_p, 1, bit); bit+=1;
         if (!stopbit) {
-//            fprintf(stdout, "!stopbit: %i\n", i);
+//            rtl433_fprintf(stdout, "!stopbit: %i\n", i);
             return 0;
         }
         checksum_calculated ^= dec[i];
@@ -49,11 +49,11 @@ static int em1000_callback(r_device *decoder, bitbuffer_t *bitbuffer)
     // Read checksum
     checksum_received = AD_POP (bb_p, 8, bit); bit+=8;
     if (checksum_received != checksum_calculated) {
-//        fprintf(stdout, "checksum_received != checksum_calculated: %d %d\n", checksum_received, checksum_calculated);
+//        rtl433_fprintf(stdout, "checksum_received != checksum_calculated: %d %d\n", checksum_received, checksum_calculated);
         return 0;
     }
 
-//for (i = 0; i < bytes; i++) fprintf(stdout, "%02X ", dec[i]); fprintf(stdout, "\n");
+//for (i = 0; i < bytes; i++) rtl433_fprintf(stdout, "%02X ", dec[i]); rtl433_fprintf(stdout, "\n");
 
     // based on 15_CUL_EM.pm
     char *subtype = dec[0] >= 1 && dec[0] <= 3 ? types[dec[0] - 1] : "?";
@@ -72,7 +72,7 @@ static int em1000_callback(r_device *decoder, bitbuffer_t *bitbuffer)
             "peak",     "", DATA_FORMAT, peak,
             NULL);
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }
@@ -101,7 +101,7 @@ r_device elv_em1000 = {
 
 
 // based on http://www.dc3yc.privat.t-online.de/protocol.htm
-static int ws2000_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int ws2000_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     bitrow_t *bb = bitbuffer->bb;
@@ -118,7 +118,7 @@ static int ws2000_callback(r_device *decoder, bitbuffer_t *bitbuffer)
     dec[0] = AD_POP (bb[0], 4, bit); bit+=4;
     stopbit= AD_POP (bb[0], 1, bit); bit+=1;
     if (!stopbit) {
-        if(decoder->verbose) fprintf(stdout, "!stopbit\n");
+        if(decoder->verbose) rtl433_fprintf(stdout, "!stopbit\n");
         return 0;
     }
     check_calculated ^= dec[0];
@@ -129,17 +129,17 @@ static int ws2000_callback(r_device *decoder, bitbuffer_t *bitbuffer)
         dec[i] = AD_POP (bb[0], 4, bit); bit+=4;
         stopbit= AD_POP (bb[0], 1, bit); bit+=1;
         if (!stopbit) {
-            if(decoder->verbose) fprintf(stdout, "!stopbit %i\n", bit);
+            if(decoder->verbose) rtl433_fprintf(stdout, "!stopbit %i\n", bit);
             return 0;
         }
         check_calculated ^= dec[i];
         sum_calculated   += dec[i];
         nibbles++;
     }
-    if(decoder->verbose) { for (i = 0; i < nibbles; i++) fprintf(stdout, "%02X ", dec[i]); fprintf(stdout, "\n"); }
+    if(decoder->verbose) { for (i = 0; i < nibbles; i++) rtl433_fprintf(stdout, "%02X ", dec[i]); rtl433_fprintf(stdout, "\n"); }
 
     if (check_calculated) {
-        if(decoder->verbose) fprintf(stdout, "check_calculated (%d) != 0\n", check_calculated);
+        if(decoder->verbose) rtl433_fprintf(stdout, "check_calculated (%d) != 0\n", check_calculated);
         return 0;
     }
 
@@ -148,7 +148,7 @@ static int ws2000_callback(r_device *decoder, bitbuffer_t *bitbuffer)
     sum_calculated+=5;
     sum_calculated&=0xF;
     if (sum_received != sum_calculated) {
-        if(decoder->verbose) fprintf(stdout, "sum_received (%d) != sum_calculated (%d) ", sum_received, sum_calculated);
+        if(decoder->verbose) rtl433_fprintf(stdout, "sum_received (%d) != sum_calculated (%d) ", sum_received, sum_calculated);
         return 0;
     }
 
@@ -170,7 +170,7 @@ static int ws2000_callback(r_device *decoder, bitbuffer_t *bitbuffer)
             "pressure",     "", DATA_INT, pressure,
             NULL);
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

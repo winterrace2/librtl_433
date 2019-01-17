@@ -28,7 +28,7 @@
 // could be shorter   11 0101 0011 11
 static const unsigned char preamble_pattern[2] = {0xa9, 0xe0}; // 12 bits (but pass last bit to decode)
 
-static int tpms_toyota_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned row, unsigned bitpos)
+static int tpms_toyota_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext, unsigned row, unsigned bitpos)
 {
     data_t *data;
     unsigned int start_pos;
@@ -59,7 +59,7 @@ static int tpms_toyota_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigne
 
     if (pressure1 != pressure2) {
         if (decoder->verbose)
-            fprintf(stderr, "Toyota TPMS pressure check error: %02x vs %02x\n", pressure1, pressure2);
+            rtl433_fprintf(stderr, "Toyota TPMS pressure check error: %02x vs %02x\n", pressure1, pressure2);
         return 0;
     }
 
@@ -75,18 +75,18 @@ static int tpms_toyota_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigne
         "mic",              "",     DATA_STRING,    "CRC",
         NULL);
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
     return 1;
 }
 
-static int tpms_toyota_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int tpms_toyota_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     unsigned bitpos = 0;
     int events = 0;
 
     // Find a preamble with enough bits after it that it could be a complete packet
     while ((bitpos = bitbuffer_search(bitbuffer, 0, bitpos, (const uint8_t *)&preamble_pattern, 12)) + 156 <=
             bitbuffer->bits_per_row[0]) {
-        events += tpms_toyota_decode(decoder, bitbuffer, 0, bitpos + 11);
+        events += tpms_toyota_decode(decoder, bitbuffer, ext, 0, bitpos + 11);
         bitpos += 2;
     }
 
