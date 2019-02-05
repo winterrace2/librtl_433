@@ -155,6 +155,9 @@ int add_dumper(dm_state *dm, char const *spec, int overwrite) {
     if (dumper->format == VCD_LOGIC) {
         pulse_data_print_vcd_header(dumper->file, dm->rtl->cfg->samp_rate);
     }
+    if (dumper->format == PULSE_OOK) {
+        pulse_data_print_pulse_header(dumper->file);
+    }
     return 0;
 }
 
@@ -170,16 +173,13 @@ int registerNonflexDevices(dm_state *dm) {
     for (uint32_t i = 0; i < num_r_devices; i++) {
         r_devices[i].protocol_num = i + 1;
         if (dm->rtl->cfg->active_prots.len) {
-            if (r_devices[i].disabled != 2) r_devices[i].disabled = (dm->rtl->cfg->active_prots.elems[i] ? 0 : 1);
+            if (r_devices[i].disabled != 2) r_devices[i].disabled = (dm->rtl->cfg->active_prots.elems[i] != NULL ? 0 : 1);
         }
     }
     for (uint32_t i = 0; i < num_r_devices; i++) {
         if (!r_devices[i].disabled) {
-            if (!register_protocol(dm, &r_devices[i]))
+            if (!register_protocol(dm, &r_devices[i], ""))
                 return 0;
-            if (r_devices[i].modulation >= FSK_DEMOD_MIN_VAL) {
-                dm->enable_FM_demod = 1;
-            }
         }
     }
     return 1;
@@ -192,16 +192,14 @@ int registerFlexDevices(dm_state *dm, list_t *flex_specs) {
         if (!r_dev) {
             return 0;
         }
-        if (!register_protocol(dm, r_dev))
+        if (!register_protocol(dm, r_dev, ""))
             return 0;
-        if (r_dev->modulation >= FSK_DEMOD_MIN_VAL) dm->enable_FM_demod = 1;
-
     }
     return 1;
 }
 
-int Run_OOK_Demodulation(dm_state *dm) {
-    if (!dm) return RTL_433_ERROR_INVALID_PARAM;
+int run_ook_demods(dm_state *dm) {
+    if (!dm) return 0;
 
     int p_events = 0;
 
@@ -242,7 +240,8 @@ int Run_OOK_Demodulation(dm_state *dm) {
         default:
             rtl433_fprintf(stderr, "Unknown modulation %d in protocol!\n", r_dev->modulation);
         }
-    } // for demodulators
+    }
+
     if (!p_events && dm->rtl->cfg->report_unknown && dm->pulse_data.num_pulses > 10) { // unknown OOK signal (no matching device demodulator) - pass to GUI as unknown signal if it has a significant length
         extdata_t ext = {
             .prot_id = 0,
@@ -266,8 +265,8 @@ int Run_OOK_Demodulation(dm_state *dm) {
     return p_events;
 }
 
-int Run_FSK_Demodulation(dm_state *dm) {
-    if (!dm) return RTL_433_ERROR_INVALID_PARAM;
+int run_fsk_demods(dm_state *dm) {
+    if (!dm) return 0;
 
     int p_events = 0;
     for (void **iter = dm->r_devs.elems; iter && *iter; ++iter) {
@@ -378,6 +377,29 @@ int ReadFromFiles(dm_state *dm) {
             rtl433_fprintf(stderr, "Input format: %s\n", file_info_string(&dm->load_info));
         }
         dm->sample_file_pos = 0.0;
+
+		// special case for pulse data file-inputs
+		if (dm->load_info.format == PULSE_OOK) {
+			while (!dm->rtl->do_exit) {
+				pulse_data_load(in_file, &dm->pulse_data);
+				if (!dm->pulse_data.num_pulses)
+					break;
+
+				if (dm->pulse_data.fsk_f2_est) {
+					run_fsk_demods(dm);
+				}
+				else {
+					run_ook_demods(dm);
+				}
+			}
+
+			if (in_file != stdin)
+				fclose(in_file = stdin);
+
+			continue;
+		}
+
+		// default case for file-inputs
         int n_blocks = 0;
         unsigned long n_read;
         do {
@@ -430,7 +452,10 @@ int dumpSamplesToFile(dm_state *dm, unsigned char *iq_buf, unsigned long n_sampl
 
     for (void **iter = dm->dumper.elems; iter && *iter; ++iter) {
         file_info_t const *dumper = *iter;
-        if (!dumper->file || dumper->format == VCD_LOGIC) continue;
+        if (!dumper->file
+                || dumper->format == VCD_LOGIC
+                || dumper->format == PULSE_OOK)
+            continue;
 
         uint8_t* out_buf = iq_buf;  // Default is to dump IQ samples
         unsigned long out_len = n_samples * 2 * dm->sample_size;
@@ -646,7 +671,6 @@ static void data_acquired_handler(r_device *r_dev, data_t *data, extdata_t *ext)
         }
 
         if (rtl->cfg->report_meta && rtl->demod->fsk_pulse_data.fsk_f2_est) {
-            calc_rssi_snr(rtl);
             data_append(data,
                 "mod", "Modulation", DATA_STRING, "FSK",
                 "freq1", "Freq1", DATA_FORMAT, "%.1f MHz", DATA_DOUBLE, rtl->demod->fsk_pulse_data.freq1_hz / 1000000.0,
@@ -657,7 +681,6 @@ static void data_acquired_handler(r_device *r_dev, data_t *data, extdata_t *ext)
                 NULL);
         }
         else if (rtl->cfg->report_meta) {
-            calc_rssi_snr(rtl);
             data_append(data,
                 "mod", "Modulation", DATA_STRING, "ASK",
                 "freq", "Freq", DATA_FORMAT, "%.1f MHz", DATA_DOUBLE, rtl->demod->pulse_data.freq1_hz / 1000000.0,
@@ -735,6 +758,13 @@ static void update_protocol(r_cfg_t *cfg, r_device *r_dev)
     r_dev->verbose_bits = cfg->verbose_bits;
 }
 
+static void free_protocol(r_device *r_dev)
+{
+    // free(r_dev->name);
+    free(r_dev->decode_ctx);
+    free(r_dev);
+}
+
 void update_protocols(dm_state *dm, r_cfg_t *cfg)
 {
     for (void **iter = dm->r_devs.elems; iter && *iter; ++iter) {
@@ -743,11 +773,21 @@ void update_protocols(dm_state *dm, r_cfg_t *cfg)
     }
 }
 
-static int register_protocol(dm_state *dm, r_device *r_dev) {
+static int register_protocol(dm_state *dm, r_device *r_dev, char *arg)
+{
     if (!dm) return RTL_433_ERROR_INVALID_PARAM;
 
-    r_device *p = calloc(1, sizeof(r_device));
-    *p = *r_dev; // copy
+    r_device *p;
+    if (r_dev->create_fn) {
+        p = r_dev->create_fn(arg);
+    }
+    else {
+        if (arg && *arg) {
+			rtl433_fprintf(stderr, "Protocol [%d] \"%s\" does not take arguments \"%s\"!\n", r_dev->protocol_num, r_dev->name, arg);
+        }
+        p = malloc(sizeof (*p));
+        *p = *r_dev; // copy
+    }
 
     update_protocol(dm->rtl->cfg, p);
 

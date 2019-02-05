@@ -209,6 +209,15 @@ RTL_433_API int start(rtl_433_t *rtl, struct sigaction *sigact){
                 rtl433_fprintf(stderr, "Registered %zu out of %d device decoding protocols",
                     rtl->demod->r_devs.len, getDevCount());
 
+                // check if we need FM demod // todo: move to demod function?
+                for (void **iter = rtl->demod->r_devs.elems; iter && *iter; ++iter) {
+                    r_device *r_dev = *iter;
+                    if (r_dev->modulation >= FSK_DEMOD_MIN_VAL) {
+                        rtl->demod->enable_FM_demod = 1;
+                        break;
+                    }
+                }
+
                 if (!rtl->cfg->verbosity) {
                     // print registered decoder ranges
                     rtl433_fprintf(stderr, " [");
@@ -279,7 +288,8 @@ RTL_433_API int start(rtl_433_t *rtl, struct sigaction *sigact){
     return r >= 0 ? r : -r;
 }
 
-void sdr_callback(unsigned char *iq_buf, uint32_t len, void *ctx) {
+void sdr_callback(unsigned char *iq_buf, uint32_t len, void *ctx)
+{
     rtl_433_t *rtl = (rtl_433_t*) ctx;
 
     if (!rtl || !rtl->demod) {
@@ -355,30 +365,39 @@ void sdr_callback(unsigned char *iq_buf, uint32_t len, void *ctx) {
                 rtl->demod->frame_end_ago = rtl->demod->pulse_data.end_ago;
             }
             if (package_type == PULSEDETECTION_OOK /*1*/) {
+                calc_rssi_snr(rtl, &rtl->demod->pulse_data);
                 if (rtl->cfg->analyze_pulses) rtl433_fprintf(stderr, "Detected OOK package\t%s\n", time_pos_str(rtl, rtl->demod->pulse_data.start_ago, time_str));
-                p_events += Run_OOK_Demodulation(rtl->demod); // this will pass the signal to the device demodulators
+
+                p_events += run_ook_demods(rtl->demod);
+
                 for (void **iter = rtl->demod->dumper.elems; iter && *iter; ++iter) {
                     file_info_t const *dumper = *iter;
                     if (dumper->format == VCD_LOGIC) pulse_data_print_vcd(dumper->file, &rtl->demod->pulse_data, '\'', rtl->cfg->samp_rate);
                     if (dumper->format == U8_LOGIC) pulse_data_dump_raw(rtl->demod->u8_buf, n_samples, rtl->input_pos, &rtl->demod->pulse_data, 0x02);
+                    if (dumper->format == PULSE_OOK) pulse_data_dump(dumper->file, &rtl->demod->pulse_data);
                 }
+
                 if (rtl->cfg->verbosity > 2) pulse_data_print(&rtl->demod->pulse_data);
                 if (rtl->cfg->analyze_pulses && (rtl->cfg->grab_mode <= GRAB_ALL_DEVICES || (rtl->cfg->grab_mode == GRAB_UNKNOWN_DEVICES && p_events == 0) || (rtl->cfg->grab_mode == GRAB_KNOWN_DEVICES && p_events > 0))) {
-                    calc_rssi_snr(rtl);
                     pulse_analyzer(&rtl->demod->pulse_data, rtl->cfg->samp_rate, rtl);
                 }
+
             }
             else if (package_type == PULSEDETECTION_FSK/*2*/) {
+                calc_rssi_snr(rtl, &rtl->demod->fsk_pulse_data);
                 if (rtl->cfg->analyze_pulses) rtl433_fprintf(stderr, "Detected FSK package\t %s\n", time_pos_str(rtl, rtl->demod->fsk_pulse_data.start_ago, time_str));
-                p_events += Run_FSK_Demodulation(rtl->demod);
+
+                p_events += run_fsk_demods(rtl->demod);
+
                 for (void **iter = rtl->demod->dumper.elems; iter && *iter; ++iter) {
                     file_info_t const *dumper = *iter;
                     if (dumper->format == VCD_LOGIC) pulse_data_print_vcd(dumper->file, &rtl->demod->fsk_pulse_data, '"', rtl->cfg->samp_rate);
                     if (dumper->format == U8_LOGIC) pulse_data_dump_raw(rtl->demod->u8_buf, n_samples, rtl->input_pos, &rtl->demod->fsk_pulse_data, 0x04);
+                    if (dumper->format == PULSE_OOK) pulse_data_dump(dumper->file, &rtl->demod->fsk_pulse_data);
                 }
+
                 if (rtl->cfg->verbosity > 2) pulse_data_print(&rtl->demod->fsk_pulse_data);
                 if (rtl->cfg->analyze_pulses && (rtl->cfg->grab_mode <= GRAB_ALL_DEVICES || (rtl->cfg->grab_mode == GRAB_UNKNOWN_DEVICES && p_events == 0) || (rtl->cfg->grab_mode == GRAB_KNOWN_DEVICES && p_events > 0))) {
-                    calc_rssi_snr(rtl);
                     pulse_analyzer(&rtl->demod->fsk_pulse_data, rtl->cfg->samp_rate, rtl);
                 }
             } // if (package_type == ...
@@ -463,7 +482,7 @@ static int InitSdr(rtl_433_t *rtl) {
     
     r = sdr_open(&rtl->dev, &rtl->demod->sample_size, (rtl->cfg->dev_query[0]?rtl->cfg->dev_query:NULL), rtl->cfg->verbosity);
     if (r < 0) {
-		rtl433_fprintf(stderr, "InitSdr: sdr_open failed.\n");
+        rtl433_fprintf(stderr, "InitSdr: sdr_open failed.\n");
         return 0;
     }
     /* Set the sample rate */
@@ -539,13 +558,11 @@ static int ReadRtlAsync(rtl_433_t *rtl, struct sigaction *sigact) {
     return r;
 }
 
-void calc_rssi_snr(rtl_433_t *rtl){
-    if (!rtl || !rtl->demod) {
+static void calc_rssi_snr(rtl_433_t *rtl, pulse_data_t *pulse_data){
+    if (!rtl || !rtl->demod || !pulse_data) {
         rtl433_fprintf(stderr, "calc_rssi_snr: missing context (internal error).\n");
         return;
     }
-
-    pulse_data_t *pulse_data = &rtl->demod->fsk_pulse_data;
 
     float asnr = (float)pulse_data->ook_high_estimate / ((float)pulse_data->ook_low_estimate + 1);
     float foffs1 = (float)pulse_data->fsk_f1_est / INT16_MAX * rtl->cfg->samp_rate / 2.0;
@@ -555,12 +572,12 @@ void calc_rssi_snr(rtl_433_t *rtl){
     // NOTE: for (CU8) amplitude is 10x (because it's squares)
     if (rtl->demod->sample_size == 1) { // amplitude (CU8)
         pulse_data->rssi_db = 10.0f * log10f(pulse_data->ook_high_estimate) - 42.1442f; // 10*log10f(16384.0f)
-        pulse_data->noise_db = 10.0f * log10f(pulse_data->ook_low_estimate) - 42.1442f; // 10*log10f(16384.0f)
+        pulse_data->noise_db = 10.0f * log10f(pulse_data->ook_low_estimate + 1) - 42.1442f; // 10*log10f(16384.0f)
         pulse_data->snr_db = 10.0f * log10f(asnr);
     }
     else { // magnitude (CS16)
         pulse_data->rssi_db = 20.0f * log10f(pulse_data->ook_high_estimate) - 84.2884f; // 20*log10f(16384.0f)
-        pulse_data->noise_db = 20.0f * log10f(pulse_data->ook_low_estimate) - 84.2884f; // 20*log10f(16384.0f)
+        pulse_data->noise_db = 20.0f * log10f(pulse_data->ook_low_estimate + 1) - 84.2884f; // 20*log10f(16384.0f)
         pulse_data->snr_db = 20.0f * log10f(asnr);
     }
 }

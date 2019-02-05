@@ -17,6 +17,9 @@
 #include "librtl_433_devices.h"
 #include "data_printer_ext.h"
 
+/// Create a new r_device, copy from template if not NULL.
+r_device *create_device(r_device *new_template);
+
 /// Output data.
 void decoder_output_data(r_device *decoder, data_t *data, extdata_t *ext);
 

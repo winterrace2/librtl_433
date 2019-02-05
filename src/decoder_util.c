@@ -17,6 +17,17 @@
 #include "decoder_util.h"
 #include "redir_print.h"
 
+// create decoder functions
+
+r_device *create_device(r_device *template)
+{
+    r_device *r_dev = malloc(sizeof (*r_dev));
+    if (template)
+        *r_dev = *template; // copy
+
+    return r_dev;
+}
+
 // variadic print functions
 
 void bitbuffer_printf(const bitbuffer_t *bitbuffer, char const *restrict format, ...)

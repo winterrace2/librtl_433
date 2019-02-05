@@ -88,11 +88,11 @@ RTL_433_API SdrDriverType getDriverType();
 
 void sdr_callback(unsigned char *iq_buf, uint32_t len, void *ctx);
 char *time_pos_str(rtl_433_t *rtl, unsigned samples_ago, char *buf);
-void calc_rssi_snr(rtl_433_t *rtl);
 
 //private:
 static int InitSdr(rtl_433_t *rtl);
 static int ReadRtlAsync(rtl_433_t *rtl, struct sigaction *sigact);
+static void calc_rssi_snr(rtl_433_t *rtl, pulse_data_t *pulse_data);
 
 #ifdef __cplusplus
 }
