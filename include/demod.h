@@ -58,8 +58,8 @@ int registerFlexDevices(dm_state *dm, list_t *flex_specs);
 int Perform_AM_Demodulation(dm_state *dm, unsigned char *iq_buf, unsigned long n_samples);
 int Perform_FM_Demodulation(dm_state *dm, unsigned char *iq_buf, unsigned long n_samples);
 
-int Run_OOK_Demodulation(dm_state *dm);
-int Run_FSK_Demodulation(dm_state *dm);
+int run_ook_demods(dm_state *dm);
+int run_fsk_demods(dm_state *dm);
 
 int	ReadFromFiles(dm_state *dm);
 int dumpSamplesToFile(dm_state *dm, unsigned char *iq_buf, unsigned long n_samples);
@@ -75,7 +75,7 @@ int add_ext_output(dm_state *dm, void *extcb);
 // private:
 static void data_acquired_handler(r_device *r_dev, data_t *data, extdata_t *ext);
 static void update_protocol(r_cfg_t *cfg, r_device *r_dev);
-static int register_protocol(dm_state *dm, r_device* t_dev);
+static int register_protocol(dm_state *dm, r_device* t_dev, char *arg);
 static char const **determine_csv_fields(dm_state *dm, char const **well_known, int *num_fields);
 static FILE *fopen_output(char *param, int allow_overwrite);
 

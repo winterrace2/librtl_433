@@ -53,7 +53,7 @@ typedef struct r_cfg { // following explanations contain the former command line
 	int ppm_error;										// [-p] Correct rtl-sdr tuner frequency offset error
 	uint32_t samp_rate;									// [-s] Sample rate
 	uint32_t out_block_size;							// [-b] Output block size for RTL-SDR
-	list_t active_prots;								// [-R] [-G] nth element set to 1 if corresponding protocol should be used (do this for all entries to "register_all"). Empty list to use defaults
+	list_t active_prots;								// [-R] [-G] nth element set to a non-NULL argument (might be "") if corresponding protocol should be used (do this for all entries to "register_all"). Empty list to use defaults
 	list_t flex_specs;									// [-X] list of specs of general purpose decoders
 	uint32_t level_limit;								// [-l] Change detection level used to determine pulses [0-16384] (0 = auto)
 	uint32_t override_short;							// [-z] Override short value in data decoder (only effective on -a)
@@ -63,7 +63,7 @@ typedef struct r_cfg { // following explanations contain the former command line
 	int analyze_pulses;									// [-A] 1 for Pulse Analyzer. Enable pulse analysis and decode attempt
 	char test_data[MAX_TESTDATA_LEN];					// [-y] demodulated test data (e.g. "{25}fb2dd58") to verify decoding of with enabled devices
 	GrabMode grab_mode;									// [-S] Signal auto save. Creates one file per signal.
-	char output_path_sigdmp[MAX_PATHLEN];				//      directory to which the grabbed signals should be written (empty string for working dir)
+	char output_path_sigdmp[MAX_PATHLEN];				//      directory to which the grabbed signals should be written, has to include trailing slash. (empty string for working dir)
 	list_t in_files;									// [-r] input file to read data from (instead of a receiver)
 	char out_filename[MAX_PATHLEN];						// [-w, -W, deprecated: <filename>] output file to Save data stream to  ('-' dumps samples to stdout)
 	unsigned char overwrite_modes;						// [-w/W] mask allowing to overwrite different kinds of output files

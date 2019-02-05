@@ -61,7 +61,7 @@ r_cfg_t *r_create_cfg(void)
 
 void r_free_cfg(r_cfg_t *cfg)
 {
-    list_free_elems(&cfg->active_prots, NULL);
+    list_free_elems(&cfg->active_prots, free);
     list_free_elems(&cfg->flex_specs, free);
     list_free_elems(&cfg->in_files, free);
     free(cfg);
