@@ -372,14 +372,14 @@ void sdr_callback(unsigned char *iq_buf, uint32_t len, void *ctx)
 
                 for (void **iter = rtl->demod->dumper.elems; iter && *iter; ++iter) {
                     file_info_t const *dumper = *iter;
-                    if (dumper->format == VCD_LOGIC) pulse_data_print_vcd(dumper->file, &rtl->demod->pulse_data, '\'', rtl->cfg->samp_rate);
+                    if (dumper->format == VCD_LOGIC) pulse_data_print_vcd(dumper->file, &rtl->demod->pulse_data, '\'');
                     if (dumper->format == U8_LOGIC) pulse_data_dump_raw(rtl->demod->u8_buf, n_samples, rtl->input_pos, &rtl->demod->pulse_data, 0x02);
                     if (dumper->format == PULSE_OOK) pulse_data_dump(dumper->file, &rtl->demod->pulse_data);
                 }
 
                 if (rtl->cfg->verbosity > 2) pulse_data_print(&rtl->demod->pulse_data);
                 if (rtl->cfg->analyze_pulses && (rtl->cfg->grab_mode <= GRAB_ALL_DEVICES || (rtl->cfg->grab_mode == GRAB_UNKNOWN_DEVICES && p_events == 0) || (rtl->cfg->grab_mode == GRAB_KNOWN_DEVICES && p_events > 0))) {
-                    pulse_analyzer(&rtl->demod->pulse_data, rtl->cfg->samp_rate, rtl);
+                    pulse_analyzer(&rtl->demod->pulse_data, rtl);
                 }
 
             }
@@ -391,14 +391,14 @@ void sdr_callback(unsigned char *iq_buf, uint32_t len, void *ctx)
 
                 for (void **iter = rtl->demod->dumper.elems; iter && *iter; ++iter) {
                     file_info_t const *dumper = *iter;
-                    if (dumper->format == VCD_LOGIC) pulse_data_print_vcd(dumper->file, &rtl->demod->fsk_pulse_data, '"', rtl->cfg->samp_rate);
+                    if (dumper->format == VCD_LOGIC) pulse_data_print_vcd(dumper->file, &rtl->demod->fsk_pulse_data, '"');
                     if (dumper->format == U8_LOGIC) pulse_data_dump_raw(rtl->demod->u8_buf, n_samples, rtl->input_pos, &rtl->demod->fsk_pulse_data, 0x04);
                     if (dumper->format == PULSE_OOK) pulse_data_dump(dumper->file, &rtl->demod->fsk_pulse_data);
                 }
 
                 if (rtl->cfg->verbosity > 2) pulse_data_print(&rtl->demod->fsk_pulse_data);
                 if (rtl->cfg->analyze_pulses && (rtl->cfg->grab_mode <= GRAB_ALL_DEVICES || (rtl->cfg->grab_mode == GRAB_UNKNOWN_DEVICES && p_events == 0) || (rtl->cfg->grab_mode == GRAB_KNOWN_DEVICES && p_events > 0))) {
-                    pulse_analyzer(&rtl->demod->fsk_pulse_data, rtl->cfg->samp_rate, rtl);
+                    pulse_analyzer(&rtl->demod->fsk_pulse_data, rtl);
                 }
             } // if (package_type == ...
             d_events += p_events;

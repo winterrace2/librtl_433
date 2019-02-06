@@ -53,7 +53,7 @@ void pulse_data_dump_raw(uint8_t *buf, unsigned len, uint64_t buf_offset, pulse_
 	}
 }
 
-void pulse_data_print_vcd_header(FILE *file, uint32_t sample_rate)
+RTL_433_API void pulse_data_print_vcd_header(FILE *file, uint32_t sample_rate)
 {
 	char time_str[LOCAL_TIME_BUFLEN];
 	char *timescale;
@@ -74,13 +74,13 @@ void pulse_data_print_vcd_header(FILE *file, uint32_t sample_rate)
 	fprintf(file, "#0 0/ 0' 0\"\n");
 }
 
-void pulse_data_print_vcd(FILE *file, pulse_data_t const *data, int ch_id, uint32_t sample_rate)
+RTL_433_API void pulse_data_print_vcd(FILE *file, pulse_data_t const *data, int ch_id)
 {
 	float scale;
-	if (sample_rate <= 500000)
-		scale = 1000000 / sample_rate; // unit: 1 us
+	if (data->sample_rate <= 500000)
+		scale = 1000000 / data->sample_rate; // unit: 1 us
 	else
-		scale = 10000000 / sample_rate; // unit: 100 ns
+		scale = 10000000 / data->sample_rate; // unit: 100 ns
 	uint64_t pos = data->offset;
 	for (unsigned n = 0; n < data->num_pulses; ++n) {
 		if (n == 0)
@@ -102,8 +102,10 @@ void pulse_data_load(FILE *file, pulse_data_t *data)
     int size = sizeof(data->pulse) / sizeof(int);
 
     pulse_data_clear(data);
+	data->sample_rate = 1000000; // assumes 1us timescale
     // read line-by-line
     while (i < size && fgets(s, sizeof(s), file)) {
+		// TODO: we should parse sample rate and timescale
         if (!strncmp(s, ";freq1", 6)) {
             data->freq1_hz = strtol(s+6, NULL, 10);
         }
@@ -132,17 +134,18 @@ void pulse_data_load(FILE *file, pulse_data_t *data)
     data->num_pulses = i;
 }
 
-void pulse_data_print_pulse_header(FILE *file)
+RTL_433_API void pulse_data_print_pulse_header(FILE *file)
 {
     char time_str[LOCAL_TIME_BUFLEN];
 
     fprintf(file, ";pulse data\n");
     fprintf(file, ";version 1\n");
     fprintf(file, ";timescale 1us\n");
+    //fprintf(file, ";samplerate %u\n", data->sample_rate);
     fprintf(file, ";created %s\n", local_time_str(0, time_str));
 }
 
-void pulse_data_dump(FILE *file, pulse_data_t *data)
+RTL_433_API void pulse_data_dump(FILE *file, pulse_data_t *data)
 {
     if (data->fsk_f2_est) {
         fprintf(file, ";fsk %d pulses\n", data->num_pulses);
@@ -153,8 +156,9 @@ void pulse_data_dump(FILE *file, pulse_data_t *data)
         fprintf(file, ";ook %d pulses\n", data->num_pulses);
         fprintf(file, ";freq1 %.0f\n", data->freq1_hz);
     }
+    double to_us = 1e6 / data->sample_rate;
     for (unsigned i = 0; i < data->num_pulses; ++i) {
-        fprintf(file, "%d %d\n", data->pulse[i], data->gap[i]);
+        fprintf(file, "%.0f %.0f\n", data->pulse[i] * to_us, data->gap[i] * to_us);
     }
     fprintf(file, ";end\n");
 }
@@ -373,6 +377,8 @@ PulseDetectionResult pulse_detect_package(pulse_detect_t *pulse_detect, int16_t 
 					// Initialize all data
 					pulse_data_clear(pulses);
 					pulse_data_clear(fsk_pulses);
+					pulses->sample_rate = samp_rate;
+					fsk_pulses->sample_rate = samp_rate;
 					pulses->offset = sample_offset + s->data_counter;
 					fsk_pulses->offset = sample_offset + s->data_counter;
 					pulses->start_ago = len - s->data_counter;

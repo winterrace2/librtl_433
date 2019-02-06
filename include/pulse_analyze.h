@@ -17,7 +17,7 @@
 #include "pulse_detect.h"
 
 /// Analyze and print result
-void pulse_analyzer(pulse_data_t *data, uint32_t samp_rate, rtl_433_t *ctx);
+void pulse_analyzer(pulse_data_t *data, rtl_433_t *ctx);
 
 
 #endif /* RTL_433_PULSE_ANALYZE_H */
