@@ -158,10 +158,10 @@ void histogram_print(histogram_t const *hist, uint32_t samp_rate) {
 #define TOLERANCE (0.2f)        // 20% tolerance should still discern between the pulse widths: 0.33, 0.66, 1.0
 
 /// Analyze the statistics of a pulse data structure and print result
-void pulse_analyzer(pulse_data_t *data, uint32_t samp_rate, rtl_433_t *ctx)
+void pulse_analyzer(pulse_data_t *data, rtl_433_t *ctx)
 {
-    double to_ms = 1e3 / samp_rate;
-    double to_us = 1e6 / samp_rate;
+    double to_ms = 1e3 / data->sample_rate;
+    double to_us = 1e6 / data->sample_rate;
     // Generate pulse period data
     int pulse_total_period = 0;
     pulse_data_t pulse_periods = {0};
@@ -190,19 +190,19 @@ void pulse_analyzer(pulse_data_t *data, uint32_t samp_rate, rtl_433_t *ctx)
     rtl433_fprintf(stderr, "Total count: %4u,  width: %4.2f ms\t\t(%5i S)\n",
         data->num_pulses, pulse_total_period*to_ms, pulse_total_period);
     rtl433_fprintf(stderr, "Pulse width distribution:\n");
-    histogram_print(&hist_pulses, samp_rate);
+    histogram_print(&hist_pulses, data->sample_rate);
     rtl433_fprintf(stderr, "Gap width distribution:\n");
-    histogram_print(&hist_gaps, samp_rate);
+    histogram_print(&hist_gaps, data->sample_rate);
     rtl433_fprintf(stderr, "Pulse period distribution:\n");
-    histogram_print(&hist_periods, samp_rate);
+    histogram_print(&hist_periods, data->sample_rate);
     rtl433_fprintf(stderr, "Level estimates [high, low]: %6i, %6i\n",
         data->ook_high_estimate, data->ook_low_estimate);
     rtl433_fprintf(stderr, "RSSI: %.1f dB SNR: %.1f dB Noise: %.1f dB\n",
         data->rssi_db, data->snr_db, data->noise_db);
     rtl433_fprintf(stderr, "Frequency offsets [F1, F2]:  %6i, %6i\t(%+.1f kHz, %+.1f kHz)\n",
         data->fsk_f1_est, data->fsk_f2_est,
-        (float)data->fsk_f1_est/INT16_MAX*samp_rate/2.0/1000.0,
-        (float)data->fsk_f2_est/INT16_MAX*samp_rate/2.0/1000.0);
+        (float)data->fsk_f1_est/INT16_MAX*data->sample_rate /2.0/1000.0,
+        (float)data->fsk_f2_est/INT16_MAX*data->sample_rate /2.0/1000.0);
 
     rtl433_fprintf(stderr, "Guessing modulation: ");
     r_device device = { .name = "Analyzer Device", .ctx = ctx, 0 };
