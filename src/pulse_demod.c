@@ -1,14 +1,15 @@
-/**
- * Pulse demodulation functions
- *
- * Binary demodulators (PWM/PPM/Manchester/...) using a pulse data structure as input
- *
- * Copyright (C) 2015 Tommy Vestermark
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- */
+/** @file
+    Pulse demodulation functions.
+
+    Binary demodulators (PWM/PPM/Manchester/...) using a pulse data structure as input.
+
+    Copyright (C) 2015 Tommy Vestermark
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+*/
 
 #include "pulse_demod.h"
 #include "bitbuffer.h"
@@ -66,7 +67,6 @@ int pulse_demod_pcm(const pulse_data_t *pulses, r_device *device)
         ) {
             if (device->decode_fn) {
                 extdata_t ext;
-                ext.prot_id = device->protocol_num;
                 ext.bitbuffer = &bits;
                 ext.pulses = pulses;
                 ext.pulseexc_startidx = startpulse;
@@ -133,7 +133,6 @@ int pulse_demod_ppm(const pulse_data_t *pulses, r_device *device)
 
             if (device->decode_fn) {
                 extdata_t ext;
-                ext.prot_id = device->protocol_num;
                 ext.bitbuffer = &bits;
                 ext.pulses = pulses;
                 ext.pulseexc_startidx = startpulse;
@@ -238,7 +237,6 @@ int pulse_demod_pwm(const pulse_data_t *pulses, r_device *device)
                 && (bits.num_rows > 0)) {                        // Only if data has been accumulated
             if (device->decode_fn) {
                 extdata_t ext;
-                ext.prot_id = device->protocol_num;
                 ext.bitbuffer = &bits;
                 ext.pulses = pulses;
                 ext.pulseexc_startidx = startpulse;
@@ -256,7 +254,7 @@ int pulse_demod_pwm(const pulse_data_t *pulses, r_device *device)
             startpulse = n + 1;
         }
         else if (device->s_gap_limit > 0 && pulses->gap[n] > device->s_gap_limit
-				&& bits.num_rows > 0 && bits.bits_per_row[bits.num_rows - 1] > 0) {
+                && bits.num_rows > 0 && bits.bits_per_row[bits.num_rows - 1] > 0) {
             // New packet in multipacket
             bitbuffer_add_row(&bits);
         }
@@ -277,10 +275,10 @@ int pulse_demod_manchester_zerobit(const pulse_data_t *pulses, r_device *device)
     for (unsigned n = 0; n < pulses->num_pulses; ++n) {
         // Falling edge is on end of pulse
         if (device->s_tolerance > 0
-				&& (pulses->pulse[n] < device->s_short_width - device->s_tolerance
-				|| pulses->pulse[n] > device->s_short_width * 2 + device->s_tolerance
-				|| pulses->gap[n] < device->s_short_width - device->s_tolerance
-				|| pulses->gap[n] > device->s_short_width * 2 + device->s_tolerance)) {
+                && (pulses->pulse[n] < device->s_short_width - device->s_tolerance
+                || pulses->pulse[n] > device->s_short_width * 2 + device->s_tolerance
+                || pulses->gap[n] < device->s_short_width - device->s_tolerance
+                || pulses->gap[n] > device->s_short_width * 2 + device->s_tolerance)) {
             // The pulse or gap is too long or too short, thus invalid
             bitbuffer_add_row(&bits);
             bitbuffer_add_bit(&bits, 0); // Prepare for new message with hardcoded 0
@@ -301,7 +299,6 @@ int pulse_demod_manchester_zerobit(const pulse_data_t *pulses, r_device *device)
             int newevents = 0;
             if (device->decode_fn) {
                 extdata_t ext;
-                ext.prot_id = device->protocol_num;
                 ext.bitbuffer = &bits;
                 ext.pulses = pulses;
                 ext.pulseexc_startidx = startpulse;
@@ -371,13 +368,12 @@ int pulse_demod_dmc(const pulse_data_t *pulses, r_device *device)
             bitbuffer_add_bit(&bits, 0);
         }
         else if (symbol[n] >= device->s_reset_limit - device->s_tolerance
-				&& bits.num_rows > 0) { // Only if data has been accumulated
+                && bits.num_rows > 0) { // Only if data has been accumulated
             //END message ?
             if (device->decode_fn) {
                 int start = startpulse / 2;
                 int end = (n + 1) / 2;
                 extdata_t ext;
-                ext.prot_id = device->protocol_num;
                 ext.bitbuffer = &bits;
                 ext.pulses = pulses;
                 ext.pulseexc_startidx = start; // todo: test pulse ranges
@@ -424,8 +420,8 @@ int pulse_demod_piwm_raw(const pulse_data_t *pulses, r_device *device)
                 bitbuffer_add_bit(&bits, 1 - n % 2);
         }
         else if (symbol[n] < device->s_reset_limit
-				&& bits.num_rows > 0
-				&& bits.bits_per_row[bits.num_rows - 1] > 0) {
+                && bits.num_rows > 0
+                && bits.bits_per_row[bits.num_rows - 1] > 0) {
             bitbuffer_add_row(&bits);
 /*
             rtl433_fprintf(stderr, "Detected error during pulse_demod_piwm_raw(): %s\n",
@@ -441,7 +437,6 @@ int pulse_demod_piwm_raw(const pulse_data_t *pulses, r_device *device)
                 int start = startpulse / 2;
                 int end = (n + 1) / 2;
                 extdata_t ext;
-                ext.prot_id = device->protocol_num;
                 ext.bitbuffer = &bits;
                 ext.pulses = pulses;
                 ext.pulseexc_startidx = start; // todo: test pulse ranges
@@ -486,8 +481,8 @@ int pulse_demod_piwm_dc(const pulse_data_t *pulses, r_device *device)
             bitbuffer_add_bit(&bits, 0);
         }
         else if (symbol[n] < device->s_reset_limit
-				&& bits.num_rows > 0
-				&& bits.bits_per_row[bits.num_rows - 1] > 0) {
+                && bits.num_rows > 0
+                && bits.bits_per_row[bits.num_rows - 1] > 0) {
             bitbuffer_add_row(&bits);
 /*
             rtl433_fprintf(stderr, "Detected error during pulse_demod_piwm_dc(): %s\n",
@@ -503,7 +498,6 @@ int pulse_demod_piwm_dc(const pulse_data_t *pulses, r_device *device)
                 int start = startpulse / 2;
                 int end = (n + 1) / 2;
                 extdata_t ext;
-                ext.prot_id = device->protocol_num;
                 ext.bitbuffer = &bits;
                 ext.pulses = pulses;
                 ext.pulseexc_startidx = start; // todo: test pulse ranges
@@ -590,12 +584,11 @@ int pulse_demod_osv1(const pulse_data_t *pulses, r_device *device)
                 bitbuffer_add_bit(&bits, 1);
         }
         if ((n == pulses->num_pulses - 1
-					|| pulses->gap[n] > device->s_reset_limit)
-				&& (bits.num_rows > 0)) { // Only if data has been accumulated
+                    || pulses->gap[n] > device->s_reset_limit)
+                && (bits.num_rows > 0)) { // Only if data has been accumulated
             //END message ?
             if (device->decode_fn) {
                 extdata_t ext;
-                ext.prot_id = device->protocol_num;
                 ext.bitbuffer = &bits;
                 ext.pulses = pulses;
                 ext.pulseexc_startidx = 0; // todo: here we pass the entire pulse set on each call. could this be improved?

@@ -54,12 +54,12 @@ ss_sensor_parser(r_device *decoder, bitbuffer_t *bitbuffer, int row, extdata_t *
     }
 
     data = data_make(
-    	"model",    "", DATA_STRING, "SimpliSafe Sensor",
-    	"device",   "Device ID",    DATA_STRING, id,
-    	"seq",      "Sequence", DATA_INT, seq,
-    	"state",    "State",    DATA_INT, state,
-    	"extradata",    "Extra Data",   DATA_STRING, extradata,
-    	NULL
+            "model",        "",             DATA_STRING, "SimpliSafe Sensor",
+            "device",       "Device ID",    DATA_STRING, id,
+            "seq",          "Sequence",     DATA_INT, seq,
+            "state",        "State",        DATA_INT, state,
+            "extradata",    "Extra Data",   DATA_STRING, extradata,
+            NULL
     );
     decoder_output_data(decoder, data, ext);
 
@@ -89,11 +89,11 @@ ss_pinentry_parser(r_device *decoder, bitbuffer_t *bitbuffer, int row, extdata_t
     sprintf(extradata, "Disarm Pin: %x%x%x%x", digits[0], digits[1], digits[2], digits[3]);
 
     data = data_make(
-        "model",    "", DATA_STRING, "SimpliSafe Keypad",
-        "device",   "Device ID",    DATA_STRING, id,
-        "seq",      "Sequence", DATA_INT, b[9],
-        "extradata",    "Extra Data",   DATA_STRING, extradata,
-        NULL
+            "model",        "",             DATA_STRING, "SimpliSafe Keypad",
+            "device",       "Device ID",    DATA_STRING, id,
+            "seq",          "Sequence",     DATA_INT, b[9],
+            "extradata",    "Extra Data",   DATA_STRING, extradata,
+            NULL
     );
     decoder_output_data(decoder, data, ext);
 
@@ -125,11 +125,11 @@ ss_keypad_commands(r_device *decoder, bitbuffer_t *bitbuffer, int row, extdata_t
     ss_get_id(id, b);
 
     data = data_make(
-    	"model",    "", DATA_STRING, "SimpliSafe Keypad",
-    	"device",   "", DATA_STRING, id,
-    	"seq",  "Sequence",DATA_INT, b[9],
-    	"extradata",    "", DATA_STRING, extradata,
-    	NULL
+            "model",        "",             DATA_STRING, "SimpliSafe Keypad",
+            "device",       "Device ID",    DATA_STRING, id,
+            "seq",          "Sequence",     DATA_INT, b[9],
+            "extradata",    "Extra Data",   DATA_STRING, extradata,
+            NULL
     );
     decoder_output_data(decoder, data, ext);
 

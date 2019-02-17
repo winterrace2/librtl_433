@@ -7,7 +7,6 @@
 #include "bitbuffer.h"
 
 typedef struct _extdata {
-	uint32_t prot_id;
 	bitbuffer_t *bitbuffer;
 	const pulse_data_t *pulses;
 	unsigned pulseexc_startidx;

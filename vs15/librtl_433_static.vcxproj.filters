@@ -454,9 +454,6 @@
     <ClInclude Include="..\include\librtl_433_export.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\librtl_433_devices.h">
-      <Filter>Header files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\am_analyze.h">
       <Filter>Header files</Filter>
     </ClInclude>
@@ -491,6 +488,12 @@
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\r_util.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\librtl_433_devices.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\r_device.h">
       <Filter>Header files</Filter>
     </ClInclude>
   </ItemGroup>

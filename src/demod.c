@@ -244,7 +244,6 @@ int run_ook_demods(dm_state *dm) {
 
     if (!p_events && dm->rtl->cfg->report_unknown && dm->pulse_data.num_pulses > 10) { // unknown OOK signal (no matching device demodulator) - pass to GUI as unknown signal if it has a significant length
         extdata_t ext = {
-            .prot_id = 0,
             .bitbuffer = NULL,
             .pulses = &dm->pulse_data,
             .pulseexc_startidx = 0,

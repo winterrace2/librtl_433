@@ -130,7 +130,7 @@ static void datagram_client_close(datagram_client_t *client)
 
 #ifdef _WIN32
     WSACleanup();
-#endif 
+#endif
 }
 
 static void datagram_client_send(datagram_client_t *client, const char *message, size_t message_len)
@@ -201,7 +201,7 @@ static void print_syslog_data(data_output_t *output, data_t *data, char *format)
     gmtime_s(&tm_info, &now);
 #else
     gmtime_r(&now, &tm_info);
-#endif    
+#endif
     char timestamp[21];
     strftime(timestamp, 21, "%Y-%m-%dT%H:%M:%SZ", &tm_info);
 

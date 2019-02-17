@@ -1,22 +1,22 @@
-/*
- * A general structure for extracting hierarchical data from the devices;
- * typically key-value pairs, but allows for more rich data as well.
- *
- * Copyright (C) 2015 by Erkki Seppälä <flux@modeemi.fi>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/** @file
+    A general structure for extracting hierarchical data from the devices;
+    typically key-value pairs, but allows for more rich data as well.
+
+    Copyright (C) 2015 by Erkki Seppälä <flux@modeemi.fi>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #ifndef INCLUDE_DATA_H_
 #define INCLUDE_DATA_H_
@@ -36,7 +36,7 @@
 
     // MSVC has something like C99 restrict as __restrict
     #ifndef restrict
-		#define restrict  __restrict
+    #define restrict __restrict
     #endif
 #endif
 
@@ -53,13 +53,13 @@
 #endif
 
 typedef enum {
-    DATA_DATA,        /* pointer to data is stored */
-    DATA_INT,        /* pointer to integer is stored */
-    DATA_DOUBLE,        /* pointer to a double is stored */
-    DATA_STRING,        /* pointer to a string is stored */
-    DATA_ARRAY,        /* pointer to an array of values is stored */
-    DATA_COUNT,        /* invalid */
-    DATA_FORMAT        /* indicates the following value is formatted */
+    DATA_DATA,   /**< pointer to data is stored */
+    DATA_INT,    /**< pointer to integer is stored */
+    DATA_DOUBLE, /**< pointer to a double is stored */
+    DATA_STRING, /**< pointer to a string is stored */
+    DATA_ARRAY,  /**< pointer to an array of values is stored */
+    DATA_COUNT,  /**< invalid */
+    DATA_FORMAT  /**< indicates the following value is formatted */
 } data_type_t;
 
 typedef struct data_array {
@@ -70,12 +70,12 @@ typedef struct data_array {
 
 typedef struct data {
     char        *key;
-    char        *pretty_key; /* the name used for displaying data to user in with a nicer name */
+    char        *pretty_key; /**< the name used for displaying data to user in with a nicer name */
     data_type_t type;
-    char        *format; /* if not null, contains special formatting string */
+    char        *format; /**< if not null, contains special formatting string */
     void        *value;
-    unsigned    retain; /* incremented on data_retain, data_free only frees if this is zero */
-    struct data *next; /* chaining to the next element in the linked list; NULL indicates end-of-list */
+    unsigned    retain; /**< incremented on data_retain, data_free only frees if this is zero */
+    struct data *next; /**< chaining to the next element in the linked list; NULL indicates end-of-list */
 } data_t;
 
 /** Constructs a structured data object.
@@ -133,7 +133,7 @@ data_t *data_prepend(data_t *first, const char *key, const char *pretty_key, ...
 */
 data_array_t *data_array(int num_values, data_type_t type, void *ptr);
 
-/** Releases a data array */
+/** Releases a data array. */
 void data_array_free(data_array_t *array);
 
 /** Retain a structure object, returns the structure object passed in. */
@@ -144,27 +144,27 @@ RTL_433_API void data_free(data_t *data);
 
 typedef struct _data_output data_output_t;
 typedef struct _data_output {
-	void(*print_data)(data_output_t *output, data_t *data, char *format);
-	void(*print_array)(data_output_t *output, data_array_t *data, char *format);
-	void(*print_string)(data_output_t *output, const char *data, char *format);
-	void(*print_double)(data_output_t *output, double data, char *format);
-	void(*print_int)(data_output_t *output, int data, char *format);
-	void(*output_start)(data_output_t *output, const char **fields, int num_fields);
-	void(*output_poll)(data_output_t *output);
-	void(*output_free)(data_output_t *output);
-	FILE *file;
-	void *ext_callback;
+    void(*print_data)(data_output_t *output, data_t *data, char *format);
+    void(*print_array)(data_output_t *output, data_array_t *data, char *format);
+    void(*print_string)(data_output_t *output, const char *data, char *format);
+    void(*print_double)(data_output_t *output, double data, char *format);
+    void(*print_int)(data_output_t *output, int data, char *format);
+    void(*output_start)(data_output_t *output, const char **fields, int num_fields);
+    void(*output_poll)(data_output_t *output);
+    void(*output_free)(data_output_t *output);
+    FILE *file;
+    void *ext_callback;
 } data_output_t;
 
-/** Prints a structured data object */
+/** Prints a structured data object. */
 void data_output_print(data_output_t *output, data_t *data);
 
-/** Allows to polls an event loop, if necessary */
+/** Allows to polls an event loop, if necessary. */
 void data_output_poll(data_output_t *output);
 
 void data_output_free(data_output_t *output);
 
-/* data output helpers */
+/* data output helpers. */
 
 void print_value(data_output_t *output, data_type_t type, void *value, char *format);
 

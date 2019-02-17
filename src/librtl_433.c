@@ -1,24 +1,19 @@
-/*
- * rtl_433, turns your Realtek RTL2832 based DVB dongle into a 433.92MHz generic data receiver
- * Copyright (C) 2012 by Benjamin Larsson <benjamin@southpole.se>
- *
- * Based on rtl_sdr
- *
- * Copyright (C) 2012 by Steve Markgraf <steve@steve-m.de>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/** @file
+    rtl_433, turns your Realtek RTL2832 based DVB dongle into a 433.92MHz generic data receiver.
+    Copyright (C) 2012 by Benjamin Larsson <benjamin@southpole.se>
+    Based on rtl_sdr
+    Copyright (C) 2012 by Steve Markgraf <steve@steve-m.de>
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 2 of the License, or
+    (at your option) any later version.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,6 +25,7 @@
 //#include <signal.h>
 
 #include "librtl_433.h"
+#include "r_device.h"
 #include "librtl_433_devices.h"
 #include "sdr.h"
 #include "baseband.h"
@@ -50,6 +46,30 @@
 #ifndef _MSC_VER
 #include <unistd.h>
 #endif
+
+char const *version_string(void)
+{
+    return "rtl_433"
+#ifdef GIT_VERSION
+#define STR_VALUE(arg) #arg
+#define STR_EXPAND(s) STR_VALUE(s)
+            " version " STR_EXPAND(GIT_VERSION)
+            " branch " STR_EXPAND(GIT_BRANCH)
+            " at " STR_EXPAND(GIT_TIMESTAMP)
+#undef STR_VALUE
+#undef STR_EXPAND
+#else
+            " version unknown"
+#endif
+            " inputs file rtl_tcp"
+#ifdef RTLSDR
+            " RTL-SDR"
+#endif
+#ifdef SOAPYSDR
+            " SoapySDR"
+#endif
+            ;
+}
  
 RTL_433_API int getDevCount() {
     r_device* dev_pointers[] = {
@@ -97,14 +117,7 @@ RTL_433_API SdrDriverType getDriverType() {
 }
 
 static void print_version(void) {
-    rtl433_fprintf(stderr, "rtl_433 " VERSION " inputs file rtl_tcp"
-#ifdef RTLSDR
-            " RTL-SDR"
-#endif
-#ifdef SOAPYSDR
-            " SoapySDR"
-#endif
-            "\n");
+    rtl433_fprintf(stderr, "%s\n", version_string());
 }
 
 RTL_433_API int rtl_433_init(rtl_433_t **out_rtl) {
