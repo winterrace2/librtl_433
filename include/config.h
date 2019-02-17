@@ -44,47 +44,47 @@ typedef enum {
 #define OUTPUT_EXT   16 // extended output to external callback
 
 typedef struct r_cfg { // following explanations contain the former command line switches in brackets
-	int verbosity;										// [-v] 0=normal, 1=verbose, 2=verbose decoders, 3=debug decoders, 4=trace decoding
-	char dev_query[40];									// [-d] RTL-SDR: USB device index or ":"+serial. SoapySDR: device query. Leavy empty for no preference (first device)
-	char gain_str[MAX_GAINSTR_LEN];						// [-g] gain (leave stringempty for auto gain)
-	uint32_t frequency[MAX_FREQS];						// [-f] list of target frequencies
-	int frequencies;									// [-f] number of target frequencies
-	int hop_time;										// [-H] Hop interval for polling of multiple frequencies
-	int ppm_error;										// [-p] Correct rtl-sdr tuner frequency offset error
-	uint32_t samp_rate;									// [-s] Sample rate
-	uint32_t out_block_size;							// [-b] Output block size for RTL-SDR
-	list_t active_prots;								// [-R] [-G] nth element set to a non-NULL argument (might be "") if corresponding protocol should be used (do this for all entries to "register_all"). Empty list to use defaults
-	list_t flex_specs;									// [-X] list of specs of general purpose decoders
-	uint32_t level_limit;								// [-l] Change detection level used to determine pulses [0-16384] (0 = auto)
-	uint32_t override_short;							// [-z] Override short value in data decoder (only effective on -a)
-	uint32_t override_long;								// [-x] Override short value in data decoder (only effective on -a)
-	uint32_t bytes_to_read;								// [-n] Specify number of samples to take (0 = no restriction)
-	int analyze_am;										// [-a] 1 for Analyze mode. Print a textual description of the signal.
-	int analyze_pulses;									// [-A] 1 for Pulse Analyzer. Enable pulse analysis and decode attempt
-	char test_data[MAX_TESTDATA_LEN];					// [-y] demodulated test data (e.g. "{25}fb2dd58") to verify decoding of with enabled devices
-	GrabMode grab_mode;									// [-S] Signal auto save. Creates one file per signal.
-	char output_path_sigdmp[MAX_PATHLEN];				//      directory to which the grabbed signals should be written, has to include trailing slash. (empty string for working dir)
-	list_t in_files;									// [-r] input file to read data from (instead of a receiver)
-	char out_filename[MAX_PATHLEN];						// [-w, -W, deprecated: <filename>] output file to Save data stream to  ('-' dumps samples to stdout)
-	unsigned char overwrite_modes;						// [-w/W] mask allowing to overwrite different kinds of output files
-	unsigned char outputs_configured;					// [-F] bit mask of formats in which decoded output shall be produced.
-	char output_path_csv[MAX_PATHLEN];					// [-F] target file for CSV output
-	char output_path_json[MAX_PATHLEN];					// [-F] target file for JSON output
-	char output_path_kv[MAX_PATHLEN];					// [-F] target file for KV output
-	char output_udp_host[100];							// [-F] target host for syslog output
-	char output_udp_port[10];							// [-F] target port for syslog output
-	void *output_extcallback;							// [-F] target callback function for extended external output
-	int report_unknown;									// flag to enable/disable passing of unknown signals to output_extcallback
-	int report_meta;									// [-M time|reltime|notime|hires|utc|protocol|level|bits] Add various meta data to every output line
-	time_mode_t report_time_preference;					// [-M time|reltime|notime|hires|utc|protocol|level|bits] Add various meta data to every output line
-	int report_time_hires;								// [-M time|reltime|notime|hires|utc|protocol|level|bits] Add various meta data to every output line
-	int report_time_utc;								// [-M time|reltime|notime|hires|utc|protocol|level|bits] Add various meta data to every output line
-	int report_protocol;								// [-M time|reltime|notime|hires|utc|protocol|level|bits] Add various meta data to every output line
-	int verbose_bits;									// [-M time|reltime|notime|hires|utc|protocol|level|bits] Add various meta data to every output line
-	char *output_tag;									// [-K FILE|PATH|<tag>] Add an expanded token or fixed tag to every output line
-	conversion_mode_t conversion_mode;					// [-C] Convert units in decoded output
-	uint32_t duration;									// [-T] Specify number of seconds to run.
-	int stop_after_successful_events_flag;				// [-E] 1 for stopping after outputting successful event(s)
+	int verbosity;										///< [-v] 0=normal, 1=verbose, 2=verbose decoders, 3=debug decoders, 4=trace decoding.
+	char dev_query[40];									///< [-d] RTL-SDR: USB device index or ":"+serial. SoapySDR: device query. Leavy empty for no preference (first device).
+	char gain_str[MAX_GAINSTR_LEN];						///< [-g] gain (leave stringempty for auto gain).
+	uint32_t frequency[MAX_FREQS];						///< [-f] list of target frequencies.
+	int frequencies;									///< [-f] number of target frequencies.
+	int hop_time;										///< [-H] Hop interval for polling of multiple frequencies.
+	int ppm_error;										///< [-p] Correct rtl-sdr tuner frequency offset error.
+	uint32_t samp_rate;									///< [-s] Sample rate.
+	uint32_t out_block_size;							///< [-b] Output block size for RTL-SDR.
+	list_t active_prots;								///< [-R] [-G] nth element set to a non-NULL argument (might be "") if corresponding protocol should be used (do this for all entries to "register_all"). Empty list to use defaults.
+	list_t flex_specs;									///< [-X] list of specs of general purpose decoders.
+	uint32_t level_limit;								///< [-l] Change detection level used to determine pulses [0-16384] (0 = auto).
+	uint32_t override_short;							///< [-z] Override short value in data decoder (only effective on -a).
+	uint32_t override_long;								///< [-x] Override short value in data decoder (only effective on -a).
+	uint32_t bytes_to_read;								///< [-n] Specify number of samples to take (0 = no restriction).
+	int analyze_am;										///< [-a] 1 for Analyze mode. Print a textual description of the signal.
+	int analyze_pulses;									///< [-A] 1 for Pulse Analyzer. Enable pulse analysis and decode attempt.
+	char test_data[MAX_TESTDATA_LEN];					///< [-y] demodulated test data (e.g. "{25}fb2dd58") to verify decoding of with enabled devices.
+	GrabMode grab_mode;									///< [-S] Signal auto save. Creates one file per signal.
+	char output_path_sigdmp[MAX_PATHLEN];				///<      directory to which the grabbed signals should be written, has to include trailing slash. (empty string for working dir).
+	list_t in_files;									///< [-r] input file to read data from (instead of a receiver).
+	char out_filename[MAX_PATHLEN];						///< [-w, -W, deprecated: <filename>] output file to Save data stream to  ('-' dumps samples to stdout).
+	unsigned char overwrite_modes;						///< [-w/W] mask allowing to overwrite different kinds of output files.
+	unsigned char outputs_configured;					///< [-F] bit mask of formats in which decoded output shall be produced.
+	char output_path_csv[MAX_PATHLEN];					///< [-F] target file for CSV output.
+	char output_path_json[MAX_PATHLEN];					///< [-F] target file for JSON output.
+	char output_path_kv[MAX_PATHLEN];					///< [-F] target file for KV output.
+	char output_udp_host[100];							///< [-F] target host for syslog output.
+	char output_udp_port[10];							///< [-F] target port for syslog output.
+	void *output_extcallback;							///< [-F] target callback function for extended external output.
+	int report_unknown;									///< flag to enable/disable passing of unknown signals to output_extcallback.
+	int report_meta;									///< [-M time|reltime|notime|hires|utc|protocol|level|bits] Add various meta data to every output line.
+	time_mode_t report_time_preference;					///< [-M time|reltime|notime|hires|utc|protocol|level|bits] Add various meta data to every output line.
+	int report_time_hires;								///< [-M time|reltime|notime|hires|utc|protocol|level|bits] Add various meta data to every output line.
+	int report_time_utc;								///< [-M time|reltime|notime|hires|utc|protocol|level|bits] Add various meta data to every output line.
+	int report_protocol;								///< [-M time|reltime|notime|hires|utc|protocol|level|bits] Add various meta data to every output line.
+	int verbose_bits;									///< [-M time|reltime|notime|hires|utc|protocol|level|bits] Add various meta data to every output line.
+	char *output_tag;									///< [-K FILE|PATH|<tag>] Add an expanded token or fixed tag to every output line.
+	conversion_mode_t conversion_mode;					///< [-C] Convert units in decoded output.
+	uint32_t duration;									///< [-T] Specify number of seconds to run.
+	int stop_after_successful_events_flag;				///< [-E] 1 for stopping after outputting successful event(s).
 } r_cfg_t;
 
 void r_init_cfg(r_cfg_t *cfg); // Fills a config with all default elements

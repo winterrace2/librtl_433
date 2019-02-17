@@ -238,6 +238,7 @@
     <ClInclude Include="..\include\librtl_433.h" />
     <ClInclude Include="..\include\librtl_433_devices.h" />
     <ClInclude Include="..\include\librtl_433_export.h" />
+    <ClInclude Include="..\include\r_device.h" />
     <ClInclude Include="..\include\r_util.h" />
     <ClInclude Include="..\include\samp_grab.h" />
     <ClInclude Include="..\include\sdr.h" />

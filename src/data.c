@@ -144,10 +144,10 @@ alloc_error:
 static data_t *vdata_make(data_t *first, const char *key, const char *pretty_key, va_list ap)
 {
     data_type_t type;
-	data_t *prev = first;
-	while (prev && prev->next)
-		prev = prev->next;
-	char *format = false;
+    data_t *prev = first;
+    while (prev && prev->next)
+        prev = prev->next;
+    char *format = false;
     type = va_arg(ap, data_type_t);
     do {
         data_t *current;
@@ -219,7 +219,7 @@ static data_t *vdata_make(data_t *first, const char *key, const char *pretty_key
             format = NULL;
         }
     } while (key);
-	va_end(ap);
+    va_end(ap);
 
     return first;
 
@@ -230,38 +230,38 @@ alloc_error:
 
 data_t *data_make(const char *key, const char *pretty_key, ...)
 {
-	va_list ap;
-	va_start(ap, pretty_key);
-	data_t *result = vdata_make(NULL, key, pretty_key, ap);
-	va_end(ap);
-	return result;
+    va_list ap;
+    va_start(ap, pretty_key);
+    data_t *result = vdata_make(NULL, key, pretty_key, ap);
+    va_end(ap);
+    return result;
 }
 
 data_t *data_append(data_t *first, const char *key, const char *pretty_key, ...)
 {
-	va_list ap;
-	va_start(ap, pretty_key);
-	data_t *result = vdata_make(first, key, pretty_key, ap);
-	va_end(ap);
-	return result;
+    va_list ap;
+    va_start(ap, pretty_key);
+    data_t *result = vdata_make(first, key, pretty_key, ap);
+    va_end(ap);
+    return result;
 }
 
 data_t *data_prepend(data_t *first, const char *key, const char *pretty_key, ...)
 {
-	va_list ap;
-	va_start(ap, pretty_key);
-	data_t *result = vdata_make(NULL, key, pretty_key, ap);
-	va_end(ap);
+    va_list ap;
+    va_start(ap, pretty_key);
+    data_t *result = vdata_make(NULL, key, pretty_key, ap);
+    va_end(ap);
 
     if (!result)
         return first;
 
-	data_t *prev = result;
-	while (prev && prev->next)
-		prev = prev->next;
-	prev->next = first;
+    data_t *prev = result;
+    while (prev && prev->next)
+        prev = prev->next;
+    prev->next = first;
 
-	return result;
+    return result;
 }
 
 void data_array_free(data_array_t *array)
@@ -316,9 +316,9 @@ void data_output_print(data_output_t *output, data_t *data)
 
 void data_output_start(data_output_t *output, const char **fields, int num_fields)
 {
-	if (!output || !output->output_start)
-		return;
-	output->output_start(output, fields, num_fields);
+    if (!output || !output->output_start)
+        return;
+    output->output_start(output, fields, num_fields);
 }
 
 void data_output_poll(data_output_t *output)
@@ -370,7 +370,7 @@ void print_array_value(data_output_t *output, data_array_t *array, char *format,
 #else
     char buffer[element_size];
 #endif
-    
+
     if (!dmt[array->type].array_is_boxed) {
         memcpy(buffer, (void **)((char *)array->values + element_size * idx), element_size);
         print_value(output, array->type, buffer, format);

@@ -42,14 +42,6 @@ typedef struct _rtl_433 rtl_433_t;
  */
 #define DEFAULT_LEVEL_LIMIT     0
 
-#ifdef GIT_VERSION
-#define STR_VALUE(arg) #arg
-#define STR_EXPAND(s) STR_VALUE(s)
-#define VERSION "version " STR_EXPAND(GIT_VERSION) " branch " STR_EXPAND(GIT_BRANCH) " at " STR_EXPAND(GIT_TIMESTAMP)
-#else
-#define VERSION "version unknown"
-#endif
-
 typedef enum { // used by getDriverType()
 	SDRDRV_NONE = 2,
 	SDRDRV_RTLSDR = 1,

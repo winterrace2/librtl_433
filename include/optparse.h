@@ -1,13 +1,16 @@
-/**
- * heavily reduced version of Christian Zuckschwerdts option parsing functions
- *
- * Only following 2 functions are used to parse the rtl_tcp query string.
- * 
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- */
+/** @file
+    heavily reduced version of Christian Zuckschwerdts option parsing functions
+    Only following 2 functions are used to parse the rtl_tcp query string.
+ 
+    Option parsing functions to complement getopt.
+
+    Copyright (C) 2017 Christian Zuckschwerdt
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+*/
 
 #ifndef INCLUDE_OPTPARSE_H_
 #define INCLUDE_OPTPARSE_H_

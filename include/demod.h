@@ -23,8 +23,8 @@ typedef struct _dm_state{
 		float f32_buf[MAXIMAL_BUF_LENGTH]; // format conversion buffer
 		int sample_size; // CU8: 1, CS16: 2
 		pulse_detect_t *pulse_detect;
-		FilterState lowpass_filter_state;
-		DemodFM_State demod_FM_state;
+		filter_state_t lowpass_filter_state;
+		demodfm_state_t demod_FM_state;
 		int enable_FM_demod;
 		samp_grab_t *samp_grab;   // (only allocated if cfg->grab_mode != 0; created by dm_state_init, freed by dm_state_destroy)
 		am_analyze_t *am_analyze; // (only allocated if cfg->analyze_am != 0; created by dm_state_init, freed by dm_state_destroy)

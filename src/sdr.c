@@ -1,17 +1,17 @@
-/**
- * SDR input from RTLSDR or SoapySDR
- *
- * Copyright (C) 2018 Christian Zuckschwerdt
- * based on code
- * Copyright (C) 2012 by Steve Markgraf <steve@steve-m.de>
- * Copyright (C) 2014 by Kyle Keen <keenerd@gmail.com>
- * Copyright (C) 2016 by Robert X. Seger
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- */
+/** @file
+    SDR input from RTLSDR or SoapySDR.
+
+    Copyright (C) 2018 Christian Zuckschwerdt
+    based on code
+    Copyright (C) 2012 by Steve Markgraf <steve@steve-m.de>
+    Copyright (C) 2014 by Kyle Keen <keenerd@gmail.com>
+    Copyright (C) 2016 by Robert X. Seger
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -718,11 +718,15 @@ int sdr_open(sdr_dev_t **out_dev, int *sample_size, char *dev_query, int verbose
     return -1;
 #endif
 
-#ifdef RTLSDR
     /* Open RTLSDR by default or if index or serial given, if available */
-    if (!dev_query || *dev_query == ':' || (*dev_query >= '0' && *dev_query <= '9'))
+    if (!dev_query || *dev_query == ':' || (*dev_query >= '0' && *dev_query <= '9')) {
+#ifdef RTLSDR
         return sdr_open_rtl(out_dev, sample_size, dev_query, verbose);
+#else
+        rtl433_fprintf(stderr, "No input driver for RTL-SDR compiled in.\n");
+        return -1;
 #endif
+    }
 
 #ifdef SOAPYSDR
     /* Open SoapySDR otherwise, if available */
