@@ -73,6 +73,7 @@ int pulse_demod_pcm(const pulse_data_t *pulses, r_device *device)
                 ext.pulseexc_len = (n - startpulse) + 1;
                 ext.mod = device->modulation;
                 ext.samprate = device->ctx->cfg->samp_rate;
+                ext.freq = device->ctx->center_frequency;
                 events += device->decode_fn(device, &bits, &ext);
             }
             // Debug printout
@@ -139,6 +140,7 @@ int pulse_demod_ppm(const pulse_data_t *pulses, r_device *device)
                 ext.pulseexc_len = (n - startpulse) + 1;
                 ext.mod = device->modulation;
                 ext.samprate = device->ctx->cfg->samp_rate;
+                ext.freq = device->ctx->center_frequency;
                 events += device->decode_fn(device, &bits, &ext);
             }
             // Debug printout
@@ -243,6 +245,7 @@ int pulse_demod_pwm(const pulse_data_t *pulses, r_device *device)
                 ext.pulseexc_len = (n - startpulse) + 1;
                 ext.mod = device->modulation;
                 ext.samprate = device->ctx->cfg->samp_rate;
+                ext.freq = device->ctx->center_frequency;
                 events += device->decode_fn(device, &bits, &ext);
             }
             // Debug printout
@@ -305,6 +308,7 @@ int pulse_demod_manchester_zerobit(const pulse_data_t *pulses, r_device *device)
                 ext.pulseexc_len = (n - startpulse) + 1;
                 ext.mod = device->modulation;
                 ext.samprate = device->ctx->cfg->samp_rate;
+                ext.freq = device->ctx->center_frequency;
                 events += device->decode_fn(device, &bits, &ext);
             }
             // Debug printout
@@ -380,6 +384,7 @@ int pulse_demod_dmc(const pulse_data_t *pulses, r_device *device)
                 ext.pulseexc_len = end-start; // todo: test pulse ranges
                 ext.mod = device->modulation;
                 ext.samprate = device->ctx->cfg->samp_rate;
+                ext.freq = device->ctx->center_frequency;
                 events += device->decode_fn(device, &bits, &ext);
             }
             if (!device->decode_fn || (device->verbose && events > 0)) {
@@ -443,6 +448,7 @@ int pulse_demod_piwm_raw(const pulse_data_t *pulses, r_device *device)
                 ext.pulseexc_len = end - start; // todo: test pulse ranges
                 ext.mod = device->modulation;
                 ext.samprate = device->ctx->cfg->samp_rate;
+                ext.freq = device->ctx->center_frequency;
                 events += device->decode_fn(device, &bits, &ext);
             }
             if (!device->decode_fn || (device->verbose && events > 0)) {
@@ -504,6 +510,7 @@ int pulse_demod_piwm_dc(const pulse_data_t *pulses, r_device *device)
                 ext.pulseexc_len = end - start; // todo: test pulse ranges
                 ext.mod = device->modulation;
                 ext.samprate = device->ctx->cfg->samp_rate;
+                ext.freq = device->ctx->center_frequency;
                 events += device->decode_fn(device, &bits, &ext);
             }
             if (!device->decode_fn || (device->verbose && events > 0)) {
@@ -595,6 +602,7 @@ int pulse_demod_osv1(const pulse_data_t *pulses, r_device *device)
                 ext.pulseexc_len = 0; // todo: here we pass the entire pulse set on each call. could this be improved?
                 ext.mod = device->modulation;
                 ext.samprate = device->ctx->cfg->samp_rate;
+                ext.freq = device->ctx->center_frequency;
                 events += device->decode_fn(device, &bits, &ext);
             }
             return events;

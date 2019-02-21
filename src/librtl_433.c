@@ -163,23 +163,36 @@ RTL_433_API int rtl_433_destroy(rtl_433_t *rtl) {
     return 0;
 }
 
-// well-known fields "time", "msg" and "codes" are used to output general decoder messages
-// well-known field "bits" is only used when verbose bits (-M bits) is requested
-// well-known field "tag" is only used when output tagging is requested
-static char const *well_known_default[] = { "time", "msg", "codes", NULL };
-static char const *well_known_with_tag[] = {"time", "msg", "codes", "tag", NULL};
-static char const *well_known_with_bits[] = {"time", "msg", "codes", "bits", NULL};
-static char const *well_known_with_bits_tag[] = {"time", "msg", "codes", "bits", "tag", NULL};
+// well-known field "protocol" is only used when model protocol is requested
+// well-known field "description" is only used when model description is requested
+// well-known fields "mod", "freq", "freq1", "freq2", "rssi", "snr", "noise" are used by meta report option
+static char const *well_known_default[15] = {0};
 static char const **well_known_output_fields(r_cfg_t *cfg)
 {
-    if (cfg->output_tag && cfg->verbose_bits)
-        return well_known_with_bits_tag;
-    else if (cfg->output_tag)
-        return well_known_with_tag;
-    else if (cfg->verbose_bits)
-        return well_known_with_bits;
-    else
-        return well_known_default;
+    char const **p = well_known_default;
+    *p++ = "time";
+    *p++ = "msg";
+    *p++ = "codes";
+
+    if (cfg->verbose_bits)
+        *p++ = "bits";
+    if (cfg->output_tag)
+        *p++ = "tag";
+    if (cfg->report_protocol)
+        *p++ = "protocol";
+    if (cfg->report_description)
+        *p++ = "description";
+    if (cfg->report_meta) {
+        *p++ = "mod";
+        *p++ = "freq";
+        *p++ = "freq1";
+        *p++ = "freq2";
+        *p++ = "rssi";
+        *p++ = "snr";
+        *p++ = "noise";
+    }
+
+    return well_known_default;
 }
 
 RTL_433_API int start(rtl_433_t *rtl, struct sigaction *sigact){

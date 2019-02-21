@@ -79,6 +79,7 @@ typedef struct r_cfg { // following explanations contain the former command line
 	time_mode_t report_time_preference;					///< [-M time|reltime|notime|hires|utc|protocol|level|bits] Add various meta data to every output line.
 	int report_time_hires;								///< [-M time|reltime|notime|hires|utc|protocol|level|bits] Add various meta data to every output line.
 	int report_time_utc;								///< [-M time|reltime|notime|hires|utc|protocol|level|bits] Add various meta data to every output line.
+	int report_description;								///< [-M time|reltime|notime|hires|utc|protocol|level|bits] Add various meta data to every output line.
 	int report_protocol;								///< [-M time|reltime|notime|hires|utc|protocol|level|bits] Add various meta data to every output line.
 	int verbose_bits;									///< [-M time|reltime|notime|hires|utc|protocol|level|bits] Add various meta data to every output line.
 	char *output_tag;									///< [-K FILE|PATH|<tag>] Add an expanded token or fixed tag to every output line.

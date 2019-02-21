@@ -243,13 +243,14 @@ int run_ook_demods(dm_state *dm) {
     }
 
     if (!p_events && dm->rtl->cfg->report_unknown && dm->pulse_data.num_pulses > 10) { // unknown OOK signal (no matching device demodulator) - pass to GUI as unknown signal if it has a significant length
-        extdata_t ext = {
-            .bitbuffer = NULL,
-            .pulses = &dm->pulse_data,
-            .pulseexc_startidx = 0,
-            .pulseexc_len = 0,
-            .mod = UNKNOWN_MODULATION_TYPE,
-            .samprate = dm->rtl->cfg->samp_rate
+		extdata_t ext = {
+			.bitbuffer = NULL,
+			.pulses = &dm->pulse_data,
+			.pulseexc_startidx = 0,
+			.pulseexc_len = 0,
+			.mod = UNKNOWN_MODULATION_TYPE,
+			.samprate = dm->rtl->cfg->samp_rate,
+			.freq = dm->rtl->center_frequency
         };
         r_device pseudo = {
             .name = "pseudo device",
@@ -663,6 +664,14 @@ static void data_acquired_handler(r_device *r_dev, data_t *data, extdata_t *ext)
             }
         }
 
+        // prepend "description" if requested
+        if (rtl->cfg->report_description) {
+            data = data_prepend(data,
+                    "description", "Description", DATA_STRING, r_dev->name,
+                    NULL);
+        }
+
+        // prepend "protocol" if requested
         if (rtl->cfg->report_protocol && r_dev->protocol_num) {
             data = data_prepend(data,
                 "protocol", "Protocol", DATA_INT, r_dev->protocol_num,
