@@ -204,7 +204,7 @@ static int acurite_rain_gauge_callback(r_device *decoder, bitbuffer_t *bitbuffer
 
         if (decoder->verbose > 1) {
             rtl433_fprintf(stdout, "AcuRite Rain Gauge Total Rain is %2.1fmm\n", total_rain);
-            rtl433_fprintf(stdout, "Raw Message ");
+			rtl433_fprintf(stdout, "Raw Message ");
             bitrow_print(bb[0], bitbuffer->bits_per_row[0]);
         }
 
@@ -500,7 +500,7 @@ static int acurite_6045_decode(r_device *decoder, bitrow_t bb, int browlen, extd
     for (int i=0; i < browlen; i++) {
         char pc;
         pc = parity8(bb[i]) == 0 ? ' ' : '*';
-        rtl433_fprintf(stdout, " %02x%c", bb[i], pc);
+		rtl433_fprintf(stdout, " %02x%c", bb[i], pc);
     }
     printf("\n");
     }
@@ -555,7 +555,7 @@ static int acurite_txr_callback(r_device *decoder, bitbuffer_t *bitbuf, extdata_
     bitbuffer_invert(bitbuf);
 
     if (decoder->verbose > 1) {
-        rtl433_fprintf(stderr,"acurite_txr\n");
+		rtl433_fprintf(stderr,"acurite_txr\n");
         bitbuffer_print(bitbuf);
     }
 
@@ -564,13 +564,13 @@ static int acurite_txr_callback(r_device *decoder, bitbuffer_t *bitbuf, extdata_
         bb = bitbuf->bb[brow];
 
         if (decoder->verbose > 1)
-            rtl433_fprintf(stderr,"acurite_txr: row %d bits %d, bytes %d \n", brow, bitbuf->bits_per_row[brow], browlen);
+			rtl433_fprintf(stderr,"acurite_txr: row %d bits %d, bytes %d \n", brow, bitbuf->bits_per_row[brow], browlen);
 
         if ((bitbuf->bits_per_row[brow] < ACURITE_TXR_BITLEN ||
             bitbuf->bits_per_row[brow] > ACURITE_5N1_BITLEN + 1) &&
             bitbuf->bits_per_row[brow] != ACURITE_6045_BITLEN) {
             if (decoder->verbose > 1 && bitbuf->bits_per_row[brow] > 16)
-                rtl433_fprintf(stderr,"acurite_txr: skipping wrong len\n");
+				rtl433_fprintf(stderr,"acurite_txr: skipping wrong len\n");
             continue;
         }
 
@@ -581,20 +581,20 @@ static int acurite_txr_callback(r_device *decoder, bitbuffer_t *bitbuf, extdata_
 
         if (!acurite_checksum(bb,browlen - 1)) {
             if (decoder->verbose) {
-                rtl433_fprintf(stderr, "Acurite bad checksum:");
+				rtl433_fprintf(stderr, "Acurite bad checksum:");
                 for (uint8_t i = 0; i < browlen; i++)
-                    rtl433_fprintf(stderr," 0x%02x",bb[i]);
-                rtl433_fprintf(stderr,"\n");
+					rtl433_fprintf(stderr," 0x%02x",bb[i]);
+				rtl433_fprintf(stderr,"\n");
             }
             continue;
         }
 
         if (decoder->verbose) {
-            rtl433_fprintf(stderr, "acurite_txr Parity: ");
+			rtl433_fprintf(stderr, "acurite_txr Parity: ");
             for (uint8_t i = 0; i < browlen; i++) {
-                rtl433_fprintf(stderr, "%d", parity8(bb[i]));
+				rtl433_fprintf(stderr, "%d", parity8(bb[i]));
             }
-            rtl433_fprintf(stderr,"\n");
+			rtl433_fprintf(stderr,"\n");
         }
 
 
@@ -637,7 +637,7 @@ static int acurite_txr_callback(r_device *decoder, bitbuffer_t *bitbuf, extdata_
         // The 5-n-1 weather sensor messages are 8 bytes.
         if (browlen == ACURITE_5N1_BITLEN / 8) {
             if (decoder->verbose) {
-                rtl433_fprintf(stderr, "Acurite 5n1 raw msg: %02X %02X %02X %02X %02X %02X %02X %02X\n",
+				rtl433_fprintf(stderr, "Acurite 5n1 raw msg: %02X %02X %02X %02X %02X %02X %02X %02X\n",
                     bb[0], bb[1], bb[2], bb[3], bb[4], bb[5], bb[6], bb[7]);
             }
             channel = acurite_getChannel(bb[0]);
@@ -706,7 +706,7 @@ static int acurite_txr_callback(r_device *decoder, bitbuffer_t *bitbuf, extdata_
                 decoder_output_data(decoder, data, ext);
 
             } else {
-                rtl433_fprintf(stderr, "Acurite 5n1 sensor 0x%04X Ch %c, Status %02X, Unknown message type 0x%02x\n",
+				rtl433_fprintf(stderr, "Acurite 5n1 sensor 0x%04X Ch %c, Status %02X, Unknown message type 0x%02x\n",
                     sensor_id, channel, bb[3], message_type);
             }
         }
@@ -780,12 +780,12 @@ static int acurite_986_callback(r_device *decoder, bitbuffer_t *bitbuf, extdata_
     for (uint16_t brow = 0; brow < bitbuf->num_rows; ++brow) {
 
         if (decoder->verbose > 1)
-            rtl433_fprintf(stderr,"acurite_986: row %d bits %d, bytes %d \n", brow, bitbuf->bits_per_row[brow], browlen);
+			rtl433_fprintf(stderr,"acurite_986: row %d bits %d, bytes %d \n", brow, bitbuf->bits_per_row[brow], browlen);
 
         if (bitbuf->bits_per_row[brow] < 39 ||
             bitbuf->bits_per_row[brow] > 43 ) {
             if (decoder->verbose > 1 && bitbuf->bits_per_row[brow] > 16)
-                rtl433_fprintf(stderr,"acurite_986: skipping wrong len\n");
+				rtl433_fprintf(stderr,"acurite_986: skipping wrong len\n");
             continue;
         }
         bb = bitbuf->bb[brow];
@@ -802,10 +802,10 @@ static int acurite_986_callback(r_device *decoder, bitbuffer_t *bitbuf, extdata_
             br[i] = reverse8(bb[i]);
 
         if (decoder->verbose) {
-            rtl433_fprintf(stderr,"Acurite 986 reversed: ");
+			rtl433_fprintf(stderr,"Acurite 986 reversed: ");
             for (uint8_t i = 0; i < browlen; i++)
-                rtl433_fprintf(stderr," %02x",br[i]);
-            rtl433_fprintf(stderr,"\n");
+				rtl433_fprintf(stderr," %02x",br[i]);
+			rtl433_fprintf(stderr,"\n");
         }
 
         tempf = br[0];
@@ -824,11 +824,11 @@ static int acurite_986_callback(r_device *decoder, bitbuffer_t *bitbuf, extdata_
 
         if (crcc != crc) {
             if (decoder->verbose > 1) {
-                rtl433_fprintf(stderr,"Acurite 986 sensor bad CRC: %02x -",
+				rtl433_fprintf(stderr,"Acurite 986 sensor bad CRC: %02x -",
                 crc8le(br, 4, 0x07, 0));
                 for (uint8_t i = 0; i < browlen; i++)
-                    rtl433_fprintf(stderr," %02x", br[i]);
-                rtl433_fprintf(stderr,"\n");
+					rtl433_fprintf(stderr," %02x", br[i]);
+				rtl433_fprintf(stderr,"\n");
             }
             // HACK: rct 2018-04-22
             // the message is often missing the last 1 bit either due to a
@@ -836,7 +836,7 @@ static int acurite_986_callback(r_device *decoder, bitbuffer_t *bitbuf, extdata_
             // Add 1 (0x80 because message is LSB) and retry CRC.
             if (crcc == (crc | 0x80)) {
                 if (decoder->verbose > 1) {
-                    rtl433_fprintf(stderr,"Acurite 986 CRC fix %02x - %02x\n",
+					rtl433_fprintf(stderr,"Acurite 986 CRC fix %02x - %02x\n",
                             crc,crcc);
                 }
             } else {
@@ -922,7 +922,7 @@ static int acurite_606_callback(r_device *decoder, bitbuffer_t *bitbuf, extdata_
 
 
     if (decoder->verbose > 1) {
-        rtl433_fprintf(stderr,"acurite_606\n");
+		rtl433_fprintf(stderr,"acurite_606\n");
         bitbuffer_print(bitbuf);
     }
 
@@ -964,7 +964,6 @@ static int acurite_00275rm_callback(r_device *decoder, bitbuffer_t *bitbuf, extd
 {
     int crc, battery_low, id, model, valid = 0;
     data_t *data;
-    char *model1 = "00275rm", *model2 = "00276rm";
     float tempc, ptempc;
     uint8_t probe, humidity, phumidity, water;
     uint8_t signal[3][11];  //  Hold three copies of the signal
@@ -973,7 +972,7 @@ static int acurite_00275rm_callback(r_device *decoder, bitbuffer_t *bitbuf, extd
     bitbuffer_invert(bitbuf);
 
     if (decoder->verbose > 1) {
-        rtl433_fprintf(stderr,"acurite_00275rm\n");
+		rtl433_fprintf(stderr,"acurite_00275rm\n");
         bitbuffer_print(bitbuf);
     }
 
@@ -983,9 +982,9 @@ static int acurite_00275rm_callback(r_device *decoder, bitbuffer_t *bitbuf, extd
         if (nsignal>=3) continue;
         memcpy(signal[nsignal], bitbuf->bb[brow], 11);
         if (decoder->verbose) {
-            rtl433_fprintf(stderr,"acurite_00275rm: ");
+			rtl433_fprintf(stderr,"acurite_00275rm: ");
             for (int i=0; i<11; i++) rtl433_fprintf(stderr," %02x",signal[nsignal][i]);
-            rtl433_fprintf(stderr,"\n");
+			rtl433_fprintf(stderr,"\n");
         }
         nsignal++;
     }
@@ -1002,76 +1001,59 @@ static int acurite_00275rm_callback(r_device *decoder, bitbuffer_t *bitbuf, extd
         // CRC check fails?
         if ((crc=crc16lsb(&(signal[0][0]), 11/*len*/, 0x00b2/*poly*/, 0x00d0/*seed*/)) != 0) {
             if (decoder->verbose) {
-                rtl433_fprintf(stderr,"Acurite 00275rm sensor bad CRC: %02x -",
+				rtl433_fprintf(stderr,"Acurite 00275rm sensor bad CRC: %02x -",
                     crc);
                 for (uint8_t i = 0; i < 11; i++)
-                    rtl433_fprintf(stderr," %02x", signal[0][i]);
-                rtl433_fprintf(stderr,"\n");
+					rtl433_fprintf(stderr," %02x", signal[0][i]);
+				rtl433_fprintf(stderr,"\n");
             }
         // CRC is OK
         } else {
             //  Decode the combined signal
-            id = (signal[0][0]<<16) | (signal[0][1]<<8) | signal[0][3];
-            battery_low = (signal[0][2] & 0x40)==0;
+            id          = (signal[0][0] << 16) | (signal[0][1] << 8) | signal[0][3];
+            battery_low = (signal[0][2] & 0x40) == 0;
             model       = (signal[0][2] & 1);
-            tempc       = 0.1 * ( (signal[0][4]<<4) | (signal[0][5]>>4) ) - 100;
+            tempc       = ((signal[0][4] << 4) | (signal[0][5] >> 4)) * 0.1 - 100;
             probe       = signal[0][5] & 3;
             humidity    = ((signal[0][6] & 0x1f) << 2) | (signal[0][7] >> 6);
             //  No probe
-            if (probe==0) {
-                data = data_make(
-                        "model",           "",             DATA_STRING,    model ? model1 : model2,
-                        "probe",           "",             DATA_INT,       probe,
-                        "id",              "",             DATA_INT,       id,
-                        "battery",         "",             DATA_STRING,    battery_low ? "LOW" : "OK",
-                        "temperature_C",   "Celsius",      DATA_FORMAT,    "%.1f C",  DATA_DOUBLE, tempc,
-                        "humidity",        "Humidity",     DATA_INT,       humidity,
-                        "mic",             "Integrity",    DATA_STRING,    "CRC",
-                        NULL);
+            data = data_make(
+                    "model",           "",             DATA_STRING,    model ? "00275rm" : "00276rm",
+                    "probe",           "",             DATA_INT,       probe,
+                    "id",              "",             DATA_INT,       id,
+                    "battery",         "",             DATA_STRING,    battery_low ? "LOW" : "OK",
+                    "temperature_C",   "Celsius",      DATA_FORMAT,    "%.1f C",  DATA_DOUBLE, tempc,
+                    "humidity",        "Humidity",     DATA_INT,       humidity,
+                    NULL);
             //  Water probe (detects water leak)
-            } else if (probe==1) {
+            if (probe == 1) {
                 water = (signal[0][7] & 0x0f) == 15;
-                data = data_make(
-                        "model",           "",             DATA_STRING,    model ? model1 : model2,
-                        "probe",           "",             DATA_INT,       probe,
-                        "id",              "",             DATA_INT,       id,
-                        "battery",         "",             DATA_STRING,    battery_low ? "LOW" : "OK",
-                        "temperature_C",   "Celsius",      DATA_FORMAT,    "%.1f C",  DATA_DOUBLE, tempc,
-                        "humidity",        "Humidity",     DATA_INT,       humidity,
+                data = data_append(data,
                         "water",           "",             DATA_INT,       water,
                         "mic",             "Integrity",    DATA_STRING,    "CRC",
                         NULL);
+            }
             //  Soil probe (detects temperature)
-            } else if (probe==2) {
-                ptempc    = 0.1 * ( ((0x0f&signal[0][7])<<8) | signal[0][8] ) - 100;
-                data = data_make(
-                        "model",           "",             DATA_STRING,    model ? model1 : model2,
-                        "probe",           "",             DATA_INT,       probe,
-                        "id",              "",             DATA_INT,       id,
-                        "battery",         "",             DATA_STRING,    battery_low ? "LOW" : "OK",
-                        "temperature_C",   "Celsius",      DATA_FORMAT,    "%.1f C",  DATA_DOUBLE, tempc,
-                        "humidity",        "Humidity",     DATA_INT,       humidity,
+            else if (probe == 2) {
+                ptempc = (((signal[0][7] & 0x0f) << 8) | signal[0][8]) * 0.1 - 100;
+                data = data_append(data,
                         "ptemperature_C",  "Celsius",      DATA_FORMAT,    "%.1f C",  DATA_DOUBLE, ptempc,
                         "mic",             "Integrity",    DATA_STRING,    "CRC",
                         NULL);
+            }
             //  Spot probe (detects temperature and humidity)
-            } else if (probe==3) {
-                ptempc    = 0.1 * ( ((0x0f&signal[0][7])<<8) | signal[0][8] ) - 100;
+            else if (probe == 3) {
+                ptempc    = (((signal[0][7] & 0x0f) << 8) | signal[0][8]) * 0.1 - 100;
                 phumidity = signal[0][9] & 0x7f;
-                data = data_make(
-                        "model",           "",             DATA_STRING,    model ? model1 : model2,
-                        "probe",           "",             DATA_INT,       probe,
-                        "id",              "",             DATA_INT,       id,
-                        "battery",         "",             DATA_STRING,    battery_low ? "LOW" : "OK",
-                        "temperature_C",   "Celsius",      DATA_FORMAT,    "%.1f C",  DATA_DOUBLE, tempc,
-                        "humidity",        "Humidity",     DATA_INT,       humidity,
+                data = data_append(data,
                         "ptemperature_C",  "Celsius",      DATA_FORMAT,    "%.1f C",  DATA_DOUBLE, ptempc,
                         "phumidity",       "Humidity",     DATA_INT,       phumidity,
                         "mic",             "Integrity",    DATA_STRING,    "CRC",
                         NULL);
-            } else { // suppress compiler warning
-                return 0;
             }
+            data = data_append(data,
+                    "mic",             "Integrity",    DATA_STRING,    "CRC",
+                    NULL);
             decoder_output_data(decoder, data, ext);
             valid=1;
         }

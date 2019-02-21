@@ -6,10 +6,12 @@
 #define INCLUDE_DECODER_H_
 
 #include <string.h>
+#include "librtl_433.h"
 #include "r_device.h"
 #include "bitbuffer.h"
 #include "data.h"
 #include "util.h"
 #include "decoder_util.h"
+#include "redir_print.h"
 
 #endif /* INCLUDE_DECODER_H_ */
