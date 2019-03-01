@@ -869,6 +869,8 @@ int sdr_set_auto_gain(sdr_dev_t *dev, int verbose)
 
 int sdr_set_tuner_gain(sdr_dev_t *dev, char *gain_str, int verbose)
 {
+    int r = -1;
+
     if (!gain_str || !*gain_str) {
         /* Enable automatic gain */
         return sdr_set_auto_gain(dev, verbose);
@@ -893,7 +895,7 @@ int sdr_set_tuner_gain(sdr_dev_t *dev, char *gain_str, int verbose)
 
 #ifdef RTLSDR
     /* Enable manual gain */
-    int r = rtlsdr_set_tuner_gain_mode(dev->rtlsdr_dev, 1);
+    r = rtlsdr_set_tuner_gain_mode(dev->rtlsdr_dev, 1);
     if (verbose)
         if (r < 0)
 			rtl433_fprintf(stderr, "WARNING: Failed to enable manual gain.\n");
@@ -906,10 +908,9 @@ int sdr_set_tuner_gain(sdr_dev_t *dev, char *gain_str, int verbose)
         else
 			rtl433_fprintf(stderr, "Tuner gain set to %f dB.\n", gain / 10.0);
     }
-    return r;
 #endif
 
-    return -1;
+    return r;
 }
 
 int sdr_set_sample_rate(sdr_dev_t *dev, uint32_t rate, int verbose)
