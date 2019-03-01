@@ -360,7 +360,7 @@ PulseDetectionResult pulse_detect_package(pulse_detect_t *pulse_detect, int16_t 
 {
     int const samples_per_ms = samp_rate / 1000;
     pulse_detect_t *s = pulse_detect;
-    s->ook_high_estimate = max(s->ook_high_estimate, OOK_MIN_HIGH_LEVEL);    // Be sure to set initial minimum level
+    s->ook_high_estimate = MAX(s->ook_high_estimate, OOK_MIN_HIGH_LEVEL);    // Be sure to set initial minimum level
 
     if (s->data_counter == 0) {
         // age the pulse_data if this is a fresh buffer
@@ -403,8 +403,8 @@ PulseDetectionResult pulse_detect_package(pulse_detect_t *pulse_detect, int16_t 
                     s->ook_low_estimate += ((ook_low_delta > 0) ? 1 : -1);    // Hack to compensate for lack of fixed-point scaling
                     // Calculate default OOK high level estimate
                     s->ook_high_estimate = OOK_HIGH_LOW_RATIO * s->ook_low_estimate;    // Default is a ratio of low level
-                    s->ook_high_estimate = max(s->ook_high_estimate, OOK_MIN_HIGH_LEVEL);
-                    s->ook_high_estimate = min(s->ook_high_estimate, OOK_MAX_HIGH_LEVEL);
+                    s->ook_high_estimate = MAX(s->ook_high_estimate, OOK_MIN_HIGH_LEVEL);
+                    s->ook_high_estimate = MIN(s->ook_high_estimate, OOK_MAX_HIGH_LEVEL);
                     if (s->lead_in_counter <= OOK_EST_LOW_RATIO) s->lead_in_counter++;        // Allow initial estimate to settle
                 }
                 break;
@@ -419,7 +419,7 @@ PulseDetectionResult pulse_detect_package(pulse_detect_t *pulse_detect, int16_t 
                     else {
                         // Continue with OOK decoding
                         pulses->pulse[pulses->num_pulses] = s->pulse_length;    // Store pulse width
-                        s->max_pulse = max(s->pulse_length, s->max_pulse);    // Find largest pulse
+                        s->max_pulse = MAX(s->pulse_length, s->max_pulse);    // Find largest pulse
                         s->pulse_length = 0;
                         s->ook_state = PD_OOK_STATE_GAP_START;
                     }
@@ -428,8 +428,8 @@ PulseDetectionResult pulse_detect_package(pulse_detect_t *pulse_detect, int16_t 
                 else {
                     // Calculate OOK high level estimate
                     s->ook_high_estimate += am_n / OOK_EST_HIGH_RATIO - s->ook_high_estimate / OOK_EST_HIGH_RATIO;
-                    s->ook_high_estimate = max(s->ook_high_estimate, OOK_MIN_HIGH_LEVEL);
-                    s->ook_high_estimate = min(s->ook_high_estimate, OOK_MAX_HIGH_LEVEL);
+                    s->ook_high_estimate = MAX(s->ook_high_estimate, OOK_MIN_HIGH_LEVEL);
+                    s->ook_high_estimate = MIN(s->ook_high_estimate, OOK_MAX_HIGH_LEVEL);
                     // Estimate pulse carrier frequency
                     pulses->fsk_f1_est += fm_data[s->data_counter] / OOK_EST_HIGH_RATIO - pulses->fsk_f1_est / OOK_EST_HIGH_RATIO;
                 }
