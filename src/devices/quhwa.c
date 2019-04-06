@@ -34,7 +34,7 @@ static int quhwa_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *
 
 
     data_t *data = data_make(
-            "model", "", DATA_STRING, "Quhwa doorbell",
+            "model", "", DATA_STRING, _X("Quhwa-Doorbell","Quhwa doorbell"),
             "id", "ID", DATA_INT, id,
             NULL);
 

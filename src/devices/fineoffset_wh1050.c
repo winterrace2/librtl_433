@@ -76,13 +76,13 @@ static int fineoffset_wh1050_callback(r_device *decoder, bitbuffer_t *bitbuffer,
 
     // PRESENTING DATA
     data = data_make(
-            "model",            "",                 DATA_STRING, "Fine Offset WH1050 weather station",
+            "model",            "",                 DATA_STRING, _X("Fineoffset-WH1050","Fine Offset WH1050 weather station"),
             "id",               "StationID",        DATA_FORMAT, "%04X",    DATA_INT,    device_id,
             "temperature_C",    "Temperature",      DATA_FORMAT, "%.01f C", DATA_DOUBLE, temperature,
             "humidity",         "Humidity",         DATA_FORMAT, "%u %%",   DATA_INT,    humidity,
-            "speed",            "Wind avg speed",   DATA_FORMAT, "%.02f",   DATA_DOUBLE, speed,
-            "gust",             "Wind gust",        DATA_FORMAT, "%.02f",   DATA_DOUBLE, gust,
-            "rain",             "Total rainfall",   DATA_FORMAT, "%.01f",   DATA_DOUBLE, rain,
+            _X("wind_avg_km_h","speed"),   "Wind avg speed",   DATA_FORMAT, "%.02f",   DATA_DOUBLE, speed,
+            _X("wind_max_km_h","gust"),   "Wind gust",        DATA_FORMAT, "%.02f",   DATA_DOUBLE, gust,
+            _X("rain_mm","rain"),             "Total rainfall",   DATA_FORMAT, "%.01f",   DATA_DOUBLE, rain,
             "battery",          "Battery",          DATA_STRING, battery_low ? "LOW" : "OK",
             "mic",              "Integrity",        DATA_STRING, "CRC",
             NULL);
@@ -95,9 +95,12 @@ static char *output_fields[] = {
     "id",
     "temperature_C",
     "humidity",
-    "speed",
-    "gust",
-    "rain",
+    "speed", // TODO: remove this
+    "gust", // TODO: remove this
+    "wind_avg_km_h",
+    "wind_max_km_h",
+    "rain", // TODO: delete this
+    "rain_mm",
     "battery",
     NULL
 };

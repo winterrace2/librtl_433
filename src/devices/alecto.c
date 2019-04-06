@@ -151,12 +151,12 @@ static int alectov1_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_
             int direction = (reverse8(bb[5 + skip][2]) << 1) | (bb[5 + skip][1] & 0x1);
 
             data = data_make(
-                    "model",          "",           DATA_STRING, "AlectoV1 Wind Sensor",
+                    "model",          "",           DATA_STRING, _X("AlectoV1-Wind","AlectoV1 Wind Sensor"),
                     "id",             "House Code", DATA_INT,    sensor_id,
                     "channel",        "Channel",    DATA_INT,    channel,
                     "battery",        "Battery",    DATA_STRING, battery_low ? "LOW" : "OK",
-                    "wind_speed",     "Wind speed", DATA_FORMAT, "%.2f m/s", DATA_DOUBLE, speed * 0.2F,
-                    "wind_gust",      "Wind gust",  DATA_FORMAT, "%.2f m/s", DATA_DOUBLE, gust * 0.2F,
+                    _X("wind_avg_m_s","wind_speed"),     "Wind speed", DATA_FORMAT, "%.2f m/s", DATA_DOUBLE, speed * 0.2F,
+                    _X("wind_max_m_s","wind_gust"),      "Wind gust",  DATA_FORMAT, "%.2f m/s", DATA_DOUBLE, gust * 0.2F,
                     "wind_direction", "Direction",  DATA_INT,    direction,
                     "mic",           "Integrity",   DATA_STRING,    "CHECKSUM",
                     NULL);
@@ -170,11 +170,11 @@ static int alectov1_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_
         double rain_mm = ((reverse8(b[3]) << 8) | reverse8(b[2])) * 0.25F;
 
         data = data_make(
-                "model",         "",           DATA_STRING, "AlectoV1 Rain Sensor",
+                "model",         "",           DATA_STRING, _X("AlectoV1-Rain","AlectoV1 Rain Sensor"),
                 "id",            "House Code", DATA_INT,    sensor_id,
                 "channel",       "Channel",    DATA_INT,    channel,
                 "battery",       "Battery",    DATA_STRING, battery_low ? "LOW" : "OK",
-                "rain_total",    "Total Rain", DATA_FORMAT, "%.02f mm", DATA_DOUBLE, rain_mm,
+                _X("rain_mm","rain_total"),    "Total Rain", DATA_FORMAT, "%.02f mm", DATA_DOUBLE, rain_mm,
                 "mic",           "Integrity",  DATA_STRING,    "CHECKSUM",
                 NULL);
         decoder_output_data(decoder, data, ext);
@@ -195,7 +195,7 @@ static int alectov1_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_
             return 0;//extra detection false positive!! prologue is also 36bits and sometimes detected as alecto
 
         data = data_make(
-                "model",         "",            DATA_STRING, "AlectoV1 Temperature Sensor",
+                "model",         "",            DATA_STRING, _X("AlectoV1-Temperature","AlectoV1 Temperature Sensor"),
                 "id",            "House Code",  DATA_INT,    sensor_id,
                 "channel",       "Channel",     DATA_INT,    channel,
                 "battery",       "Battery",     DATA_STRING, battery_low ? "LOW" : "OK",
@@ -217,10 +217,14 @@ static char *output_fields[] = {
     "battery",
     "temperature_C",
     "humidity",
-    "rain_total",
-    "wind_speed",
-    "wind_gust",
-    "wind_direction",
+    "rain_total", // TODO: remove this
+    "rain_mm",
+    "wind_speed", // TODO: remove this
+    "wind_gust", // TODO: remove this
+    "wind_direction", // TODO: remove this
+    "wind_avg_km_h",
+    "wind_max_km_h",
+    "wind_dir_deg",
     "mic",
     NULL
 };

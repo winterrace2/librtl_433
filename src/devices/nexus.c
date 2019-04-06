@@ -24,13 +24,13 @@
 // NOTE: this should really not be here
 int rubicson_crc_check(bitrow_t *bb);
 
-static int nexus_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
+static int nexus_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
     bitrow_t *bb = bitbuffer->bb;
     data_t *data;
 
 
     if (decoder->verbose > 1) {
-        rtl433_fprintf(stderr,"Possible Nexus: ");
+        fprintf(stderr,"Possible Nexus: ");
         bitbuffer_print(bitbuffer);
     }
 
@@ -75,26 +75,26 @@ static int nexus_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *
 
         // Thermo
         if (humidity == 0x00) {
-            data = data_make(
-                "model",         "",            DATA_STRING, "Nexus Temperature",
+        data = data_make(
+                "model",         "",            DATA_STRING, _X("Nexus-T","Nexus Temperature"),
                 "id",            "House Code",  DATA_INT, id,
                 "channel",       "Channel",     DATA_INT, channel,
                 "battery",       "Battery",     DATA_STRING, battery ? "OK" : "LOW",
                 "temperature_C", "Temperature", DATA_FORMAT, "%.02f C", DATA_DOUBLE, temp/10.0,
                 NULL);
-            decoder_output_data(decoder, data, ext);
+        decoder_output_data(decoder, data);
         }
         // Thermo/Hygro
         else {
-            data = data_make(
-                "model",         "",            DATA_STRING, "Nexus Temperature/Humidity",
+        data = data_make(
+                "model",         "",            DATA_STRING, _X("Nexus-TH","Nexus Temperature/Humidity"),
                 "id",            "House Code",  DATA_INT, id,
                 "channel",       "Channel",     DATA_INT, channel,
                 "battery",       "Battery",     DATA_STRING, battery ? "OK" : "LOW",
                 "temperature_C", "Temperature", DATA_FORMAT, "%.02f C", DATA_DOUBLE, temp/10.0,
                 "humidity",      "Humidity",    DATA_FORMAT, "%u %%", DATA_INT, humidity,
                 NULL);
-        decoder_output_data(decoder, data, ext);
+        decoder_output_data(decoder, data);
         }
         return 1;
     }

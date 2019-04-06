@@ -1,5 +1,5 @@
 /** @file
-    Definition of all available decoders.
+    Declaration of all available decoders.
 */
 
 #ifndef INCLUDE_RTL_433_DEVICES_H_
@@ -12,11 +12,11 @@
     DECL(rubicson) \
     DECL(prologue) \
     DECL(waveman) \
-    DECL(new_template) \
+    DECL(template) \
     DECL(elv_em1000) \
     DECL(elv_ws2000) \
     DECL(lacrossetx) \
-    DECL(new_template) \
+    DECL(template) \
     DECL(acurite_rain_gauge) \
     DECL(acurite_th) \
     DECL(oregon_scientific) \
@@ -34,8 +34,8 @@
     DECL(brennenstuhl_rcs_2044) \
     DECL(gt_wt_02) \
     DECL(danfoss_CFR) \
-    DECL(new_template) \
-    DECL(new_template) \
+    DECL(template) \
+    DECL(template) \
     DECL(chuango) \
     DECL(generic_remote) \
     DECL(tfa_twin_plus_303049) \
@@ -72,8 +72,8 @@
     DECL(elro_db286a) \
     DECL(efergy_optical) \
     DECL(hondaremote) \
-    DECL(new_template) \
-    DECL(new_template) \
+    DECL(template) \
+    DECL(template) \
     DECL(radiohead_ask) \
     DECL(kerui) \
     DECL(fineoffset_wh1050) \
@@ -127,7 +127,12 @@
     DECL(esa) \
     DECL(bt_rain) \
     DECL(bresser_5in1) \
-    DECL(digitech_xc0324)
+    DECL(digitech_xc0324) \
+    DECL(opus_xt300) \
+    DECL(fs20) \
+    DECL(tpms_jansite) \
+    DECL(lacrosse_ws7000) \
+    /* Add new decoders here. */
 
 #define DECL(name) extern r_device name;
 DEVICES

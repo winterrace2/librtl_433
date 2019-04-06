@@ -135,7 +135,7 @@ static int philips_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t
     battery_status = packet[PHILIPS_PACKETLEN - 1] & 0x40;
 
     data = data_make(
-                     "model",         "",            DATA_STRING, "Philips outdoor temperature sensor",
+                     "model",         "",            DATA_STRING, _X("Philips-Temperature","Philips outdoor temperature sensor"),
                      "channel",       "Channel",     DATA_INT,    channel,
                      "temperature_C", "Temperature", DATA_FORMAT, "%.1f C", DATA_DOUBLE, temperature,
                      "battery",       "Battery",     DATA_STRING, battery_status ? "LOW" : "OK",
