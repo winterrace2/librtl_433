@@ -152,12 +152,12 @@ vaillant_vrt340_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *e
         uint8_t isBatteryLow = get_battery_status(bb[0]);
 
         data = data_make(
-                "model",   "", DATA_STRING, "Vaillant VRT340f Central Heating Thermostat",
-                "device",  "Device ID", DATA_FORMAT, "0x%04X", DATA_INT, deviceID,
+                "model",   "", DATA_STRING, _X("Vaillant-VRT340f","Vaillant VRT340f Central Heating Thermostat"),
+                 _X("id","device"),  "Device ID", DATA_FORMAT, "0x%04X", DATA_INT, deviceID,
                 "heating", "Heating Mode", DATA_STRING, (heating_mode==0)?"OFF":((heating_mode==1)?"ON (2-point)":"ON (analogue)"),
                 "heating_temp", "Heating Water Temp.", DATA_FORMAT, "%d", DATA_INT, (int16_t)target_temperature,
                 "water",   "Pre-heated Water", DATA_STRING, water_preheated ? "ON" : "off",
-                "battery", "Battery", DATA_STRING, isBatteryLow ? "Low" : "Ok",
+                "battery", "Battery", DATA_STRING, isBatteryLow ? "Low" : "OK",
                 NULL);
         decoder_output_data(decoder, data, ext);
 
@@ -175,8 +175,8 @@ vaillant_vrt340_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *e
         uint16_t deviceID = get_device_id(bb[0], 11);
 
         data = data_make(
-                "model",   "", DATA_STRING, "Vaillant VRT340f Central Heating Thermostat (RF Detection)",
-                "device",  "Device ID", DATA_INT, deviceID,
+                "model",   "", DATA_STRING, _X("Vaillant-VRT340f","Vaillant VRT340f Central Heating Thermostat (RF Detection)"),
+                 _X("id","device"),  "Device ID", DATA_INT, deviceID,
                 NULL);
         decoder_output_data(decoder, data, ext);
 
@@ -188,7 +188,8 @@ vaillant_vrt340_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *e
 
 static char *output_fields[] = {
     "model",
-    "device",
+    "device", // TODO: delete this
+    "id",
     "heating",
     "heating_temp",
     "water",
@@ -197,7 +198,7 @@ static char *output_fields[] = {
 };
 
 r_device vaillant_vrt340f = {
-    .name           = "Vaillant calorMatic 340f Central Heating Control",
+    .name           = "Vaillant calorMatic VRT340f Central Heating Control",
     .modulation     = OOK_PULSE_DMC,
     .short_width    = 836,  // half-bit width 836 us
     .long_width     = 1648, // bit width 1648 us

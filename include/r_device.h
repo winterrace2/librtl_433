@@ -15,8 +15,6 @@
 
 /** Supported modulation types. */
 enum modulation_types {
-    UNKNOWN_MODULATION_TYPE =       0,
-
     OOK_DEMOD_MIN_VAL =             3,  ///< Dummy. OOK demodulation must start at this value.
     OOK_PULSE_MANCHESTER_ZEROBIT =  3,  ///< Manchester encoding. Hardcoded zerobit. Rising Edge = 0, Falling edge = 1.
     OOK_PULSE_PCM_RZ =              4,  ///< Pulse Code Modulation with Return-to-Zero encoding, Pulse = 0, No pulse = 1.
@@ -33,6 +31,20 @@ enum modulation_types {
     FSK_PULSE_PWM =                 17, ///< FSK, Pulse Width Modulation. Short pulses = 1, Long = 0.
     FSK_PULSE_MANCHESTER_ZEROBIT =  18, ///< FSK, Manchester encoding.
     FSK_DEMOD_MAX_VAL =             18, ///< Dummy. FSK demodulation must ends at this value.
+
+	UNKNOWN_OOK =                  101,
+	UNKNOWN_FSK =                  102,
+};
+
+/** Decoders should return n>=0 for n packets successfully decoded,
+    an ABORT code if the bitbuffer is no applicable,
+    or a FAIL code if the message is malformed. */
+enum decode_return_codes {
+    DECODE_FAIL_OTHER   = 0, ///< legacy, do not use
+    DECODE_ABORT_LENGTH = -1,
+    DECODE_ABORT_EARLY  = -2,
+    DECODE_FAIL_MIC     = -3,
+    DECODE_FAIL_SANITY  = -4,
 };
 
 struct bitbuffer;
@@ -57,9 +69,16 @@ typedef struct r_device {
     char **fields; ///< List of fields this decoder produces; required for CSV output. NULL-terminated.
 
     /* public for each decoder */
+    int new_model_keys; ///< TODO: temporary allow to change to new style model keys
     int verbose;
     int verbose_bits;
     void (*output_fn)(struct r_device *decoder, struct data *data, extdata_t *ext);
+
+    /* Decoder results / statistics */
+    unsigned decode_events;
+    unsigned decode_ok;
+    unsigned decode_messages;
+    unsigned decode_fails[5];
 
     /* private for flex decoder and output callback */
     void *decode_ctx;

@@ -69,6 +69,7 @@ void start_outputs(dm_state *dm, char const **well_known);
 int	add_json_output(dm_state *dm, char *param, int allow_overwrite);
 int	add_csv_output(dm_state *dm, char *param, int allow_overwrite);
 int	add_kv_output(dm_state *dm, char *param, int allow_overwrite);
+int add_mqtt_output(dm_state *dm, char *host, char *port, char *opts);
 int	add_syslog_output(dm_state *dm, char *host, char *port);
 int add_ext_output(dm_state *dm, void *extcb);
 

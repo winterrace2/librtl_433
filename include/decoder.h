@@ -14,4 +14,7 @@
 #include "decoder_util.h"
 #include "redir_print.h"
 
+/* TODO: temporary allow to change to new style model keys */
+#define _X(n, o) (decoder->new_model_keys ? (n) : (o))
+
 #endif /* INCLUDE_DECODER_H_ */

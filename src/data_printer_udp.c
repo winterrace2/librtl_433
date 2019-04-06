@@ -26,6 +26,7 @@
 #include <limits.h>
 
 #include "abuf.h"
+#include "data_printer_jsonstr.h" // TODO: include here instead of own(?) printer file?
 #include "redir_print.h"
 // gethostname() needs _XOPEN_SOURCE 500 on unistd.h
 #define _XOPEN_SOURCE 500
@@ -148,51 +149,17 @@ typedef struct {
     datagram_client_t client;
     int pri;
     char hostname[_POSIX_HOST_NAME_MAX + 1];
-    abuf_t msg;
 } data_output_syslog_t;
-
-static void print_syslog_array(data_output_t *output, data_array_t *array, char *format)
-{
-    data_output_syslog_t *syslog = (data_output_syslog_t *)output;
-
-    abuf_cat(&syslog->msg, "[");
-    for (int c = 0; c < array->num_values; ++c) {
-        if (c)
-            abuf_cat(&syslog->msg, ",");
-        print_array_value(output, array, format, c);
-    }
-    abuf_cat(&syslog->msg, "]");
-}
-
-static void print_syslog_object(data_output_t *output, data_t *data, char *format)
-{
-    data_output_syslog_t *syslog = (data_output_syslog_t *)output;
-
-    bool separator = false;
-    abuf_cat(&syslog->msg, "{");
-    while (data) {
-        if (separator)
-            abuf_cat(&syslog->msg, ",");
-        output->print_string(output, data->key, NULL);
-        abuf_cat(&syslog->msg, ":");
-        print_value(output, data->type, data->value, data->format);
-        separator = true;
-        data = data->next;
-    }
-    abuf_cat(&syslog->msg, "}");
-}
 
 static void print_syslog_data(data_output_t *output, data_t *data, char *format)
 {
     data_output_syslog_t *syslog = (data_output_syslog_t *)output;
 
-    if (syslog->msg.tail) {
-        print_syslog_object(output, data, format);
-        return;
-    }
-
+    // we expect a normal message around 500 bytes
+    // full stats report would be 12k and we want a max of MTU anyway
     char message[1024];
-    abuf_init(&syslog->msg, message, 1024);
+    abuf_t msg = {0};
+    abuf_init(&msg, message, sizeof(message));
 
     time_t now;
     struct tm tm_info;
@@ -205,56 +172,14 @@ static void print_syslog_data(data_output_t *output, data_t *data, char *format)
     char timestamp[21];
     strftime(timestamp, 21, "%Y-%m-%dT%H:%M:%SZ", &tm_info);
 
-    abuf_printf(&syslog->msg, "<%d>1 %s %s rtl_433 - - - ", syslog->pri, timestamp, syslog->hostname);
+	abuf_printf(&msg, "<%d>1 %s %s rtl_433 - - - ", syslog->pri, timestamp, syslog->hostname);
 
-    print_syslog_object(output, data, format);
+    msg.tail += data_print_jsons(data, msg.tail, msg.left);
+    if (msg.tail >= msg.head + sizeof(message))
+        return; // abort on overflow, we don't actually want to send more than fits the MTU
 
-    datagram_client_send(&syslog->client, message, strlen(message));
-
-    abuf_setnull(&syslog->msg);
-}
-
-static void print_syslog_string(data_output_t *output, const char *str, char *format)
-{
-    data_output_syslog_t *syslog = (data_output_syslog_t *)output;
-
-    char *buf = syslog->msg.tail;
-    size_t size = syslog->msg.left;
-
-    if (size < strlen(str) + 3) {
-        return;
-    }
-
-    *buf++ = '"';
-    size--;
-    for (; *str && size >= 3; ++str) {
-        if (*str == '"' || *str == '\\') {
-            *buf++ = '\\';
-            size--;
-        }
-        *buf++ = *str;
-        size--;
-    }
-    if (size >= 2) {
-        *buf++ = '"';
-        size--;
-    }
-    *buf = '\0';
-
-    syslog->msg.tail = buf;
-    syslog->msg.left = size;
-}
-
-static void print_syslog_double(data_output_t *output, double data, char *format)
-{
-    data_output_syslog_t *syslog = (data_output_syslog_t *)output;
-    abuf_printf(&syslog->msg, "%f", data);
-}
-
-static void print_syslog_int(data_output_t *output, int data, char *format)
-{
-    data_output_syslog_t *syslog = (data_output_syslog_t *)output;
-    abuf_printf(&syslog->msg, "%d", data);
+    size_t abuf_len = msg.tail - msg.head;
+    datagram_client_send(&syslog->client, message, abuf_len);
 }
 
 static void data_output_syslog_free(data_output_t *output)
@@ -293,10 +218,6 @@ data_output_t *data_output_syslog_create(const char *host, const char *port)
 #endif
 
 	syslog->output.print_data   = print_syslog_data;
-    syslog->output.print_array  = print_syslog_array;
-    syslog->output.print_string = print_syslog_string;
-    syslog->output.print_double = print_syslog_double;
-    syslog->output.print_int    = print_syslog_int;
     syslog->output.output_free  = data_output_syslog_free;
 	syslog->output.file = NULL;
 	syslog->output.ext_callback = NULL; // prevents this printer to receive unknown signals

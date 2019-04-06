@@ -7,6 +7,7 @@
 #include "data_printer_udp.h"
 #include "data_printer_kv.h"
 #include "data_printer_ext.h"
+#include "output_mqtt.h"
 #include "redir_print.h"
 #include "pulse_demod.h"
 
@@ -33,7 +34,7 @@ int dm_state_init(dm_state **out_dm, rtl_433_t *rtl) {
         memset(&dm->buf, 0, sizeof(dm->buf));
         memset(&dm->u8_buf, 0, sizeof(dm->u8_buf));
         memset(&dm->f32_buf, 0, sizeof(dm->f32_buf));
-        dm->sample_size = 0; // Todo: prüfen, ob korrektes default
+        dm->sample_size = 0; // Todo: check if this is a suitable default
         dm->pulse_detect = pulse_detect_create();
         memset(&dm->lowpass_filter_state, 0, sizeof(dm->lowpass_filter_state));
         memset(&dm->demod_FM_state, 0, sizeof(dm->demod_FM_state));
@@ -248,20 +249,21 @@ int run_ook_demods(dm_state *dm) {
 			.pulses = &dm->pulse_data,
 			.pulseexc_startidx = 0,
 			.pulseexc_len = 0,
-			.mod = UNKNOWN_MODULATION_TYPE,
-			.samprate = dm->rtl->cfg->samp_rate,
-			.freq = dm->rtl->center_frequency
+			.mod = UNKNOWN_OOK,
+			//.samprate = dm->rtl->cfg->samp_rate,
+			//.freq = dm->rtl->center_frequency
         };
         r_device pseudo = {
             .name = "pseudo device",
             .ctx = dm->rtl,
-            .modulation = UNKNOWN_MODULATION_TYPE,
+            .modulation = UNKNOWN_OOK,
             .decode_fn = NULL,
             .disabled = 2,
             .fields = NULL,
         };
         data_acquired_handler(&pseudo, NULL, &ext);
     }
+
     return p_events;
 }
 
@@ -295,6 +297,28 @@ int run_fsk_demods(dm_state *dm) {
                 rtl433_fprintf(stderr, "Unknown modulation %d in protocol!\n", r_dev->modulation);
         }
     } // for demodulators
+
+    if (!p_events && dm->rtl->cfg->report_unknown && dm->fsk_pulse_data.num_pulses > 10) { // unknown FSK signal (no matching device demodulator) - pass to GUI as unknown signal if it has a significant length
+		extdata_t ext = {
+			.bitbuffer = NULL,
+			.pulses = &dm->fsk_pulse_data,
+			.pulseexc_startidx = 0,
+			.pulseexc_len = 0,
+			.mod = UNKNOWN_FSK,
+			//.samprate = dm->rtl->cfg->samp_rate,
+			//.freq = dm->rtl->center_frequency
+        };
+        r_device pseudo = {
+            .name = "pseudo device",
+            .ctx = dm->rtl,
+            .modulation = UNKNOWN_FSK,
+            .decode_fn = NULL,
+            .disabled = 2,
+            .fields = NULL,
+        };
+        data_acquired_handler(&pseudo, NULL, &ext);
+    }
+
     return p_events;
 }
 
@@ -412,8 +436,9 @@ int ReadFromFiles(dm_state *dm) {
                         s_tmp = -INT16_MAX;
                     else if (s_tmp > INT16_MAX)
                         s_tmp = INT16_MAX;
-                    test_mode_buf[n] = (int16_t)s_tmp;
+                    ((int16_t *)test_mode_buf)[n] = s_tmp;
                 }
+                    n_read *= 2; // convert to byte count
             } else {
                 n_read = fread(test_mode_buf, 1, DEFAULT_BUF_LENGTH, in_file);
             }
@@ -424,10 +449,15 @@ int ReadFromFiles(dm_state *dm) {
         } while (n_read != 0 && !dm->rtl->do_exit);
 
         // Call a last time with cleared samples to ensure EOP detection
-        if (dm->sample_size == 1) // CU8
+        if (dm->sample_size == 1) { // CU8
             memset(test_mode_buf, 128, DEFAULT_BUF_LENGTH); // 128 is 0 in unsigned data
-        else // CF32, CS16
+            // or is 127.5 a better 0 in cu8 data?
+            //for (unsigned long n = 0; n < DEFAULT_BUF_LENGTH/2; n++)
+            //    ((uint16_t *)test_mode_buf)[n] = 0x807f;
+        }
+        else { // CF32, CS16
             memset(test_mode_buf, 0, DEFAULT_BUF_LENGTH);
+        }
         dm->sample_file_pos = ((float)n_blocks + 1) * DEFAULT_BUF_LENGTH / dm->rtl->cfg->samp_rate / 2 / dm->sample_size;
         sdr_callback(test_mode_buf, DEFAULT_BUF_LENGTH, dm->rtl);
 
@@ -471,10 +501,34 @@ int dumpSamplesToFile(dm_state *dm, unsigned char *iq_buf, unsigned long n_sampl
         else if (dumper->format == CS16_IQ) {
             if (dm->sample_size == 1) {
                 for (unsigned long n = 0; n < n_samples * 2; ++n)
-                    ((int16_t *)dm->buf.temp)[n] = (iq_buf[n] - 128) << 8; // scale Q0.7 to Q0.15
+                    ((int16_t *)dm->buf.temp)[n] = (iq_buf[n] << 8) - 32768; // scale Q0.7 to Q0.15
                 out_buf = (uint8_t *)dm->buf.temp; // this buffer is too small if out_block_size is large
                 out_len = n_samples * 2 * sizeof(int16_t);
             }
+        }
+        else if (dumper->format == CS8_IQ) {
+            if (dm->sample_size == 1) {
+                for (unsigned long n = 0; n < n_samples * 2; ++n)
+                    ((int8_t *)dm->buf.temp)[n] = (iq_buf[n] - 128);
+            }
+            else if (dm->sample_size == 2) {
+                for (unsigned long n = 0; n < n_samples * 2; ++n)
+                    ((int8_t *)dm->buf.temp)[n] = ((int16_t *)iq_buf)[n] >> 8;
+            }
+            out_buf = (uint8_t *)dm->buf.temp;
+            out_len = n_samples * 2 * sizeof(int8_t);
+        }
+        else if (dumper->format == CF32_IQ) {
+            if (dm->sample_size == 1) {
+                for (unsigned long n = 0; n < n_samples * 2; ++n)
+                    ((float *)dm->buf.temp)[n] = (iq_buf[n] - 128) / 128.0;
+            }
+            else if (dm->sample_size == 2) {
+                for (unsigned long n = 0; n < n_samples * 2; ++n)
+                    ((float *)dm->buf.temp)[n] = ((int16_t *)iq_buf)[n] / 32768.0;
+            }
+            out_buf = (uint8_t *)dm->buf.temp; // this buffer is too small if out_block_size is large
+            out_len = n_samples * 2 * sizeof(float);
         }
         else if (dumper->format == S16_AM) {
             out_buf = (uint8_t *)dm->am_buf;
@@ -547,12 +601,29 @@ static void data_acquired_handler(r_device *r_dev, data_t *data, extdata_t *ext)
     // If this is unused, we can return immediately.
     int use_ext = (rtl->cfg->outputs_configured & OUTPUT_EXT); // is external callback being used?
     int unknown_dev = 0; // did we get called for an unknown signal?
-    if (r_dev->modulation == UNKNOWN_MODULATION_TYPE) {
+    if (r_dev->modulation == UNKNOWN_OOK || r_dev->modulation == UNKNOWN_FSK) {
         if (!use_ext || !ext) return;
         unknown_dev = 1;
     }
 
     if (!unknown_dev) {
+
+        // replace textual battery key with numerical battery key
+        if (rtl->cfg->new_model_keys) {
+            for (data_t *d = data; d; d = d->next) {
+                if ((d->type == DATA_STRING) && !strcmp(d->key, "battery")) {
+                    free(d->key);
+                    d->key = strdup("battery_ok");
+                    int ok = d->value && !strcmp(d->value, "OK");
+                    free(d->value);
+                    d->type = DATA_INT;
+                    d->value = malloc(sizeof(int));
+                    *(int *)d->value = ok;
+                    break;
+                }
+            }
+        }
+
         if (rtl->cfg->conversion_mode == CONVERT_SI) {
             for (data_t *d = data; d; d = d->next) {
                 // Convert double type fields ending in _F to _C
@@ -572,17 +643,38 @@ static void data_acquired_handler(r_device *r_dev, data_t *data, extdata_t *ext)
                     char *new_label = str_replace(d->key, "_mph", "_kph");
                     free(d->key);
                     d->key = new_label;
-                    char *new_format_label = str_replace(d->format, "mph", "kph");
+                    char *new_format_label = str_replace(d->format, "mi/h", "km/h");
                     free(d->format);
                     d->format = new_format_label;
                 }
-                // Convert double type fields ending in _mph to _kph
-                else if ((d->type == DATA_DOUBLE) && str_endswith(d->key, "_inch")) {
-                    *(double*)d->value = inch2mm(*(double*)d->value);
-                    char *new_label = str_replace(d->key, "_inch", "_mm");
+                // Convert double type fields ending in _mi_h to _km_h
+                else if ((d->type == DATA_DOUBLE) && str_endswith(d->key, "_mi_h")) {
+                    *(double*)d->value = mph2kmph(*(double*)d->value);
+                    char *new_label = str_replace(d->key, "_mi_h", "_km_h");
                     free(d->key);
                     d->key = new_label;
-                    char *new_format_label = str_replace(d->format, "inch", "mm");
+                    char *new_format_label = str_replace(d->format, "mi/h", "km/h");
+                    free(d->format);
+                    d->format = new_format_label;
+                }
+                // Convert double type fields ending in _in to _mm
+                else if ((d->type == DATA_DOUBLE) &&
+                         (str_endswith(d->key, "_in") || str_endswith(d->key, "_inch"))) {
+					*(double*)d->value = inch2mm(*(double*)d->value);
+                    char *new_label = str_replace(str_replace(d->key, "_inch", "_in"), "_in", "_mm");
+                    free(d->key);
+                    d->key = new_label;
+                    char *new_format_label = str_replace(d->format, "in", "mm");
+                    free(d->format);
+                    d->format = new_format_label;
+                }
+                // Convert double type fields ending in _in_h to _mm_h
+                else if ((d->type == DATA_DOUBLE) && str_endswith(d->key, "_in_h")) {
+                    *(double*)d->value = inch2mm(*(double*)d->value);
+                    char *new_label = str_replace(d->key, "_in_h", "_mm_h");
+                    free(d->key);
+                    d->key = new_label;
+                    char *new_format_label = str_replace(d->format, "in/h", "mm/h");
                     free(d->format);
                     d->format = new_format_label;
                 }
@@ -627,17 +719,37 @@ static void data_acquired_handler(r_device *r_dev, data_t *data, extdata_t *ext)
                     char *new_label = str_replace(d->key, "_kph", "_mph");
                     free(d->key);
                     d->key = new_label;
-                    char *new_format_label = str_replace(d->format, "kph", "mph");
+                    char *new_format_label = str_replace(d->format, "km/h", "mi/h");
+                    free(d->format);
+                    d->format = new_format_label;
+                }
+                // Convert double type fields ending in _km_h to _mi_h
+                else if ((d->type == DATA_DOUBLE) && str_endswith(d->key, "_km_h")) {
+                    *(double*)d->value = kmph2mph(*(double*)d->value);
+                    char *new_label = str_replace(d->key, "_km_h", "_mi_h");
+                    free(d->key);
+                    d->key = new_label;
+                    char *new_format_label = str_replace(d->format, "km/h", "mi/h");
                     free(d->format);
                     d->format = new_format_label;
                 }
                 // Convert double type fields ending in _mm to _inch
                 else if ((d->type == DATA_DOUBLE) && str_endswith(d->key, "_mm")) {
                     *(double*)d->value = mm2inch(*(double*)d->value);
-                    char *new_label = str_replace(d->key, "_mm", "_inch");
+                    char *new_label = str_replace(d->key, "_mm", "_in");
                     free(d->key);
                     d->key = new_label;
-                    char *new_format_label = str_replace(d->format, "mm", "inch");
+                    char *new_format_label = str_replace(d->format, "mm", "in");
+                    free(d->format);
+                    d->format = new_format_label;
+                }
+                // Convert double type fields ending in _mm_h to _in_h
+                else if ((d->type == DATA_DOUBLE) && str_endswith(d->key, "_mm_h")) {
+                    *(double*)d->value = mm2inch(*(double*)d->value);
+                    char *new_label = str_replace(d->key, "_mm_h", "_in_h");
+                    free(d->key);
+                    d->key = new_label;
+                    char *new_format_label = str_replace(d->format, "mm/h", "in/h");
                     free(d->format);
                     d->format = new_format_label;
                 }
@@ -764,6 +876,8 @@ static void update_protocol(r_cfg_t *cfg, r_device *r_dev)
 
     r_dev->verbose      = cfg->verbosity > 0 ? cfg->verbosity - 1 : 0;
     r_dev->verbose_bits = cfg->verbose_bits;
+
+    r_dev->new_model_keys = cfg->new_model_keys; // TODO: temporary allow to change to new style model keys
 }
 
 static void free_protocol(r_device *r_dev)
@@ -918,6 +1032,17 @@ int add_kv_output(dm_state *dm, char *param, int allow_overwrite) {
     }
 
     return 0;
+}
+
+int add_mqtt_output(dm_state *dm, char *host, char *port, char *opts)
+{
+    if (!dm) {
+        rtl433_fprintf(stderr, "add_kv_output: missing context.\n");
+        return RTL_433_ERROR_INVALID_PARAM;
+    }
+
+    list_push(&dm->output_handler, data_output_mqtt_create(host, port, opts, dm->rtl->cfg->dev_query));
+	return 0;
 }
 
 int add_syslog_output(dm_state *dm, char *host, char *port) {

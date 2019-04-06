@@ -155,11 +155,13 @@ alloc_error:
     free(csv);
 }
 
-static void print_csv_double(data_output_t *output, double data, char *format) {
+static void print_csv_double(data_output_t *output, double data, char *format)
+{
 	fprintf(output->file, "%.3f", data);
 }
 
-static void print_csv_int(data_output_t *output, int data, char *format) {
+static void print_csv_int(data_output_t *output, int data, char *format)
+{
 	fprintf(output->file, "%d", data);
 }
 

@@ -227,37 +227,36 @@ static int fineoffset_wh1080_callback(r_device *decoder, bitbuffer_t *bitbuffer,
     // PRESENTING DATA
     if (msg_type == 0) {
         data = data_make(
-                "model",            "",                 DATA_STRING,    "Fine Offset Electronics WH1080/WH3080 Weather Station",
+                "model",            "",                 DATA_STRING,    _X("Fineoffset-WHx080","Fine Offset Electronics WH1080/WH3080 Weather Station"),
                 "msg_type",         "Msg type",         DATA_INT,       msg_type,
                 "id",               "Station ID",       DATA_INT,       device_id,
                 "temperature_C",    "Temperature",      DATA_FORMAT,    "%.01f C",  DATA_DOUBLE,    temperature,
                 "humidity",         "Humidity",         DATA_FORMAT,    "%u %%",    DATA_INT,       humidity,
                 "direction_deg",    "Wind degrees",     DATA_INT,       direction_deg,
-                "speed",            "Wind avg speed",   DATA_FORMAT,    "%.02f",    DATA_DOUBLE,    speed,
-                "gust",             "Wind gust",        DATA_FORMAT,    "%.02f",    DATA_DOUBLE,    gust,
-                "rain",             "Total rainfall",   DATA_FORMAT,    "%3.1f",    DATA_DOUBLE,    rain,
+                 _X("wind_avg_km_h","speed"),   "Wind avg speed",   DATA_FORMAT,    "%.02f",    DATA_DOUBLE,    speed,
+                 _X("wind_max_km_h","gust"),   "Wind gust",        DATA_FORMAT,    "%.02f",    DATA_DOUBLE,    gust,
+                 _X("rain_mm","rain"),             "Total rainfall",   DATA_FORMAT,    "%3.1f",    DATA_DOUBLE,    rain,
                 "battery",          "Battery",          DATA_STRING,    battery_low ? "LOW" : "OK",
                 "mic",              "Integrity",        DATA_STRING,    "CRC",
                 NULL);
     }
     else if (msg_type == 1) {
+        char clock_str[20];
+        sprintf(clock_str, "%04d-%02d-%02dT%02d:%02d:%02d",
+                year, month, day, hours, minutes, seconds);
+
         data = data_make(
-                "model",            "",                 DATA_STRING,    "Fine Offset Electronics WH1080/WH3080 Weather Station",
+                "model",            "",                 DATA_STRING,    _X("Fineoffset-WHx080","Fine Offset Electronics WH1080/WH3080 Weather Station"),
                 "msg_type",         "Msg type",         DATA_INT,       msg_type,
                 "id",               "Station ID",       DATA_INT,       device_id,
                 "signal",           "Signal Type",      DATA_STRING,    signal_type_str,
-                "hours",            "Hours",            DATA_FORMAT,    "%02d",     DATA_INT,   hours,
-                "minutes",          "Minutes",          DATA_FORMAT,    "%02d",     DATA_INT,   minutes,
-                "seconds",          "Seconds",          DATA_FORMAT,    "%02d",     DATA_INT,   seconds,
-                "year",             "Year",             DATA_FORMAT,    "%02d",     DATA_INT,   year,
-                "month",            "Month",            DATA_FORMAT,    "%02d",     DATA_INT,   month,
-                "day",              "Day",              DATA_FORMAT,    "%02d",     DATA_INT,   day,
+                "radio_clock",      "Radio Clock",      DATA_STRING,    clock_str,
                 "mic",              "Integrity",        DATA_STRING,    "CRC",
                 NULL);
     }
     else {
         data = data_make(
-                "model",            "",                 DATA_STRING,    "Fine Offset Electronics WH3080 Weather Station",
+                "model",            "",                 DATA_STRING,    _X("Fineoffset-WHx080","Fine Offset Electronics WH3080 Weather Station"),
                 "msg_type",         "Msg type",         DATA_INT,       msg_type,
                 "uv_sensor_id",     "UV Sensor ID",     DATA_INT,       uv_sensor_id,
                 "uv_status",        "Sensor Status",    DATA_STRING,    uv_status_ok ? "OK" : "ERROR",
@@ -277,17 +276,15 @@ static char *output_fields[] = {
     "temperature_C",
     "humidity",
     "direction_deg",
-    "speed",
-    "gust",
-    "rain",
+    "speed", // TODO: remove this
+    "gust", // TODO: remove this
+    "wind_avg_km_h",
+    "wind_max_km_h",
+    "rain", // TODO: remove this
+    "rain_mm",
     "msg_type",
     "signal",
-    "hours",
-    "minutes",
-    "seconds",
-    "year",
-    "month",
-    "day",
+    "radio_clock",
     "battery",
     "sensor_code",
     "uv_status",

@@ -47,13 +47,13 @@ static int wssensor_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_
     float temperature_c;
 
     /* TTTTTTTT TTTTBSCC IIIIIIII  */
-    temperature = ((int8_t)b[0] << 4) | ((b[1] & 0xf0) >> 4); // note the sign extend
+    temperature = (int16_t)((b[0] << 8) | (b[1] & 0xf0)); // uses sign extend
     battery_status = (b[1] & 0x08) >> 3;
     startup = (b[1] & 0x04) >> 2;
     channel = (b[1] & 0x03) + 1;
     sensor_id = b[2];
 
-    temperature_c = temperature / 10.0f;
+    temperature_c = (temperature >> 4) * 0.1f;
 
     if (decoder->verbose) {
         rtl433_fprintf(stdout, "Hyundai WS SENZOR received raw data:\n");
@@ -69,7 +69,7 @@ static int wssensor_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_
     }
 
     data = data_make(
-            "model",         "",            DATA_STRING, "WS Temperature Sensor",
+            "model",         "",            DATA_STRING, _X("Hyundai-WS","WS Temperature Sensor"),
             "id",            "House Code",  DATA_INT, sensor_id,
             "channel",       "Channel",     DATA_INT, channel,
             "battery",       "Battery",     DATA_STRING, battery_status ? "OK" : "LOW",
@@ -90,7 +90,7 @@ static char *output_fields[] = {
 };
 
 r_device wssensor = {
-    .name           = "WS Temperature Sensor",
+    .name           = "Hyundai WS SENZOR Remote Temperature Sensor",
     .modulation     = OOK_PULSE_PPM,
     .short_width    = 1000,
     .long_width     = 2000,
