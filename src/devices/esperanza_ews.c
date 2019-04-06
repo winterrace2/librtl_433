@@ -18,7 +18,7 @@ Frame structure:
     Byte:      0        1        2        3        4
     Nibble:    1   2    3   4    5   6    7   8    9   10
     Type:   00 IIIIIIII ??CCTTTT TTTTTTTT HHHHHHHH FFFFXXXX
-
+	
 - 0: Preamble
 - I: Random device ID
 - C: Channel (1-3)
@@ -50,7 +50,7 @@ Sample Data:
 
 #include "decoder.h"
 
-static int esperanza_ews_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int esperanza_ews_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     uint8_t b[5];
     data_t *data;
@@ -92,7 +92,7 @@ static int esperanza_ews_callback(r_device *decoder, bitbuffer_t *bitbuffer)
             "mic",              "Integrity",    DATA_STRING, "CRC",
             NULL);
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
     return 1;
 }
 

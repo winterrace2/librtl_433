@@ -43,7 +43,7 @@ Message Layout:
 
 #include "decoder.h"
 
-static int lacrosse_ws7000_decode(r_device *decoder, bitbuffer_t *bitbuffer)
+static int lacrosse_ws7000_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     uint8_t const preamble_pattern[] = {0x01}; // 8 bits
     uint8_t const data_size[] = {3, 6, 3, 6, 10, 7}; // data nibbles by sensor type
@@ -68,28 +68,28 @@ static int lacrosse_ws7000_decode(r_device *decoder, bitbuffer_t *bitbuffer)
 
     if (type > 5) {
         if (decoder->verbose > 1)
-            fprintf(stderr, "LaCrosse-WS7000: unhandled sensor type (%u)\n", type);
+            rtl433_fprintf(stderr, "LaCrosse-WS7000: unhandled sensor type (%u)\n", type);
         return 0;
     }
 
     unsigned data_len = data_size[type];
     if (len < data_len) {
         if (decoder->verbose > 1)
-            fprintf(stderr, "LaCrosse-WS7000: short data (%u of %u)\n", len, data_len);
+			rtl433_fprintf(stderr, "LaCrosse-WS7000: short data (%u of %u)\n", len, data_len);
         return 0;
     }
 
     // check xor sum
     if (xor_bytes(b, len - 1)) {
         if (decoder->verbose > 1)
-            fprintf(stderr, "LaCrosse-WS7000: checksum error (xor)\n");
+			rtl433_fprintf(stderr, "LaCrosse-WS7000: checksum error (xor)\n");
         return 0;
     }
 
     // check add sum (all nibbles + 5)
     if (((add_bytes(b, len - 1) + 5) & 0xf) != b[len - 1]) {
         if (decoder->verbose > 1)
-            fprintf(stderr, "LaCrosse-WS7000: checksum error (add)\n");
+			rtl433_fprintf(stderr, "LaCrosse-WS7000: checksum error (add)\n");
         return 0;
     }
 
@@ -108,7 +108,7 @@ static int lacrosse_ws7000_decode(r_device *decoder, bitbuffer_t *bitbuffer)
                 NULL);
         /* clang-format on */
 
-        decoder_output_data(decoder, data);
+        decoder_output_data(decoder, data, ext);
         return 1;
     }
     else if (type == 1) {
@@ -128,7 +128,7 @@ static int lacrosse_ws7000_decode(r_device *decoder, bitbuffer_t *bitbuffer)
                 NULL);
         /* clang-format on */
 
-        decoder_output_data(decoder, data);
+        decoder_output_data(decoder, data, ext);
         return 1;
     }
     else if (type == 2) {
@@ -145,7 +145,7 @@ static int lacrosse_ws7000_decode(r_device *decoder, bitbuffer_t *bitbuffer)
                 NULL);
         /* clang-format on */
 
-        decoder_output_data(decoder, data);
+        decoder_output_data(decoder, data, ext);
         return 1;
     }
     else if (type == 3) {
@@ -166,7 +166,7 @@ static int lacrosse_ws7000_decode(r_device *decoder, bitbuffer_t *bitbuffer)
                 NULL);
         /* clang-format on */
 
-        decoder_output_data(decoder, data);
+        decoder_output_data(decoder, data, ext);
         return 1;
     }
     else if (type == 4) {
@@ -188,7 +188,7 @@ static int lacrosse_ws7000_decode(r_device *decoder, bitbuffer_t *bitbuffer)
                 NULL);
         /* clang-format on */
 
-        decoder_output_data(decoder, data);
+        decoder_output_data(decoder, data, ext);
         return 1;
     }
     else if (type == 5) {
@@ -210,7 +210,7 @@ static int lacrosse_ws7000_decode(r_device *decoder, bitbuffer_t *bitbuffer)
                 NULL);
         /* clang-format on */
 
-        decoder_output_data(decoder, data);
+        decoder_output_data(decoder, data, ext);
         return 1;
     }
 

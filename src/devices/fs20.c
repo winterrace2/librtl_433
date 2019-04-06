@@ -29,7 +29,7 @@ Command extensions are also not decoded. feel free to improve!
 
 #include "decoder.h"
 
-static int fs20_decode(r_device *decoder, bitbuffer_t *bitbuffer)
+static int fs20_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     static char const *cmd_tab[] = {
             "off",
@@ -115,7 +115,7 @@ static int fs20_decode(r_device *decoder, bitbuffer_t *bitbuffer)
             "command",      "", DATA_STRING, cmd_tab[cmd],
             NULL);
     /* clang-format on */
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

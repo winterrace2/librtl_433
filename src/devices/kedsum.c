@@ -35,7 +35,7 @@ Frame structure:
 
 #include "decoder.h"
 
-static int kedsum_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int kedsum_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     uint8_t b[5];
     data_t *data;
 
@@ -85,7 +85,7 @@ static int kedsum_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
             "mic",              "Integrity",    DATA_STRING, "CRC",
             NULL);
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
     return 1;
 }
 

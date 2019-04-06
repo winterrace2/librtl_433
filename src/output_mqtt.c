@@ -13,6 +13,7 @@
 #include "output_mqtt.h"
 #include "optparse.h"
 #include "util.h"
+#include "data_printer_jsonstr.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -175,7 +176,7 @@ typedef enum {
 } use_channel_t;
 
 typedef struct {
-    struct data_output output;
+	data_output_t output;
     struct mg_mgr *mgr;
     char topic[256];
     char *devices;
@@ -391,7 +392,7 @@ static char *mqtt_topic_default(char const *topic, char const *base, char const 
     return strdup(path);
 }
 
-struct data_output *data_output_mqtt_create(char const *host, char const *port, char *opts, char const *dev_hint)
+data_output_t *data_output_mqtt_create(char const *host, char const *port, char *opts, char const *dev_hint)
 {
     data_output_mqtt_t *mqtt = calloc(1, sizeof(data_output_mqtt_t));
     if (!mqtt) {

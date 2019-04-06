@@ -33,7 +33,7 @@ Data layout (nibbles):
 // 0101 0101  0101 0101  0101 0101  0101 0110 = 55 55 55 56
 static const unsigned char preamble_pattern[3] = {0xaa, 0xaa, 0xa9}; // after invert
 
-static int tpms_jansite_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned row, unsigned bitpos)
+static int tpms_jansite_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsigned row, unsigned bitpos, extdata_t *ext)
 {
     data_t *data;
     unsigned int start_pos;
@@ -72,11 +72,11 @@ static int tpms_jansite_decode(r_device *decoder, bitbuffer_t *bitbuffer, unsign
             NULL);
     /* clang-format on */
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
     return 1;
 }
 
-static int tpms_jansite_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int tpms_jansite_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     unsigned bitpos = 0;
     int events      = 0;
@@ -85,7 +85,7 @@ static int tpms_jansite_callback(r_device *decoder, bitbuffer_t *bitbuffer)
     // Find a preamble with enough bits after it that it could be a complete packet
     while ((bitpos = bitbuffer_search(bitbuffer, 0, bitpos, (uint8_t *)&preamble_pattern, 24)) + 80 <=
             bitbuffer->bits_per_row[0]) {
-        events += tpms_jansite_decode(decoder, bitbuffer, 0, bitpos + 24);
+        events += tpms_jansite_decode(decoder, bitbuffer, 0, bitpos + 24, ext);
         bitpos += 2;
     }
 

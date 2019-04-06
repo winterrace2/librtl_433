@@ -67,6 +67,10 @@ typedef struct _rtl_433 {
 		uint64_t input_pos;
 		dm_state *demod;
 		uint32_t center_frequency;
+        /* stats*/
+        unsigned frames_count; ///< stats counter for interval
+        unsigned frames_fsk; ///< stats counter for interval
+        unsigned frames_events; ///< stats counter for interval
 } rtl_433_t;
 
 //public

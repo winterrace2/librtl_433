@@ -31,7 +31,7 @@ The sensor can be bought at Clas Ohlson.
 
 extern int alecto_checksum(r_device *decoder, bitrow_t *bb);
 
-static int prologue_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int prologue_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     uint8_t *b;
     data_t *data;
@@ -92,7 +92,7 @@ static int prologue_callback(r_device *decoder, bitbuffer_t *bitbuffer)
                 NULL);
     /* clang-format on */
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
     return 1;
 }
 

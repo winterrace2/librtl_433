@@ -20,7 +20,7 @@
 
 #include "decoder.h"
 
-static int opus_xt300_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int opus_xt300_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     int ret = 0;
     int row;
@@ -54,7 +54,7 @@ static int opus_xt300_callback(r_device *decoder, bitbuffer_t *bitbuffer)
             "moisture",         "Moisture",     DATA_FORMAT, "%d %%", DATA_INT, moisture,
             "mic",              "Integrity",    DATA_STRING, "CHECKSUM",
             NULL);
-        decoder_output_data(decoder, data);
+        decoder_output_data(decoder, data, ext);
         ret++;
     }
     return ret;

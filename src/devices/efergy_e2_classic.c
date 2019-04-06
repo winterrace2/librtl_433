@@ -24,7 +24,7 @@
 
 #include "decoder.h"
 
-static int efergy_e2_classic_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int efergy_e2_classic_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     unsigned num_bits = bitbuffer->bits_per_row[0];
     uint8_t *bytes = bitbuffer->bb[0];
     data_t *data;
@@ -78,6 +78,7 @@ static int efergy_e2_classic_callback(r_device *decoder, bitbuffer_t *bitbuffer)
         return 0; // invalid exponent
     float current_adc = (float)(bytes[4] << 8 | bytes[5]) / (1 << fact);
 
+
     /* clang-format off */
     data = data_make(
             "model",    "",                 DATA_STRING, _X("Efergy-e2CT","Efergy e2 CT"),
@@ -90,7 +91,7 @@ static int efergy_e2_classic_callback(r_device *decoder, bitbuffer_t *bitbuffer)
             NULL);
     /* clang-format on */
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
     return 1;
 }
 

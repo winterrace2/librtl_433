@@ -47,7 +47,7 @@ ambient_weather_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext
 
     data = data_make(
             "model",          "",             DATA_STRING, _X("Ambientweather-F007TH","Ambient Weather F007TH Thermo-Hygrometer"),
-            _X("id","device"),         "House Code",   DATA_INT,    deviceID,
+             _X("id","device"),         "House Code",   DATA_INT,    deviceID,
             "channel",        "Channel",      DATA_INT,    channel,
             "battery",        "Battery",      DATA_STRING, isBatteryLow ? "Low" : "OK",
             "temperature_F",  "Temperature",  DATA_FORMAT, "%.1f F", DATA_DOUBLE, temperature,

@@ -87,7 +87,10 @@ static int rtltcp_open(sdr_dev_t **out_dev, int *sample_size, char *dev_query, i
     char *port = "1234";
 
     char *param = arg_param(dev_query);
-    hostport_param(param, &host, &port);
+	if (!hostport_param(param, &host, &port)) {
+		rtl433_fprintf(stderr, "Bad host/port param.\n");
+		return -1;
+	};
 
 	rtl433_fprintf(stderr, "rtl_tcp input from %s port %s\n", host, port);
 

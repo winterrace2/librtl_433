@@ -14,11 +14,13 @@
 #include "pulse_demod.h"
 #include "bitbuffer.h"
 #include "util.h"
+#include "decoder.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <math.h>
 #include <limits.h>
+#include "redir_print.h"
 
 static int account_event(r_device *device, int ret)
 {
@@ -42,6 +44,7 @@ int pulse_demod_pcm(const pulse_data_t *pulses, r_device *device)
     const int max_zeros = device->s_reset_limit / device->s_long_width;
     const int tolerance = device->s_long_width / 4; // Tolerance is ±25% of a bit period
 
+    unsigned startpulse = 0;
     for (unsigned n = 0; n < pulses->num_pulses; ++n) {
         // Determine number of high bit periods for NRZ coding, where bits may not be separated
         int highs = (pulses->pulse[n]) * device->f_short_width + 0.5;
@@ -65,7 +68,7 @@ int pulse_demod_pcm(const pulse_data_t *pulses, r_device *device)
         ) {
             // Data is corrupt
             if (device->verbose > 3) {
-                fprintf(stderr, "bitbuffer cleared at %d: pulse %d, gap %d, period %d\n",
+                rtl433_fprintf(stderr, "bitbuffer cleared at %d: pulse %d, gap %d, period %d\n",
                         n, pulses->pulse[n], pulses->gap[n],
                         pulses->pulse[n] + pulses->gap[n]);
             }
@@ -78,14 +81,23 @@ int pulse_demod_pcm(const pulse_data_t *pulses, r_device *device)
                 && (bits.bits_per_row[0] > 0)                    // Only if data has been accumulated
         ) {
             if (device->decode_fn) {
-                events += account_event(device, device->decode_fn(device, &bits));
+                extdata_t ext;
+                ext.bitbuffer = &bits;
+                ext.pulses = pulses;
+                ext.pulseexc_startidx = startpulse;
+                ext.pulseexc_len = (n - startpulse) + 1;
+                ext.mod = device->modulation;
+                //ext.samprate = device->ctx->cfg->samp_rate;
+                //ext.freq = device->ctx->center_frequency;
+                events += account_event(device, device->decode_fn(device, &bits, &ext));
             }
             // Debug printout
             if (!device->decode_fn || (device->verbose && events > 0)) {
-                fprintf(stderr, "pulse_demod_pcm(): %s \n", device->name);
+                rtl433_fprintf(stderr, "pulse_demod_pcm(): %s \n", device->name);
                 bitbuffer_print(&bits);
             }
             bitbuffer_clear(&bits);
+            startpulse = n + 1;
         }
     } // for
     return events;
@@ -120,6 +132,7 @@ int pulse_demod_ppm(const pulse_data_t *pulses, r_device *device)
         one_u  = device->s_gap_limit ? device->s_gap_limit : device->s_reset_limit;
     }
 
+    unsigned startpulse = 0;
     for (unsigned n = 0; n < pulses->num_pulses; ++n) {
         if (pulses->gap[n] > zero_l && pulses->gap[n] < zero_u) {
             // Short gap
@@ -129,29 +142,38 @@ int pulse_demod_ppm(const pulse_data_t *pulses, r_device *device)
             // Long gap
             bitbuffer_add_bit(&bits, 1);
         }
+        // Check for new packet in multipacket
+        else if (pulses->gap[n] < device->s_reset_limit) {
+            bitbuffer_add_row(&bits);
+        }
         else if (pulses->gap[n] > sync_l && pulses->gap[n] < sync_u) {
             // Sync gap
             bitbuffer_add_sync(&bits);
         }
 
-        // Check for new packet in multipacket
-        else if (pulses->gap[n] < device->s_reset_limit) {
-            bitbuffer_add_row(&bits);
-        }
         // End of Message?
         if (((n == pulses->num_pulses - 1)                            // No more pulses? (FSK)
                     || (pulses->gap[n] >= device->s_reset_limit))     // Long silence (OOK)
                 && (bits.bits_per_row[0] > 0 || bits.num_rows > 1)) { // Only if data has been accumulated
 
             if (device->decode_fn) {
-                events += account_event(device, device->decode_fn(device, &bits));
+                extdata_t ext;
+                ext.bitbuffer = &bits;
+                ext.pulses = pulses;
+                ext.pulseexc_startidx = startpulse;
+                ext.pulseexc_len = (n - startpulse) + 1;
+                ext.mod = device->modulation;
+                //ext.samprate = device->ctx->cfg->samp_rate;
+                //ext.freq = device->ctx->center_frequency;
+                events += account_event(device, device->decode_fn(device, &bits, &ext));
             }
             // Debug printout
             if (!device->decode_fn || (device->verbose && events > 0)) {
-                fprintf(stderr, "pulse_demod_ppm(): %s \n", device->name);
+                rtl433_fprintf(stderr, "pulse_demod_ppm(): %s \n", device->name);
                 bitbuffer_print(&bits);
             }
             bitbuffer_clear(&bits);
+            startpulse = n + 1;
         }
     } // for pulses
     return events;
@@ -213,6 +235,7 @@ int pulse_demod_pwm(const pulse_data_t *pulses, r_device *device)
         sync_u = INT_MAX;
     }
 
+    unsigned startpulse = 0;
     for (unsigned n = 0; n < pulses->num_pulses; ++n) {
         if (pulses->pulse[n] > one_l && pulses->pulse[n] < one_u) {
             // 'Short' 1 pulse
@@ -239,14 +262,23 @@ int pulse_demod_pwm(const pulse_data_t *pulses, r_device *device)
                     || (pulses->gap[n] > device->s_reset_limit)) // Long silence (OOK)
                 && (bits.num_rows > 0)) {                        // Only if data has been accumulated
             if (device->decode_fn) {
-                events += account_event(device, device->decode_fn(device, &bits));
+                extdata_t ext;
+                ext.bitbuffer = &bits;
+                ext.pulses = pulses;
+                ext.pulseexc_startidx = startpulse;
+                ext.pulseexc_len = (n - startpulse) + 1;
+                ext.mod = device->modulation;
+                //ext.samprate = device->ctx->cfg->samp_rate;
+                //ext.freq = device->ctx->center_frequency;
+                events += account_event(device, device->decode_fn(device, &bits, &ext));
             }
             // Debug printout
             if (!device->decode_fn || (device->verbose && events > 0)) {
-                fprintf(stderr, "pulse_demod_pwm(): %s \n", device->name);
+                rtl433_fprintf(stderr, "pulse_demod_pwm(): %s \n", device->name);
                 bitbuffer_print(&bits);
             }
             bitbuffer_clear(&bits);
+            startpulse = n + 1;
         }
         else if (device->s_gap_limit > 0 && pulses->gap[n] > device->s_gap_limit
                 && bits.num_rows > 0 && bits.bits_per_row[bits.num_rows - 1] > 0) {
@@ -266,6 +298,7 @@ int pulse_demod_manchester_zerobit(const pulse_data_t *pulses, r_device *device)
     // First rising edge is always counted as a zero (Seems to be hardcoded policy for the Oregon Scientific sensors...)
     bitbuffer_add_bit(&bits, 0);
 
+    unsigned startpulse = 0;
     for (unsigned n = 0; n < pulses->num_pulses; ++n) {
         // Falling edge is on end of pulse
         if (device->s_tolerance > 0
@@ -292,16 +325,25 @@ int pulse_demod_manchester_zerobit(const pulse_data_t *pulses, r_device *device)
         if (pulses->gap[n] > device->s_reset_limit) {
             int newevents = 0;
             if (device->decode_fn) {
-                events += account_event(device, device->decode_fn(device, &bits));
+                extdata_t ext;
+                ext.bitbuffer = &bits;
+                ext.pulses = pulses;
+                ext.pulseexc_startidx = startpulse;
+                ext.pulseexc_len = (n - startpulse) + 1;
+                ext.mod = device->modulation;
+                //ext.samprate = device->ctx->cfg->samp_rate;
+                //ext.freq = device->ctx->center_frequency;
+                events += account_event(device, device->decode_fn(device, &bits, &ext));
             }
             // Debug printout
             if (!device->decode_fn || (device->verbose && events > 0)) {
-                fprintf(stderr, "pulse_demod_manchester_zerobit(): %s \n", device->name);
+                rtl433_fprintf(stderr, "pulse_demod_manchester_zerobit(): %s \n", device->name);
                 bitbuffer_print(&bits);
             }
             bitbuffer_clear(&bits);
             bitbuffer_add_bit(&bits, 0); // Prepare for new message with hardcoded 0
             time_since_last = 0;
+            startpulse = n + 1;
         }
         // Rising edge is on end of gap
         else if (pulses->gap[n] + time_since_last > (device->s_short_width * 1.5)) {
@@ -330,6 +372,7 @@ int pulse_demod_dmc(const pulse_data_t *pulses, r_device *device)
         symbol[n * 2 + 1] = pulses->gap[n];
     }
 
+    unsigned startpulse = 0;
     for (n = 0; n < pulses->num_pulses * 2; ++n) {
         if (abs(symbol[n] - device->s_short_width) < device->s_tolerance) {
             // Short - 1
@@ -342,7 +385,7 @@ int pulse_demod_dmc(const pulse_data_t *pulses, r_device *device)
                 else if (bits.num_rows > 0 && bits.bits_per_row[bits.num_rows - 1] > 0) {
                     bitbuffer_add_row(&bits);
 /*
-                    fprintf(stderr, "Detected error during pulse_demod_dmc(): %s\n",
+                    rtl433_fprintf(stderr, "Detected error during pulse_demod_dmc(): %s\n",
                             device->name);
 */
                 }
@@ -356,13 +399,24 @@ int pulse_demod_dmc(const pulse_data_t *pulses, r_device *device)
                 && bits.num_rows > 0) { // Only if data has been accumulated
             //END message ?
             if (device->decode_fn) {
-                events += account_event(device, device->decode_fn(device, &bits));
+                int start = startpulse / 2;
+                int end = (n + 1) / 2;
+                extdata_t ext;
+                ext.bitbuffer = &bits;
+                ext.pulses = pulses;
+                ext.pulseexc_startidx = start; // todo: test pulse ranges
+                ext.pulseexc_len = end-start; // todo: test pulse ranges
+                ext.mod = device->modulation;
+                //ext.samprate = device->ctx->cfg->samp_rate;
+                //ext.freq = device->ctx->center_frequency;
+                events += account_event(device, device->decode_fn(device, &bits, &ext));
             }
             if (!device->decode_fn || (device->verbose && events > 0)) {
-                fprintf(stderr, "pulse_demod_dmc(): %s \n", device->name);
+                rtl433_fprintf(stderr, "pulse_demod_dmc(): %s \n", device->name);
                 bitbuffer_print(&bits);
             }
             bitbuffer_clear(&bits);
+            startpulse = n + 1;
         }
     }
 
@@ -383,6 +437,7 @@ int pulse_demod_piwm_raw(const pulse_data_t *pulses, r_device *device)
         symbol[n * 2 + 1] = pulses->gap[n];
     }
 
+    unsigned startpulse = 0;
     for (n = 0; n < pulses->num_pulses * 2; ++n) {
         w = symbol[n] * device->f_short_width + 0.5;
         if (symbol[n] > device->s_long_width) {
@@ -398,7 +453,7 @@ int pulse_demod_piwm_raw(const pulse_data_t *pulses, r_device *device)
                 && bits.bits_per_row[bits.num_rows - 1] > 0) {
             bitbuffer_add_row(&bits);
 /*
-            fprintf(stderr, "Detected error during pulse_demod_piwm_raw(): %s\n",
+            rtl433_fprintf(stderr, "Detected error during pulse_demod_piwm_raw(): %s\n",
                     device->name);
 */
         }
@@ -408,13 +463,24 @@ int pulse_demod_piwm_raw(const pulse_data_t *pulses, r_device *device)
                 && (bits.num_rows > 0)) {                   // Only if data has been accumulated
             //END message ?
             if (device->decode_fn) {
-                events += account_event(device, device->decode_fn(device, &bits));
+                int start = startpulse / 2;
+                int end = (n + 1) / 2;
+                extdata_t ext;
+                ext.bitbuffer = &bits;
+                ext.pulses = pulses;
+                ext.pulseexc_startidx = start; // todo: test pulse ranges
+                ext.pulseexc_len = end - start; // todo: test pulse ranges
+                ext.mod = device->modulation;
+                //ext.samprate = device->ctx->cfg->samp_rate;
+                //ext.freq = device->ctx->center_frequency;
+                events += account_event(device, device->decode_fn(device, &bits, &ext));
             }
             if (!device->decode_fn || (device->verbose && events > 0)) {
-                fprintf(stderr, "pulse_demod_piwm_raw(): %s \n", device->name);
+                rtl433_fprintf(stderr, "pulse_demod_piwm_raw(): %s \n", device->name);
                 bitbuffer_print(&bits);
             }
             bitbuffer_clear(&bits);
+            startpulse = n + 1;
         }
     }
 
@@ -434,6 +500,7 @@ int pulse_demod_piwm_dc(const pulse_data_t *pulses, r_device *device)
         symbol[n * 2 + 1] = pulses->gap[n];
     }
 
+    unsigned startpulse = 0;
     for (n = 0; n < pulses->num_pulses * 2; ++n) {
         if (abs(symbol[n] - device->s_short_width) < device->s_tolerance) {
             // Short - 1
@@ -448,7 +515,7 @@ int pulse_demod_piwm_dc(const pulse_data_t *pulses, r_device *device)
                 && bits.bits_per_row[bits.num_rows - 1] > 0) {
             bitbuffer_add_row(&bits);
 /*
-            fprintf(stderr, "Detected error during pulse_demod_piwm_dc(): %s\n",
+            rtl433_fprintf(stderr, "Detected error during pulse_demod_piwm_dc(): %s\n",
                     device->name);
 */
         }
@@ -458,13 +525,24 @@ int pulse_demod_piwm_dc(const pulse_data_t *pulses, r_device *device)
                 && (bits.num_rows > 0)) {                   // Only if data has been accumulated
             //END message ?
             if (device->decode_fn) {
-                events += account_event(device, device->decode_fn(device, &bits));
+                int start = startpulse / 2;
+                int end = (n + 1) / 2;
+                extdata_t ext;
+                ext.bitbuffer = &bits;
+                ext.pulses = pulses;
+                ext.pulseexc_startidx = start; // todo: test pulse ranges
+                ext.pulseexc_len = end - start; // todo: test pulse ranges
+                ext.mod = device->modulation;
+                //ext.samprate = device->ctx->cfg->samp_rate;
+                //ext.freq = device->ctx->center_frequency;
+                events += account_event(device, device->decode_fn(device, &bits, &ext));
             }
             if (!device->decode_fn || (device->verbose && events > 0)) {
-                fprintf(stderr, "pulse_demod_piwm_dc(): %s \n", device->name);
+                rtl433_fprintf(stderr, "pulse_demod_piwm_dc(): %s \n", device->name);
                 bitbuffer_print(&bits);
             }
             bitbuffer_clear(&bits);
+            startpulse = n + 1;
         }
     }
 
@@ -507,7 +585,7 @@ int pulse_demod_osv1(const pulse_data_t *pulses, r_device *device)
     }
     if (preamble != 12) {
         if (device->verbose)
-            fprintf(stderr, "preamble %d  %d %d\n", preamble, pulses->pulse[0], pulses->gap[0]);
+            rtl433_fprintf(stderr, "preamble %d  %d %d\n", preamble, pulses->pulse[0], pulses->gap[0]);
         return events;
     }
 
@@ -541,7 +619,15 @@ int pulse_demod_osv1(const pulse_data_t *pulses, r_device *device)
                 && (bits.num_rows > 0)) { // Only if data has been accumulated
             //END message ?
             if (device->decode_fn) {
-                events += account_event(device, device->decode_fn(device, &bits));
+                extdata_t ext;
+                ext.bitbuffer = &bits;
+                ext.pulses = pulses;
+                ext.pulseexc_startidx = 0; // todo: here we pass the entire pulse set on each call. could this be improved?
+                ext.pulseexc_len = 0; // todo: here we pass the entire pulse set on each call. could this be improved?
+                ext.mod = device->modulation;
+                //ext.samprate = device->ctx->cfg->samp_rate;
+                //ext.freq = device->ctx->center_frequency;
+                events += account_event(device, device->decode_fn(device, &bits, &ext));
             }
             return events;
         }
@@ -565,11 +651,11 @@ int pulse_demod_string(const char *code, r_device *device)
     bitbuffer_parse(&bits, code);
 
     if (device->decode_fn) {
-        events += account_event(device, device->decode_fn(device, &bits));
+		events += account_event(device, device->decode_fn(device, &bits, NULL));
     }
     // Debug printout
     if (!device->decode_fn || (device->verbose && events > 0)) {
-        fprintf(stderr, "pulse_demod_pcm(): %s \n", device->name);
+        rtl433_fprintf(stderr, "pulse_demod_pcm(): %s \n", device->name);
         bitbuffer_print(&bits);
     }
 

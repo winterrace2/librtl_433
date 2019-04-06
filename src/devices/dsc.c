@@ -212,7 +212,7 @@ static char *output_fields[] = {
     "model",
     "id",
     "status",
-    "battery_ok",
+    "battery_ok"
     "mic",
     NULL
 };

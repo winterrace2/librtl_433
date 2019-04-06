@@ -18,7 +18,7 @@ static const unsigned char preamble_pattern = 0xe0;
 // End of frame is 00xxxxxx or 11xxxxxx depending on final data bit
 static const unsigned char postamble_pattern[2] = { 0x00, 0xc0 };
 
-static int oil_watchman_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int oil_watchman_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
 	uint8_t *b;
 	uint32_t unit_id;
 	uint16_t depth = 0;
@@ -88,7 +88,7 @@ static int oil_watchman_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
 				NULL);
 		/* clang-format on */
 
-		decoder_output_data(decoder, data);
+		decoder_output_data(decoder, data, ext);
 		events++;
 	}
 	return events;

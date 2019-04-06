@@ -25,7 +25,7 @@ since the Nexa uses two different bit lengths for ON and OFF.
 
 #include "decoder.h"
 
-static int nexa_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int nexa_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     data_t *data;
 
     /* Reject missing sync */
@@ -63,7 +63,7 @@ static int nexa_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
             NULL);
     /* clang-format on */
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
     return 1;
 }
 

@@ -59,8 +59,9 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>RTLSDR;_DEBUG;_WINDOWS;_USRDLL;librtl_433_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>RTLSDR;_CRT_SECURE_NO_WARNINGS;_DEBUG;_WINDOWS;_USRDLL;librtl_433_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\include;..\..\librtlsdr\include</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -100,6 +101,7 @@
     <ClCompile Include="..\src\data_printer_csv.c" />
     <ClCompile Include="..\src\data_printer_ext.c" />
     <ClCompile Include="..\src\data_printer_json.c" />
+    <ClCompile Include="..\src\data_printer_jsonstr.c" />
     <ClCompile Include="..\src\data_printer_kv.c" />
     <ClCompile Include="..\src\data_printer_udp.c" />
     <ClCompile Include="..\src\decoder_util.c" />
@@ -135,6 +137,7 @@
     <ClCompile Include="..\src\devices\fineoffset_wh1080.c" />
     <ClCompile Include="..\src\devices\flex.c" />
     <ClCompile Include="..\src\devices\fordremote.c" />
+    <ClCompile Include="..\src\devices\fs20.c" />
     <ClCompile Include="..\src\devices\ft004b.c" />
     <ClCompile Include="..\src\devices\generic_motion.c" />
     <ClCompile Include="..\src\devices\generic_remote.c" />
@@ -157,6 +160,7 @@
     <ClCompile Include="..\src\devices\lacrossews.c" />
     <ClCompile Include="..\src\devices\lacrosse_TX141TH_Bv2.c" />
     <ClCompile Include="..\src\devices\lacrosse_tx35.c" />
+    <ClCompile Include="..\src\devices\lacrosse_ws7000.c" />
     <ClCompile Include="..\src\devices\lightwave_rf.c" />
     <ClCompile Include="..\src\devices\maverick_et73.c" />
     <ClCompile Include="..\src\devices\maverick_et73x.c" />
@@ -168,6 +172,7 @@
     <ClCompile Include="..\src\devices\nexus.c" />
     <ClCompile Include="..\src\devices\oil_standard.c" />
     <ClCompile Include="..\src\devices\oil_watchman.c" />
+    <ClCompile Include="..\src\devices\opus_xt300.c" />
     <ClCompile Include="..\src\devices\oregon_scientific.c" />
     <ClCompile Include="..\src\devices\oregon_scientific_sl109h.c" />
     <ClCompile Include="..\src\devices\oregon_scientific_v1.c" />
@@ -192,6 +197,7 @@
     <ClCompile Include="..\src\devices\thermopro_tp12.c" />
     <ClCompile Include="..\src\devices\tpms_citroen.c" />
     <ClCompile Include="..\src\devices\tpms_ford.c" />
+    <ClCompile Include="..\src\devices\tpms_jansite.c" />
     <ClCompile Include="..\src\devices\tpms_pmv107j.c" />
     <ClCompile Include="..\src\devices\tpms_renault.c" />
     <ClCompile Include="..\src\devices\tpms_toyota.c" />
@@ -207,7 +213,9 @@
     <ClCompile Include="..\src\fileformat.c" />
     <ClCompile Include="..\src\librtl_433.c" />
     <ClCompile Include="..\src\list.c" />
+    <ClCompile Include="..\src\mongoose.c" />
     <ClCompile Include="..\src\optparse.c" />
+    <ClCompile Include="..\src\output_mqtt.c" />
     <ClCompile Include="..\src\pulse_analyze.c" />
     <ClCompile Include="..\src\pulse_demod.c" />
     <ClCompile Include="..\src\pulse_detect.c" />
@@ -229,6 +237,7 @@
     <ClInclude Include="..\include\data_printer_csv.h" />
     <ClInclude Include="..\include\data_printer_ext.h" />
     <ClInclude Include="..\include\data_printer_json.h" />
+    <ClInclude Include="..\include\data_printer_jsonstr.h" />
     <ClInclude Include="..\include\data_printer_kv.h" />
     <ClInclude Include="..\include\data_printer_udp.h" />
     <ClInclude Include="..\include\decoder.h" />
@@ -241,10 +250,12 @@
     <ClInclude Include="..\include\list.h" />
     <ClInclude Include="..\include\mongoose.h" />
     <ClInclude Include="..\include\optparse.h" />
+    <ClInclude Include="..\include\output_mqtt.h" />
     <ClInclude Include="..\include\pulse_analyze.h" />
     <ClInclude Include="..\include\pulse_demod.h" />
     <ClInclude Include="..\include\pulse_detect.h" />
     <ClInclude Include="..\include\redir_print.h" />
+    <ClInclude Include="..\include\r_device.h" />
     <ClInclude Include="..\include\r_util.h" />
     <ClInclude Include="..\include\samp_grab.h" />
     <ClInclude Include="..\include\sdr.h" />

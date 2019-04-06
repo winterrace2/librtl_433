@@ -15,8 +15,6 @@
 
 /** Supported modulation types. */
 enum modulation_types {
-    UNKNOWN_MODULATION_TYPE =       0,
-
     OOK_DEMOD_MIN_VAL =             3,  ///< Dummy. OOK demodulation must start at this value.
     OOK_PULSE_MANCHESTER_ZEROBIT =  3,  ///< Manchester encoding. Hardcoded zerobit. Rising Edge = 0, Falling edge = 1.
     OOK_PULSE_PCM_RZ =              4,  ///< Pulse Code Modulation with Return-to-Zero encoding, Pulse = 0, No pulse = 1.
@@ -33,6 +31,9 @@ enum modulation_types {
     FSK_PULSE_PWM =                 17, ///< FSK, Pulse Width Modulation. Short pulses = 1, Long = 0.
     FSK_PULSE_MANCHESTER_ZEROBIT =  18, ///< FSK, Manchester encoding.
     FSK_DEMOD_MAX_VAL =             18, ///< Dummy. FSK demodulation must ends at this value.
+
+	UNKNOWN_OOK =                  101,
+	UNKNOWN_FSK =                  102,
 };
 
 /** Decoders should return n>=0 for n packets successfully decoded,

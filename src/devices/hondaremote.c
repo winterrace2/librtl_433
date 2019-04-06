@@ -58,7 +58,7 @@ static char *output_fields[] = {
     "model",
     "device_id", // TODO: delete this
     "id",
-    "code",
+	"code",
     NULL
 };
 

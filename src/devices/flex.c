@@ -9,6 +9,7 @@
  */
 
 #include "decoder.h"
+#include "optparse.h" // for strcasecmp() and strncasecmp()
 #include <stdlib.h>
 
 static inline int bit(const uint8_t *bytes, unsigned bit)

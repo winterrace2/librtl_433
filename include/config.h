@@ -4,6 +4,7 @@
 #include "list.h"
 
 #define MAX_GAINSTR_LEN 100
+#define MAX_SDRSET_LEN 100
 #define MAX_TESTDATA_LEN 160
 #define MAX_PATHLEN 300
 
@@ -41,12 +42,14 @@ typedef enum {
 #define OUTPUT_CSV    2 // CSV output
 #define OUTPUT_JSON   4 // JSON output
 #define OUTPUT_UDP    8 // syslog output
-#define OUTPUT_EXT   16 // extended output to external callback
+#define OUTPUT_MQTT  16 // syslog output
+#define OUTPUT_EXT  128 // extended output to external callback
 
 typedef struct r_cfg { // following explanations contain the former command line switches in brackets
 	int verbosity;										///< [-v] 0=normal, 1=verbose, 2=verbose decoders, 3=debug decoders, 4=trace decoding.
 	char dev_query[40];									///< [-d] RTL-SDR: USB device index or ":"+serial. SoapySDR: device query. Leavy empty for no preference (first device).
 	char gain_str[MAX_GAINSTR_LEN];						///< [-g] gain (leave stringempty for auto gain).
+	char settings_str[MAX_SDRSET_LEN];					///< [-t] soapy-sdr antenna settings etc.
 	uint32_t frequency[MAX_FREQS];						///< [-f] list of target frequencies.
 	int frequencies;									///< [-f] number of target frequencies.
 	int hop_time;										///< [-H] Hop interval for polling of multiple frequencies.
@@ -73,6 +76,9 @@ typedef struct r_cfg { // following explanations contain the former command line
 	char output_path_kv[MAX_PATHLEN];					///< [-F] target file for KV output.
 	char output_udp_host[100];							///< [-F] target host for syslog output.
 	char output_udp_port[10];							///< [-F] target port for syslog output.
+	char output_mqtt_host[100];							///< [-F] target host for MQTT output.
+	char output_mqtt_port[10];							///< [-F] target port for MQTT output.
+	char output_mqtt_opts[100];							///< [-F] options for MQTT output.
 	void *output_extcallback;							///< [-F] target callback function for extended external output.
 	int report_unknown;									///< flag to enable/disable passing of unknown signals to output_extcallback.
 	int report_meta;									///< [-M time|reltime|notime|hires|utc|protocol|level|bits] Add various meta data to every output line.
@@ -80,9 +86,14 @@ typedef struct r_cfg { // following explanations contain the former command line
 	int report_time_hires;								///< [-M time|reltime|notime|hires|utc|protocol|level|bits] Add various meta data to every output line.
 	int report_time_utc;								///< [-M time|reltime|notime|hires|utc|protocol|level|bits] Add various meta data to every output line.
 	int report_description;								///< [-M time|reltime|notime|hires|utc|protocol|level|bits] Add various meta data to every output line.
+    int report_stats;
+    int stats_interval;
+    int stats_now;
+    time_t stats_time;
 	int report_protocol;								///< [-M time|reltime|notime|hires|utc|protocol|level|bits] Add various meta data to every output line.
 	int verbose_bits;									///< [-M time|reltime|notime|hires|utc|protocol|level|bits] Add various meta data to every output line.
 	char *output_tag;									///< [-K FILE|PATH|<tag>] Add an expanded token or fixed tag to every output line.
+	int new_model_keys;									///< [-M newmodel] Use "newmodel" to transition to new model keys. This will become the default someday
 	conversion_mode_t conversion_mode;					///< [-C] Convert units in decoded output.
 	uint32_t duration;									///< [-T] Specify number of seconds to run.
 	int stop_after_successful_events_flag;				///< [-E] 1 for stopping after outputting successful event(s).

@@ -47,7 +47,7 @@ Packet gap is 10 ms.
 
 #include "decoder.h"
 
-static int proove_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
+static int proove_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext) {
     data_t *data;
 
     /* Reject missing sync */
@@ -85,7 +85,7 @@ static int proove_callback(r_device *decoder, bitbuffer_t *bitbuffer) {
             NULL);
     /* clang-format on */
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
     return 1;
 }
 

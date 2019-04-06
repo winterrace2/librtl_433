@@ -35,7 +35,7 @@ static int schraeder_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata
     uint8_t b[8];
     int serial_id;
     char id_str[9];
-    int flags;
+    unsigned flags;
     char flags_str[3];
     int pressure;    // mbar/hectopascal
     int temperature; // deg C
@@ -94,7 +94,7 @@ static int schrader_EG53MA4_callback(r_device *decoder, bitbuffer_t *bitbuffer, 
     uint8_t b[10];
     int serial_id;
     char id_str[9];
-    unsigned flags;
+    int flags;
     char flags_str[9];
     int pressure;    // mbar
     int temperature; // degree Fahrenheit

@@ -5,6 +5,7 @@ void r_init_cfg(r_cfg_t *cfg) {
     cfg->verbosity = 0;
     cfg->dev_query[0] = 0;
     memset(cfg->gain_str, 0, sizeof(cfg->gain_str));
+    memset(cfg->settings_str, 0, sizeof(cfg->settings_str));
     for (int a = 0; a < MAX_FREQS; a++) cfg->frequency[a] = 0;
     cfg->frequencies = 0;
     cfg->hop_time = DEFAULT_HOP_TIME;
@@ -33,7 +34,10 @@ void r_init_cfg(r_cfg_t *cfg) {
     memset(cfg->output_path_kv, 0, sizeof(cfg->output_path_kv));
     strcpy(cfg->output_udp_host, "localhost");
     strcpy(cfg->output_udp_port, "514");
-    cfg->output_extcallback = NULL;
+	strcpy(cfg->output_mqtt_host, "localhost");
+	strcpy(cfg->output_mqtt_port, "1883");
+	memset(cfg->output_mqtt_opts, 0, sizeof(cfg->output_mqtt_opts));
+	cfg->output_extcallback = NULL;
     cfg->report_unknown = 0;
     cfg->report_meta = 0;
     cfg->report_time_preference = REPORT_TIME_DEFAULT;
@@ -42,6 +46,7 @@ void r_init_cfg(r_cfg_t *cfg) {
     cfg->report_protocol = 0;
     cfg->verbose_bits = 0;
     cfg->output_tag = NULL;
+    cfg->new_model_keys = 0;
     cfg->conversion_mode = CONVERT_NATIVE;
     cfg->duration = 0;
     cfg->stop_after_successful_events_flag = 0;

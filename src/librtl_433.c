@@ -195,6 +195,110 @@ static char const **well_known_output_fields(r_cfg_t *cfg)
     return well_known_default;
 }
 
+// level 0: do not report (don't call this), 1: report successful devices, 2: report active devices, 3: report all
+static data_t *create_report_data(rtl_433_t *rtl, int level)
+{
+    list_t *r_devs = &rtl->demod->r_devs;
+    data_t *data;
+    list_t dev_data_list = {0};
+    list_ensure_size(&dev_data_list, r_devs->len);
+
+    for (void **iter = r_devs->elems; iter && *iter; ++iter) {
+        r_device *r_dev = *iter;
+        if (level <= 2 && r_dev->decode_events == 0)
+            continue;
+        if (level <= 1 && r_dev->decode_ok == 0)
+            continue;
+        if (level <= 0)
+            continue;
+        data = data_make(
+                "device",       "", DATA_INT, r_dev->protocol_num,
+                "name",         "", DATA_STRING, r_dev->name,
+                "events",       "", DATA_INT, r_dev->decode_events,
+                "ok",           "", DATA_INT, r_dev->decode_ok,
+                "messages",     "", DATA_INT, r_dev->decode_messages,
+                NULL);
+
+        if (r_dev->decode_fails[-DECODE_FAIL_OTHER])
+            data_append(data,
+                    "fail_other",   "", DATA_INT, r_dev->decode_fails[-DECODE_FAIL_OTHER],
+                    NULL);
+        if (r_dev->decode_fails[-DECODE_ABORT_LENGTH])
+            data_append(data,
+                    "abort_length", "", DATA_INT, r_dev->decode_fails[-DECODE_ABORT_LENGTH],
+                    NULL);
+        if (r_dev->decode_fails[-DECODE_ABORT_EARLY])
+            data_append(data,
+                    "abort_early",  "", DATA_INT, r_dev->decode_fails[-DECODE_ABORT_EARLY],
+                    NULL);
+        if (r_dev->decode_fails[-DECODE_FAIL_MIC])
+            data_append(data,
+                    "fail_mic",     "", DATA_INT, r_dev->decode_fails[-DECODE_FAIL_MIC],
+                    NULL);
+        if (r_dev->decode_fails[-DECODE_FAIL_SANITY])
+            data_append(data,
+                    "fail_sanity",  "", DATA_INT, r_dev->decode_fails[-DECODE_FAIL_SANITY],
+                    NULL);
+
+		list_push(&dev_data_list, data);
+    }
+
+    data = data_make(
+            "count",            "", DATA_INT, rtl->frames_count,
+            "fsk",              "", DATA_INT, rtl->frames_fsk,
+            "events",           "", DATA_INT, rtl->frames_events,
+            NULL);
+
+	data = data_make(
+            "enabled",          "", DATA_INT, r_devs->len,
+            "frames",           "", DATA_DATA, data,
+            "stats",            "", DATA_ARRAY, data_array(dev_data_list.len, DATA_DATA, dev_data_list.elems),
+            NULL);
+
+    list_free_elems(&dev_data_list, NULL);
+    return data;
+}
+
+static void flush_report_data(rtl_433_t *rtl)
+{
+    list_t *r_devs = &rtl->demod->r_devs;
+
+    rtl->frames_count = 0;
+    rtl->frames_fsk = 0;
+    rtl->frames_events = 0;
+
+    for (void **iter = r_devs->elems; iter && *iter; ++iter) {
+        r_device *r_dev = *iter;
+
+        r_dev->decode_events = 0;
+        r_dev->decode_ok = 0;
+        r_dev->decode_messages = 0;
+        r_dev->decode_fails[0] = 0;
+        r_dev->decode_fails[1] = 0;
+        r_dev->decode_fails[2] = 0;
+        r_dev->decode_fails[3] = 0;
+        r_dev->decode_fails[4] = 0;
+    }
+}
+
+/** Pass the data structure to all output handlers. Frees data afterwards. */
+void event_occured_handler(rtl_433_t *rtl, data_t *data)
+{
+    // prepend "time" if requested
+    if (rtl->demod->report_time != REPORT_TIME_OFF) {
+        char time_str[LOCAL_TIME_BUFLEN];
+        time_pos_str(rtl, 0, time_str);
+        data = data_prepend(data,
+                "time", "", DATA_STRING, time_str,
+                NULL);
+    }
+
+    for (size_t i = 0; i < rtl->demod->output_handler.len; ++i) { // list might contain NULLs
+        data_output_print(rtl->demod->output_handler.elems[i], data);
+    }
+    data_free(data);
+}
+
 RTL_433_API int start(rtl_433_t *rtl, struct sigaction *sigact){
     if (!rtl) {
         rtl433_fprintf(stderr, "start: missing context.\n");
@@ -223,7 +327,8 @@ RTL_433_API int start(rtl_433_t *rtl, struct sigaction *sigact){
     if (rtl->cfg->outputs_configured &  OUTPUT_JSON) add_json_output(rtl->demod, rtl->cfg->output_path_json, ((rtl->cfg->overwrite_modes & OVR_SUBJ_DEC_JSON) != 0));
     if (rtl->cfg->outputs_configured &  OUTPUT_CSV)  add_csv_output(rtl->demod, rtl->cfg->output_path_csv, ((rtl->cfg->overwrite_modes & OVR_SUBJ_DEC_CSV) != 0));
     if (rtl->cfg->outputs_configured &  OUTPUT_KV)   add_kv_output(rtl->demod, rtl->cfg->output_path_kv, ((rtl->cfg->overwrite_modes & OVR_SUBJ_DEC_KV) != 0));
-    if (rtl->cfg->outputs_configured &  OUTPUT_UDP)  add_syslog_output(rtl->demod, rtl->cfg->output_udp_host, rtl->cfg->output_udp_port);
+	if (rtl->cfg->outputs_configured &  OUTPUT_MQTT) add_mqtt_output(rtl->demod, rtl->cfg->output_mqtt_host, rtl->cfg->output_mqtt_port, rtl->cfg->output_mqtt_opts);
+	if (rtl->cfg->outputs_configured &  OUTPUT_UDP)  add_syslog_output(rtl->demod, rtl->cfg->output_udp_host, rtl->cfg->output_udp_port);
     if (rtl->cfg->outputs_configured &  OUTPUT_EXT)  add_ext_output(rtl->demod, rtl->cfg->output_extcallback);
         
     // Check dumper and activate, if required
@@ -301,7 +406,14 @@ RTL_433_API int start(rtl_433_t *rtl, struct sigaction *sigact){
                         rtl433_fprintf(stderr, "WARNING: Failed to activate SDR.\n");
 
                     r = ReadRtlAsync(rtl, sigact);
-                    if (!rtl->do_exit) rtl433_fprintf(stderr, "\nLibrary error %d, exiting...\n", r);
+
+                    if (rtl->cfg->report_stats > 0) {
+                        event_occured_handler(rtl, create_report_data(rtl, rtl->cfg->report_stats));
+                        flush_report_data(rtl);
+                    }
+
+                    if (!rtl->do_exit)
+                        rtl433_fprintf(stderr, "\nLibrary error %d, exiting...\n", r);
 
                     sdr_close(rtl->dev);
                 }
@@ -395,6 +507,8 @@ void sdr_callback(unsigned char *iq_buf, uint32_t len, void *ctx)
                 if (rtl->cfg->analyze_pulses) rtl433_fprintf(stderr, "Detected OOK package\t%s\n", time_pos_str(rtl, rtl->demod->pulse_data.start_ago, time_str));
 
                 p_events += run_ook_demods(rtl->demod);
+                rtl->frames_count++;
+                rtl->frames_events += p_events > 0;
 
                 for (void **iter = rtl->demod->dumper.elems; iter && *iter; ++iter) {
                     file_info_t const *dumper = *iter;
@@ -414,6 +528,8 @@ void sdr_callback(unsigned char *iq_buf, uint32_t len, void *ctx)
                 if (rtl->cfg->analyze_pulses) rtl433_fprintf(stderr, "Detected FSK package\t %s\n", time_pos_str(rtl, rtl->demod->fsk_pulse_data.start_ago, time_str));
 
                 p_events += run_fsk_demods(rtl->demod);
+                rtl->frames_fsk++;
+                rtl->frames_events += p_events > 0;
 
                 for (void **iter = rtl->demod->dumper.elems; iter && *iter; ++iter) {
                     file_info_t const *dumper = *iter;
@@ -496,6 +612,14 @@ void sdr_callback(unsigned char *iq_buf, uint32_t len, void *ctx)
         sdr_stop(rtl->dev);
         rtl433_fprintf(stderr, "Time expired, exiting!\n");
     }
+    if (rtl->cfg->stats_now || (rtl->cfg->report_stats && rtl->cfg->stats_interval && rawtime >= rtl->cfg->stats_time)) {
+        event_occured_handler(rtl, create_report_data(rtl, rtl->cfg->stats_now ? 3 : rtl->cfg->report_stats));
+        flush_report_data(rtl);
+        if (rawtime >= rtl->cfg->stats_time)
+            rtl->cfg->stats_time += rtl->cfg->stats_interval; // todo: move/copy?
+        if (rtl->cfg->stats_now)
+            rtl->cfg->stats_now--; // todo: move / copy
+    }
 }
 
 static int InitSdr(rtl_433_t *rtl) {
@@ -519,6 +643,8 @@ static int InitSdr(rtl_433_t *rtl) {
 
     if (rtl->cfg->verbosity || rtl->cfg->level_limit)
         rtl433_fprintf(stderr, "Bit detection level set to %d%s.\n", rtl->cfg->level_limit, (rtl->cfg->level_limit ? "" : " (Auto)"));
+
+    r = sdr_apply_settings(rtl->dev, rtl->cfg->settings_str, 1); // always verbose for soapy
 
     /* Enable automatic gain if gain_str empty (or 0 for RTL-SDR), set manual gain otherwise */
     r = sdr_set_tuner_gain(rtl->dev, rtl->cfg->gain_str, 1); // always verbose

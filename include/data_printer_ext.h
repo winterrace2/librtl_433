@@ -12,8 +12,8 @@ typedef struct _extdata {
 	unsigned pulseexc_startidx;
 	unsigned pulseexc_len;
 	unsigned mod;
-	unsigned samprate;
-	unsigned freq;
+//	unsigned samprate;
+//	unsigned freq;
 } extdata_t;
 
 typedef struct data_ext {

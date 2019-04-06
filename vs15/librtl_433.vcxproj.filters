@@ -399,6 +399,27 @@
     <ClCompile Include="..\src\r_util.c">
       <Filter>Source files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\devices\opus_xt300.c">
+      <Filter>Source files\devices</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\devices\fs20.c">
+      <Filter>Source files\devices</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\data_printer_jsonstr.c">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\devices\tpms_jansite.c">
+      <Filter>Source files\devices</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\output_mqtt.c">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\mongoose.c">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\devices\lacrosse_ws7000.c">
+      <Filter>Source files\devices</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\bitbuffer.h">
@@ -492,6 +513,15 @@
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\r_util.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\data_printer_jsonstr.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\r_device.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\output_mqtt.h">
       <Filter>Header files</Filter>
     </ClInclude>
   </ItemGroup>

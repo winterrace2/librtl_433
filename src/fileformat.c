@@ -11,6 +11,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include "redir_print.h"
 #ifdef _MSC_VER
 #ifndef strncasecmp // Microsoft Visual Studio
 #define strncasecmp  _strnicmp
@@ -36,19 +37,20 @@ char const *file_basename(char const *path)
         return path;
 }
 
-void check_read_file_info(file_info_t *info)
+int check_read_file_info(file_info_t *info)
 {
     if (info->format != CU8_IQ
             && info->format != CS16_IQ
             && info->format != CF32_IQ
             && info->format != S16_AM
             && info->format != PULSE_OOK) {
-        fprintf(stderr, "File type not supported as input (%s).\n", info->spec);
-        exit(1);
+        rtl433_fprintf(stderr, "File type not supported as input (%s).\n", info->spec);
+        return 0; //exit(1);
     }
+    return 1;
 }
 
-void check_write_file_info(file_info_t *info)
+int check_write_file_info(file_info_t *info)
 {
     if (info->format != CU8_IQ
             && info->format != CS8_IQ
@@ -62,9 +64,10 @@ void check_write_file_info(file_info_t *info)
             && info->format != F32_Q
             && info->format != U8_LOGIC
             && info->format != VCD_LOGIC) {
-        fprintf(stderr, "File type not supported as output (%s).\n", info->spec);
-        exit(1);
+        rtl433_fprintf(stderr, "File type not supported as output (%s).\n", info->spec);
+        return 0; //exit(1);
     }
+    return 1;
 }
 
 char const *file_info_string(file_info_t *info)
@@ -144,7 +147,7 @@ static void file_type(char const *filename, file_info_t *info)
                 ++p;
             double num = atof(n); // atouint32_metric() ?
             size_t len = p - s;
-            double scale = 1.0;
+            double scale = 1.0; // unknown scale
             switch (*s) {
             case 'k':
             case 'K':
@@ -165,7 +168,7 @@ static void file_type(char const *filename, file_info_t *info)
             else if (len == 3 && !strncasecmp("sps", s, 3)) info->sample_rate = num;
             else if (len == 3 && !strncasecmp("Hz", s+1, 2) && scale > 1.0) info->center_frequency = num * scale;
             else if (len == 4 && !strncasecmp("sps", s+1, 3) && scale > 1.0) info->sample_rate = num * scale;
-            //fprintf(stderr, "Got number %g, f is %u, s is %u\n", num, info->center_frequency, info->sample_rate);
+            //rtl433_fprintf(stderr, "Got number %g, f is %u, s is %u\n", num, info->center_frequency, info->sample_rate);
         } else if ((*p >= 'A' && *p <= 'Z')
                 || (*p >= 'a' && *p <= 'z')) {
             char const *t = p; // type starts here
@@ -197,7 +200,7 @@ static void file_type(char const *filename, file_info_t *info)
             else if (len == 3 && !strncasecmp("complex16u", t, 10)) file_type_set_format(&info->format, F_CU8);
             else if (len == 3 && !strncasecmp("complex16s", t, 10)) file_type_set_format(&info->format, F_CS8);
             else if (len == 4 && !strncasecmp("complex", t, 7)) file_type_set_format(&info->format, F_CF32);
-            //else fprintf(stderr, "Skipping type (len %ld) %s\n", len, t);
+            //else rtl433_fprintf(stderr, "Skipping type (len %ld) %s\n", len, t);
         } else {
             p++; // skip non-alphanum char otherwise
         }
@@ -274,24 +277,24 @@ void assert_file_type(int check, char const *spec)
     file_info_t info = {0};
     int ret = parse_file_info(spec, &info);
     if (check != ret) {
-        fprintf(stderr, "\nTEST failed: determine_file_type(\"%s\", &foo) = %8x == %8x\n", spec, ret, check);
+        rtl433_fprintf(stderr, "\nTEST failed: determine_file_type(\"%s\", &foo) = %8x == %8x\n", spec, ret, check);
     } else {
-        fprintf(stderr, ".");
+        rtl433_fprintf(stderr, ".");
     }
 }
 
 void assert_str_equal(char const *a, char const *b)
 {
     if (a != b && strcmp(a, b)) {
-        fprintf(stderr, "\nTEST failed: \"%s\" == \"%s\"\n", a, b);
+        rtl433_fprintf(stderr, "\nTEST failed: \"%s\" == \"%s\"\n", a, b);
     } else {
-        fprintf(stderr, ".");
+        rtl433_fprintf(stderr, ".");
     }
 }
 
 int main(int argc, char **argv)
 {
-    fprintf(stderr, "Testing:\n");
+    rtl433_fprintf(stderr, "Testing:\n");
 
     assert_str_equal(last_plain_colon("foo:bar:baz"), ":baz");
     assert_str_equal(last_plain_colon("foo"), NULL);
@@ -342,6 +345,6 @@ int main(int argc, char **argv)
     assert_file_type(S16_FM, ".s16_fm");
     assert_file_type(S16_FM, ".s16,fm");
 
-    fprintf(stderr, "\nDone!\n");
+    rtl433_fprintf(stderr, "\nDone!\n");
 }
 #endif /* _TEST */
