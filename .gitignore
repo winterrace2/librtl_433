@@ -11,7 +11,6 @@ acinclude.m4
 aminclude.am
 m4/*.m4
 autom4te.cache
-config.h*
 config.sub
 config.log
 config.status
@@ -35,10 +34,12 @@ Doxyfile
 doc/
 
 src/rtl_433
+src/rtl_sdr
+src/rtl_tcp
 
 CMakeCache.txt
 
-build*/
+build/
 .cproject
 .settings
 .project
@@ -52,12 +53,4 @@ build*/
 *.lastbuildstate
 *.db
 *.opendb
-
-_*/
-
-rtl_433_tests
-
-.idea
-cmake-build-debug/
-
-.DS_Store
+*.exp

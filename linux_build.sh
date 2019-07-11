@@ -44,11 +44,14 @@ gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/bt_rain.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/calibeur.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/cardin.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/chuango.c
+gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/companion_wtr001.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/current_cost.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/danfoss.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/digitech_xc0324.c
+gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/directv.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/dish_remote_6_3.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/dsc.c
+gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/ecowitt.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/efergy_e2_classic.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/efergy_optical.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/elro_db286a.c
@@ -56,6 +59,7 @@ gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/elv.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/emontx.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/esa.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/esperanza_ews.c
+gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/eurochron.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/fineoffset.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/fineoffset_wh1050.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/fineoffset_wh1080.c
@@ -68,12 +72,14 @@ gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/generic_motion.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/generic_remote.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/generic_temperature_sensor.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/gt_wt_02.c
+gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/hcs200.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/hideki.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/hondaremote.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/honeywell.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/honeywell_wdb.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/ht680.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/ibis_beacon.c
+gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/ikea_sparsnas.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/infactory.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/inovalley-kw9015b.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/interlogix.c
@@ -107,6 +113,7 @@ gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/quhwa.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/radiohead_ask.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/rftech.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/rubicson.c
+gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/rubicson_48659.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/s3318p.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/schraeder.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/silvercrest.c
@@ -115,6 +122,7 @@ gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/smoke_gs558.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/solight_te44.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/springfield.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/steelmate.c
+gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/tfa_30_3196.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/tfa_pool_thermometer.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/tfa_twin_plus_30.3049.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/thermopro_tp11.c
@@ -125,6 +133,7 @@ gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/tpms_jansite.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/tpms_pmv107j.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/tpms_renault.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/tpms_toyota.c
+gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/ts_ft002.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/ttx201.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/vaillant_vrt340f.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/waveman.c
@@ -134,4 +143,4 @@ gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/wt0124.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/wt450.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/x10_rf.c
 gcc -Iinclude -lm -D RTLSDR -lrtlsdr -c src/devices/x10_sec.c
-ar rcs librtl_433.a abuf.o am_analyze.o baseband.o bitbuffer.o compat_time.o config.o data.o data_printer_csv.o data_printer_ext.o data_printer_json.o data_printer_jsonstr.o data_printer_kv.o data_printer_udp.o decoder_util.o demod.o fileformat.o librtl_433.o list.o mongoose.o optparse.o output_mqtt.o pulse_analyze.o pulse_demod.o pulse_detect.o r_util.o redir_print.o samp_grab.o sdr.o term_ctl.o util.o acurite.o akhan_100F14.o alecto.o ambient_weather.o ambientweather_tx8300.o ambientweather_wh31e.o blyss.o brennenstuhl_rcs_2044.o bresser_3ch.o bresser_5in1.o bt_rain.o calibeur.o cardin.o chuango.o current_cost.o danfoss.o digitech_xc0324.o dish_remote_6_3.o dsc.o efergy_e2_classic.o efergy_optical.o elro_db286a.o elv.o emontx.o esa.o esperanza_ews.o fineoffset.o fineoffset_wh1050.o fineoffset_wh1080.o flex.o fordremote.o fs20.o ft004b.o ge_coloreffects.o generic_motion.o generic_remote.o generic_temperature_sensor.o gt_wt_02.o hideki.o hondaremote.o honeywell.o honeywell_wdb.o ht680.o ibis_beacon.o infactory.o inovalley-kw9015b.o interlogix.o intertechno.o kedsum.o kerui.o lacrosse.o lacrosse_TX141TH_Bv2.o lacrosse_tx35.o lacrosse_ws7000.o lacrossews.o lightwave_rf.o m_bus.o maverick_et73.o maverick_et73x.o mebus.o new_template.o newkaku.o nexa.o nexus.o oil_standard.o oil_watchman.o opus_xt300.o oregon_scientific.o oregon_scientific_sl109h.o oregon_scientific_v1.o philips.o prologue.o proove.o quhwa.o radiohead_ask.o rftech.o rubicson.o s3318p.o schraeder.o silvercrest.o simplisafe.o smoke_gs558.o solight_te44.o springfield.o steelmate.o tfa_pool_thermometer.o tfa_twin_plus_30.3049.o thermopro_tp11.o thermopro_tp12.o tpms_citroen.o tpms_ford.o tpms_jansite.o tpms_pmv107j.o tpms_renault.o tpms_toyota.o ttx201.o vaillant_vrt340f.o waveman.o wg_pb12v1.o wssensor.o wt0124.o wt450.o x10_rf.o x10_sec.o
+ar rcs librtl_433.a abuf.o am_analyze.o baseband.o bitbuffer.o compat_time.o config.o data.o data_printer_csv.o data_printer_ext.o data_printer_json.o data_printer_jsonstr.o data_printer_kv.o data_printer_udp.o decoder_util.o demod.o fileformat.o librtl_433.o list.o mongoose.o optparse.o output_mqtt.o pulse_analyze.o pulse_demod.o pulse_detect.o r_util.o redir_print.o samp_grab.o sdr.o term_ctl.o util.o acurite.o akhan_100F14.o alecto.o ambient_weather.o ambientweather_tx8300.o ambientweather_wh31e.o blyss.o brennenstuhl_rcs_2044.o bresser_3ch.o bresser_5in1.o bt_rain.o calibeur.o cardin.o chuango.o companion_wtr001.o current_cost.o danfoss.o digitech_xc0324.o directv.o dish_remote_6_3.o dsc.o ecowitt.o efergy_e2_classic.o efergy_optical.o elro_db286a.o elv.o emontx.o esa.o esperanza_ews.o eurochron.o fineoffset.o fineoffset_wh1050.o fineoffset_wh1080.o flex.o fordremote.o fs20.o ft004b.o ge_coloreffects.o generic_motion.o generic_remote.o generic_temperature_sensor.o gt_wt_02.o hcs200.o hideki.o hondaremote.o honeywell.o honeywell_wdb.o ht680.o ibis_beacon.o ikea_sparsnas.o infactory.o inovalley-kw9015b.o interlogix.o intertechno.o kedsum.o kerui.o lacrosse.o lacrosse_TX141TH_Bv2.o lacrosse_tx35.o lacrosse_ws7000.o lacrossews.o lightwave_rf.o m_bus.o maverick_et73.o maverick_et73x.o mebus.o new_template.o newkaku.o nexa.o nexus.o oil_standard.o oil_watchman.o opus_xt300.o oregon_scientific.o oregon_scientific_sl109h.o oregon_scientific_v1.o philips.o prologue.o proove.o quhwa.o radiohead_ask.o rftech.o rubicson.o rubicson_48659.o s3318p.o schraeder.o silvercrest.o simplisafe.o smoke_gs558.o solight_te44.o springfield.o steelmate.o tfa_30_3196.o tfa_pool_thermometer.o tfa_twin_plus_30.3049.o thermopro_tp11.o thermopro_tp12.o tpms_citroen.o tpms_ford.o tpms_jansite.o tpms_pmv107j.o tpms_renault.o tpms_toyota.o ts_ft002.o ttx201.o vaillant_vrt340f.o waveman.o wg_pb12v1.o wssensor.o wt0124.o wt450.o x10_rf.o x10_sec.o
