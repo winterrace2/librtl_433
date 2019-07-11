@@ -299,7 +299,7 @@ static int directv_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *
 
     if ((bit_len < ROW_BITLEN_MIN) || (bit_len > ROW_BITLEN_MAX)) {
         if (decoder->verbose >= 2) {
-			rtl433_fprintf(stderr, "directv: incorrect number of bits in bitbuffer: %u (expected between %u and %u).\n", bit_len, ROW_BITLEN_MIN, ROW_BITLEN_MAX);
+            rtl433_fprintf(stderr, "directv: incorrect number of bits in bitbuffer: %u (expected between %u and %u).\n", bit_len, ROW_BITLEN_MIN, ROW_BITLEN_MAX);
         }
         return 0;
     }
@@ -315,7 +315,7 @@ static int directv_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *
     // Make sure we have exactly 40 bits (DTV_BITLEN_MAX)
     if (dtv_bit_len != DTV_BITLEN_MAX) {
         if (decoder->verbose >= 2) {
-			rtl433_fprintf(stderr, "directv: Incorrect number of decoded bits: %u (should be %u).\n", dtv_bit_len, DTV_BITLEN_MAX);
+            rtl433_fprintf(stderr, "directv: Incorrect number of decoded bits: %u (should be %u).\n", dtv_bit_len, DTV_BITLEN_MAX);
         }
         return 0;
     }
@@ -323,7 +323,7 @@ static int directv_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *
     // First byte should be 0x10 (model number?)
     if (dtv_buf[0] != 0x10) {
         if (decoder->verbose >= 2) {
-			rtl433_fprintf(stderr, "directv: Incorrect Model ID number: 0x%02X (should be 0x10).\n", dtv_buf[0]);
+            rtl433_fprintf(stderr, "directv: Incorrect Model ID number: 0x%02X (should be 0x10).\n", dtv_buf[0]);
         }
         return 0;
     }
@@ -337,7 +337,7 @@ static int directv_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *
     checksum_2 = dtv_buf[4] & 0x0F;
     if (checksum_1 != checksum_2) {
         if (decoder->verbose >= 2) {
-			rtl433_fprintf(stderr, "directv: Checksum failed: 0x%01X should match 0x%01X\n", checksum_1, checksum_2);
+            rtl433_fprintf(stderr, "directv: Checksum failed: 0x%01X should match 0x%01X\n", checksum_1, checksum_2);
         }
         return 0;
     }
@@ -347,7 +347,7 @@ static int directv_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *
     dtv_device_id = dtv_buf[1] << 12 | dtv_buf[2] << 4 | dtv_buf[3] >> 4;
     if (dtv_device_id > 999999) {
         if (decoder->verbose >= 2) {
-			rtl433_fprintf(stderr, "directv: Bad Device ID: %u (should be between 000000 and 999999).\n", dtv_device_id);
+            rtl433_fprintf(stderr, "directv: Bad Device ID: %u (should be between 000000 and 999999).\n", dtv_device_id);
         }
         return 0;
     }

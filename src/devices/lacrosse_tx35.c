@@ -86,7 +86,7 @@ static int lacrosse_it(r_device *decoder, bitbuffer_t *bitbuffer, uint8_t device
         if (start_pos == bitbuffer->bits_per_row[brow])
             continue; // no preamble detected, move to the next row
         if (decoder->verbose)
-			rtl433_fprintf(stderr, "LaCrosse TX29/35 detected, buffer is %d bits length, device is TX%d\n", bitbuffer->bits_per_row[brow], device29or35);
+            rtl433_fprintf(stderr, "LaCrosse TX29/35 detected, buffer is %d bits length, device is TX%d\n", bitbuffer->bits_per_row[brow], device29or35);
         // remove preamble and keep only 64 bits
         bitbuffer_extract_bytes(bitbuffer, brow, start_pos, out, 64);
 
@@ -100,7 +100,7 @@ static int lacrosse_it(r_device *decoder, bitbuffer_t *bitbuffer, uint8_t device
         c_crc = crc8(&out[3], 4, LACROSSE_TX35_CRC_POLY, LACROSSE_TX35_CRC_INIT);
         if (r_crc != c_crc) {
             if (decoder->verbose)
-				rtl433_fprintf(stderr, "LaCrosse TX29/35 bad CRC: calculated %02x, received %02x\n", c_crc, r_crc);
+                rtl433_fprintf(stderr, "LaCrosse TX29/35 bad CRC: calculated %02x, received %02x\n", c_crc, r_crc);
             // reject row
             continue;
         }

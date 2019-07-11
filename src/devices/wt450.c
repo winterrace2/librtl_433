@@ -71,7 +71,7 @@ static int wt450_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *
 
     if (bitbuffer->bits_per_row[0] != 36) {
         if (decoder->verbose)
-			rtl433_fprintf(stderr, "wt450_callback: wrong size of bit per row %d\n",
+            rtl433_fprintf(stderr, "wt450_callback: wrong size of bit per row %d\n",
                     bitbuffer->bits_per_row[0]);
         return DECODE_ABORT_LENGTH;
     }

@@ -18,11 +18,11 @@
 #endif
 
 #ifndef librtl_433_STATIC
-#	ifdef librtl_433_EXPORTS
-#	define RTL_433_API __RTL_433_EXPORT
-#	else
-#	define RTL_433_API __RTL_433_IMPORT
-#	endif
+#   ifdef librtl_433_EXPORTS
+#   define RTL_433_API __RTL_433_EXPORT
+#   else
+#   define RTL_433_API __RTL_433_IMPORT
+#   endif
 #else
 #define RTL_433_API
 #endif

@@ -44,30 +44,30 @@ typedef struct _rtl_433 rtl_433_t;
 #define DEFAULT_LEVEL_LIMIT     0
 
 typedef enum { // used by getDriverType()
-	SDRDRV_NONE = 2,
-	SDRDRV_RTLSDR = 1,
-	SDRDRV_SOAPYSDR  = 2
+    SDRDRV_NONE = 2,
+    SDRDRV_RTLSDR = 1,
+    SDRDRV_SOAPYSDR  = 2
 } SdrDriverType;
 
 // buffer to hold localized timestamp YYYY-MM-DD HH:MM:SS
-#define LOCAL_TIME_BUFLEN	32
+#define LOCAL_TIME_BUFLEN   32
 
 typedef struct _rtl_433 {
-	#ifndef _WIN32
-		struct sigaction sigact;
-	#endif
+    #ifndef _WIN32
+        struct sigaction sigact;
+    #endif
 
-		r_cfg_t *cfg;
+        r_cfg_t *cfg;
 
-		sdr_dev_t *dev;
-		int do_exit;									// set to 1 in order to quit processing
-		int do_exit_async;								// set to 1 in order to quit 1 processing round (async frequency hopping)
-		time_t rawtime_old;								// used by async mode to check multiple frequencies hopping time
-		time_t stop_time;								// used by async mode to check duration
-		uint32_t bytes_to_read_left;					// rest of bytes_to_read (value is initialized with cfg->bytes_to_read on startup)
-		uint64_t input_pos;
-		dm_state *demod;
-		uint32_t center_frequency;
+        sdr_dev_t *dev;
+        int do_exit;                                    // set to 1 in order to quit processing
+        int do_exit_async;                              // set to 1 in order to quit 1 processing round (async frequency hopping)
+        time_t rawtime_old;                             // used by async mode to check multiple frequencies hopping time
+        time_t stop_time;                               // used by async mode to check duration
+        uint32_t bytes_to_read_left;                    // rest of bytes_to_read (value is initialized with cfg->bytes_to_read on startup)
+        uint64_t input_pos;
+        dm_state *demod;
+        uint32_t center_frequency;
         /* stats*/
         unsigned frames_count; ///< stats counter for interval
         unsigned frames_fsk; ///< stats counter for interval

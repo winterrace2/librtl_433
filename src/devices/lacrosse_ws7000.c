@@ -75,21 +75,21 @@ static int lacrosse_ws7000_decode(r_device *decoder, bitbuffer_t *bitbuffer, ext
     unsigned data_len = data_size[type];
     if (len < data_len) {
         if (decoder->verbose > 1)
-			rtl433_fprintf(stderr, "LaCrosse-WS7000: short data (%u of %u)\n", len, data_len);
+            rtl433_fprintf(stderr, "LaCrosse-WS7000: short data (%u of %u)\n", len, data_len);
         return 0;
     }
 
     // check xor sum
     if (xor_bytes(b, len - 1)) {
         if (decoder->verbose > 1)
-			rtl433_fprintf(stderr, "LaCrosse-WS7000: checksum error (xor)\n");
+            rtl433_fprintf(stderr, "LaCrosse-WS7000: checksum error (xor)\n");
         return 0;
     }
 
     // check add sum (all nibbles + 5)
     if (((add_bytes(b, len - 1) + 5) & 0xf) != b[len - 1]) {
         if (decoder->verbose > 1)
-			rtl433_fprintf(stderr, "LaCrosse-WS7000: checksum error (add)\n");
+            rtl433_fprintf(stderr, "LaCrosse-WS7000: checksum error (add)\n");
         return 0;
     }
 

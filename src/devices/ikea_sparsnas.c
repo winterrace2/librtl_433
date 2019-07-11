@@ -132,7 +132,7 @@ static int ikea_sparsnas_callback(r_device *decoder, bitbuffer_t *bitbuffer, ext
     if ((bitbuffer->bits_per_row[0] < IKEA_SPARSNAS_MESSAGE_BITLEN) || (bitbuffer->bits_per_row[0] > IKEA_SPARSNAS_MESSAGE_BITLEN_MAX)) {
         if (decoder->verbose > 1) {
             decoder_output_bitbufferf(decoder, ext, bitbuffer, "IKEA Sparsnäs");
-			rtl433_fprintf(stderr, "IKEA Sparsnäs: Too short or too long packet received. Expected %d, received %d\n", IKEA_SPARSNAS_MESSAGE_BITLEN, bitbuffer->bits_per_row[0]);
+            rtl433_fprintf(stderr, "IKEA Sparsnäs: Too short or too long packet received. Expected %d, received %d\n", IKEA_SPARSNAS_MESSAGE_BITLEN, bitbuffer->bits_per_row[0]);
         }
         return 0;
     }
@@ -143,7 +143,7 @@ static int ikea_sparsnas_callback(r_device *decoder, bitbuffer_t *bitbuffer, ext
     if ((bitbuffer->bits_per_row[0] == bitpos) || (bitpos + IKEA_SPARSNAS_MESSAGE_BITLEN > bitbuffer->bits_per_row[0])) {
         if (decoder->verbose > 1){
             decoder_output_bitbufferf(decoder, ext, bitbuffer, "IKEA Sparsnäs");
-			rtl433_fprintf(stderr, "IKEA Sparsnäs: malformed package, preamble not found. (Expected 0xAAAAD201)\n");
+            rtl433_fprintf(stderr, "IKEA Sparsnäs: malformed package, preamble not found. (Expected 0xAAAAD201)\n");
         }
         return 0;
     }
@@ -162,7 +162,7 @@ static int ikea_sparsnas_callback(r_device *decoder, bitbuffer_t *bitbuffer, ext
 
     if (crc_received != crc_calculated) {
         if (decoder->verbose > 1) {
-			rtl433_fprintf(stderr, "IKEA Sparsnäs: CRC check failed (0x%X != 0x%X)\n", crc_calculated, crc_received);
+            rtl433_fprintf(stderr, "IKEA Sparsnäs: CRC check failed (0x%X != 0x%X)\n", crc_calculated, crc_received);
         }
         return 0;
     }
@@ -170,14 +170,14 @@ static int ikea_sparsnas_callback(r_device *decoder, bitbuffer_t *bitbuffer, ext
     //Decryption
     if (!ikea_sparsnas_sensor_id){
         if (decoder->verbose > 1){
-			rtl433_fprintf(stderr, "IKEA Sparsnäs: No sensor ID configured. Brute forcing encryption.\n");
+            rtl433_fprintf(stderr, "IKEA Sparsnäs: No sensor ID configured. Brute forcing encryption.\n");
         }
         ikea_sparsnas_sensor_id = ikea_sparsnas_brute_force_encryption(buffer);
         if (decoder->verbose > 1){
             if (ikea_sparsnas_sensor_id){
-				rtl433_fprintf(stderr, "IKEA Sparsnäs: Found valid sensor ID %06d. If reported values does not make sense, this might be incorrect.\n", ikea_sparsnas_sensor_id);
+                rtl433_fprintf(stderr, "IKEA Sparsnäs: Found valid sensor ID %06d. If reported values does not make sense, this might be incorrect.\n", ikea_sparsnas_sensor_id);
             } else {
-				rtl433_fprintf(stderr, "IKEA Sparsnäs: No valid sensor ID found.\n");
+                rtl433_fprintf(stderr, "IKEA Sparsnäs: No valid sensor ID found.\n");
             }
         }
     }
@@ -204,15 +204,15 @@ static int ikea_sparsnas_callback(r_device *decoder, bitbuffer_t *bitbuffer, ext
     uint32_t rcv_sensor_id = decrypted[5] << 24 | decrypted[6] << 16 | decrypted[7] << 8 | decrypted[8];
 
     if (decoder->verbose > 1){
-		rtl433_fprintf(stderr, "IKEA Sparsnäs: CRC OK (%X == %X)\n", crc_calculated, crc_received);
-		rtl433_fprintf(stderr, "IKEA Sparsnäs: Encryption key: 0x%X%X%X%X%X\n", key[0], key[1], key[2], key[3], key[4]);
+        rtl433_fprintf(stderr, "IKEA Sparsnäs: CRC OK (%X == %X)\n", crc_calculated, crc_received);
+        rtl433_fprintf(stderr, "IKEA Sparsnäs: Encryption key: 0x%X%X%X%X%X\n", key[0], key[1], key[2], key[3], key[4]);
         decoder_output_bitrowf(decoder, ext, decrypted, 18 * 8, "Decrypted");
-		rtl433_fprintf(stderr, "IKEA Sparsnäs: Received sensor id: %d\n", rcv_sensor_id);
+        rtl433_fprintf(stderr, "IKEA Sparsnäs: Received sensor id: %d\n", rcv_sensor_id);
     }
     
     if (rcv_sensor_id != ikea_sparsnas_sensor_id) {
         if (decoder->verbose > 1){
-			rtl433_fprintf(stderr, "IKEA Sparsnäs: Malformed package, or wrong sensor id. Received sensor id (%d) not the same as sender (%d)\n", rcv_sensor_id, ikea_sparsnas_sensor_id);
+            rtl433_fprintf(stderr, "IKEA Sparsnäs: Malformed package, or wrong sensor id. Received sensor id (%d) not the same as sender (%d)\n", rcv_sensor_id, ikea_sparsnas_sensor_id);
         }
     }
 
@@ -232,14 +232,14 @@ static int ikea_sparsnas_callback(r_device *decoder, bitbuffer_t *bitbuffer, ext
     if (decrypted[0] != 0x11){
         decoder_output_bitrowf(decoder, ext, decrypted + 5, 13 * 8,  "Message malformed");
         if (decoder->verbose > 1){
-			rtl433_fprintf(stderr, "IKEA Sparsnäs: Message malformed (byte0=%X expected %X)\n", decrypted[0], 0x11);
+            rtl433_fprintf(stderr, "IKEA Sparsnäs: Message malformed (byte0=%X expected %X)\n", decrypted[0], 0x11);
         }
         return 0;
     }
     if (decrypted[3] != 0x07){
         decoder_output_bitrowf(decoder, ext, decrypted + 5, 13 * 8,  "Message malformed");
         if (decoder->verbose > 1){
-			rtl433_fprintf(stderr, "IKEA Sparsnäs: Message malformed (byte3=%X expected %X)\n", decrypted[0], 0x07);
+            rtl433_fprintf(stderr, "IKEA Sparsnäs: Message malformed (byte3=%X expected %X)\n", decrypted[0], 0x07);
         }
         return 0;
     }

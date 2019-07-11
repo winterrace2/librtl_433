@@ -7,18 +7,18 @@
 #include "bitbuffer.h"
 
 typedef struct _extdata {
-	bitbuffer_t *bitbuffer;
-	const pulse_data_t *pulses;
-	unsigned pulseexc_startidx;
-	unsigned pulseexc_len;
-	unsigned mod;
-//	unsigned samprate;
-//	unsigned freq;
+    bitbuffer_t *bitbuffer;
+    const pulse_data_t *pulses;
+    unsigned pulseexc_startidx;
+    unsigned pulseexc_len;
+    unsigned mod;
+//  unsigned samprate;
+//  unsigned freq;
 } extdata_t;
 
 typedef struct data_ext {
-	data_t      data;
-	extdata_t	ext;
+    data_t      data;
+    extdata_t   ext;
 } data_ext_t;
 
 typedef void(*rx_callback)(data_ext_t *datext);

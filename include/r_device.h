@@ -32,8 +32,8 @@ enum modulation_types {
     FSK_PULSE_MANCHESTER_ZEROBIT =  18, ///< FSK, Manchester encoding.
     FSK_DEMOD_MAX_VAL =             18, ///< Dummy. FSK demodulation must ends at this value.
 
-	UNKNOWN_OOK =                  101,
-	UNKNOWN_FSK =                  102,
+    UNKNOWN_OOK =                  101,
+    UNKNOWN_FSK =                  102,
 };
 
 /** Decoders should return n>0 for n packets successfully decoded,

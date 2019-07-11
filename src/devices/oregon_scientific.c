@@ -147,7 +147,7 @@ static int validate_os_checksum(r_device *decoder, unsigned char *msg, int check
     }
     else {
         if (decoder->verbose) {
-			rtl433_fprintf(stderr, "Checksum error in Oregon Scientific message.    Expected: %02x    Calculated: %02x\n", checksum, sum_of_nibbles);
+            rtl433_fprintf(stderr, "Checksum error in Oregon Scientific message.    Expected: %02x    Calculated: %02x\n", checksum, sum_of_nibbles);
             bitrow_printf(msg, ((checksum_nibble_idx + 4) >> 1) * 8, "Message: ");
         }
         return 1;
@@ -196,7 +196,7 @@ static int oregon_scientific_v2_1_decode(r_device *decoder, bitbuffer_t *bitbuff
         unsigned int pattern2 = (unsigned int)(0xaa990000 >> pattern_index);
 
         if (decoder->verbose) {
-			rtl433_fprintf(stderr, "OS v2.1 sync byte search - test_val=%08x pattern=%08x    mask=%08x\n", sync_test_val, pattern, mask);
+            rtl433_fprintf(stderr, "OS v2.1 sync byte search - test_val=%08x pattern=%08x    mask=%08x\n", sync_test_val, pattern, mask);
         }
 
         if (((sync_test_val & mask) != pattern)
@@ -206,7 +206,7 @@ static int oregon_scientific_v2_1_decode(r_device *decoder, bitbuffer_t *bitbuff
         // Found sync byte - start working on decoding the stream data.
         // pattern_index indicates    where sync nibble starts, so now we can find the start of the payload
         if (decoder->verbose) {
-			rtl433_fprintf(stderr, "OS v2.1 Sync test val %08x found, starting decode at bit %d\n", sync_test_val, pattern_index);
+            rtl433_fprintf(stderr, "OS v2.1 Sync test val %08x found, starting decode at bit %d\n", sync_test_val, pattern_index);
         }
 
         //bitrow_printf(b, bitbuffer->bits_per_row[0], "Raw OSv2 bits: ");
@@ -613,7 +613,7 @@ static int oregon_scientific_v3_decode(r_device *decoder, bitbuffer_t *bitbuffer
                     "power_W",        "Power",            DATA_FORMAT,    "%d W",DATA_INT, ipower,
                     "energy_kWh", "Energy",         DATA_FORMAT,    "%2.1f kWh",DATA_DOUBLE, total_energy,
                     NULL);
-	        decoder_output_data(decoder, data, ext);
+            decoder_output_data(decoder, data, ext);
             return 1;
         }
         else if (!itotal) {
@@ -623,20 +623,20 @@ static int oregon_scientific_v3_decode(r_device *decoder, bitbuffer_t *bitbuffer
                     "id",         "House Code", DATA_INT, msg[1]&0x0F,
                     "power_W", "Power",         DATA_FORMAT,    "%d W",DATA_INT, ipower,
                     NULL);
-	        decoder_output_data(decoder, data, ext);
+            decoder_output_data(decoder, data, ext);
             return 1;
         }
     }
     else if ((msg[0] != 0) && (msg[1]!= 0)) { // sync nibble was found    and some data is present...
         if (decoder->verbose) {
-			rtl433_fprintf(stderr, "Message received from unrecognized Oregon Scientific v3 sensor.\n");
+            rtl433_fprintf(stderr, "Message received from unrecognized Oregon Scientific v3 sensor.\n");
             bitrow_printf(msg, msg_len, "Message: ");
             bitrow_printf(b, bitbuffer->bits_per_row[0], "Raw: ");
         }
     }
     else if (b[3] != 0 ) {
         if (decoder->verbose) {
-			rtl433_fprintf(stderr, "Possible Oregon Scientific v3 message, but sync nibble wasn't found\n");
+            rtl433_fprintf(stderr, "Possible Oregon Scientific v3 message, but sync nibble wasn't found\n");
             bitrow_printf(b, bitbuffer->bits_per_row[0], "Raw Data: ");
         }
     }

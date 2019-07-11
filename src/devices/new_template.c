@@ -168,7 +168,7 @@ static int new_template_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdat
 
     if (!parity) {
         if (decoder->verbose) {
-			rtl433_fprintf(stderr, "%s: parity check failed\n", __func__);
+            rtl433_fprintf(stderr, "%s: parity check failed\n", __func__);
         }
         return 0;
     }
@@ -178,7 +178,7 @@ static int new_template_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdat
      */
     if (((b[0] + b[1] + b[2] + b[3] - b[4]) & 0xFF) != 0) {
         if (decoder->verbose) {
-			rtl433_fprintf(stderr, "%s: checksum error\n", __func__);
+            rtl433_fprintf(stderr, "%s: checksum error\n", __func__);
         }
         return 0;
     }
@@ -219,7 +219,7 @@ static int new_template_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdat
     }
 
     /* clang-format off */
-	data = data_make(
+    data = data_make(
             "model", "", DATA_STRING, "New Template",
             "id",    "", DATA_INT,    sensor_id,
             "data",  "", DATA_INT,    value,
