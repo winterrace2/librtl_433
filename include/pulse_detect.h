@@ -15,7 +15,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "r_util.h"
-#include "librtl_433_export.h"
 
 #define PD_MAX_PULSES 1200      // Maximum number of pulses before forcing End Of Package
 #define PD_MIN_PULSES 16        // Minimum number of pulses before declaring a proper package
@@ -45,6 +44,12 @@ typedef struct pulse_data {
     float noise_db;
 } pulse_data_t;
 
+// Package types
+enum package_types {
+    PULSE_DATA_OOK = 1,
+    PULSE_DATA_FSK = 2,
+};
+
 typedef struct pulse_detect pulse_detect_t;
 
 /// Clear the content of a pulse_data_t structure.
@@ -57,19 +62,19 @@ void pulse_data_print(pulse_data_t const *data);
 void pulse_data_dump_raw(uint8_t *buf, unsigned len, uint64_t buf_offset, pulse_data_t const *data, uint8_t bits);
 
 /// Print a header for the VCD format.
-RTL_433_API void pulse_data_print_vcd_header(FILE *file, uint32_t sample_rate);
+void pulse_data_print_vcd_header(FILE *file, uint32_t sample_rate);
 
 /// Print the content of a pulse_data_t structure in VCD format.
-RTL_433_API void pulse_data_print_vcd(FILE *file, pulse_data_t const *data, int ch_id);
+void pulse_data_print_vcd(FILE *file, pulse_data_t const *data, int ch_id);
 
 /// Read the next pulse_data_t structure from OOK text.
 void pulse_data_load(FILE *file, pulse_data_t *data);
 
 /// Print a header for the OOK text format.
-RTL_433_API void pulse_data_print_pulse_header(FILE *file);
+void pulse_data_print_pulse_header(FILE *file);
 
 /// Print the content of a pulse_data_t structure as OOK text.
-RTL_433_API void pulse_data_dump(FILE *file, pulse_data_t *data);
+void pulse_data_dump(FILE *file, pulse_data_t *data);
 
 pulse_detect_t *pulse_detect_create(void);
 
@@ -87,13 +92,10 @@ void pulse_detect_free(pulse_detect_t *pulse_detect);
 /// @return 0 if all input sample data is processed
 /// @return 1 if OOK package is detected (but all sample data is still not completely processed)
 /// @return 2 if FSK package is detected (but all sample data is still not completely processed)
+int pulse_detect_package(pulse_detect_t *pulse_detect, int16_t const *envelope_data, int16_t const *fm_data, int len, int16_t level_limit, uint32_t samp_rate, uint64_t sample_offset, pulse_data_t *pulses, pulse_data_t *fsk_pulses);
 
-typedef enum {
-	PULSEDETECTION_OUTOFDATA = 0,
-	PULSEDETECTION_OOK = 1,
-	PULSEDETECTION_FSK = 2
-} PulseDetectionResult;
+/// Analyze and print result.
+void pulse_analyzer(pulse_data_t *data, int package_type);
 
-PulseDetectionResult pulse_detect_package(pulse_detect_t *pulse_detect, int16_t const *envelope_data, int16_t const *fm_data, int len, int16_t level_limit, uint32_t samp_rate, uint64_t sample_offset, pulse_data_t *pulses, pulse_data_t *fsk_pulses);
 
 #endif /* INCLUDE_PULSE_DETECT_H_ */

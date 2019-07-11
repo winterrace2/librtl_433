@@ -9,10 +9,10 @@
     (at your option) any later version.
 */
 
+#include "util.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "util.h"
 
 uint8_t reverse8(uint8_t x)
 {
@@ -180,7 +180,7 @@ uint8_t lfsr_digest8(uint8_t const message[], unsigned bytes, uint8_t gen, uint8
     for (unsigned k = 0; k < bytes; ++k) {
         uint8_t data = message[k];
         for (int i = 7; i >= 0; --i) {
-            // rtl433_fprintf(stderr, "key is %02x\n", key);
+            // fprintf(stderr, "key is %02x\n", key);
             // XOR key into sum if data bit is set
             if ((data >> i) & 1)
                 sum ^= key;
@@ -200,7 +200,7 @@ uint16_t lfsr_digest16(uint32_t data, int bits, uint16_t gen, uint16_t key)
 {
     uint16_t sum = 0;
     for (int bit = bits - 1; bit >= 0; --bit) {
-        // rtl433_fprintf(stderr, "key at bit %d : %04x\n", bit, key);
+        // fprintf(stderr, "key at bit %d : %04x\n", bit, key);
         // if data bit is set then xor with key
         if ((data >> bit) & 1)
             sum ^= key;
@@ -219,7 +219,7 @@ uint16_t lfsr_digest16(uint32_t data, int bits, uint16_t gen, uint16_t key)
 void lfsr_keys_fwd16(int rounds, uint16_t gen, uint16_t key)
 {
     for (int i = 0; i <= rounds; ++i) {
-        rtl433_fprintf(stderr, "key at bit %d : %04x\n", i, key);
+        fprintf(stderr, "key at bit %d : %04x\n", i, key);
 
         // roll the key right (actually the lsb is dropped here)
         // and apply the gen (needs to include the dropped lsb as msb)
@@ -233,7 +233,7 @@ void lfsr_keys_fwd16(int rounds, uint16_t gen, uint16_t key)
 void lfsr_keys_rwd16(int rounds, uint16_t gen, uint16_t key)
 {
     for (int i = 0; i <= rounds; ++i) {
-        rtl433_fprintf(stderr, "key at bit -%d : %04x\n", i, key);
+        fprintf(stderr, "key at bit -%d : %04x\n", i, key);
 
         // roll the key left (actually the msb is dropped here)
         // and apply the gen (needs to include the dropped msb as lsb)
@@ -280,35 +280,24 @@ int add_bytes(uint8_t const message[], unsigned num_bytes)
     return result;
 }
 
-// moved from optparse:
-char *asepc(char **stringp, char delim)
+int add_nibbles(uint8_t const message[], unsigned num_bytes)
 {
-    if (!stringp || !*stringp) return NULL;
-    char *s = strchr(*stringp, delim);
-    if (s) *s++ = '\0';
-    char *p = *stringp;
-    *stringp = s;
-    return p;
-}
-
-char *getkwargs(char **s, char **key, char **val)
-{
-    char *v = asepc(s, ',');
-    char *k = asepc(&v, '=');
-    if (key) *key = k;
-    if (val) *val = v;
-    return k;
+    int result = 0;
+    for (unsigned i = 0; i < num_bytes; ++i) {
+        result += (message[i] >> 4) + (message[i] & 0x0f);
+    }
+    return result;
 }
 
 // Unit testing
 #ifdef _TEST
 int main(int argc, char **argv) {
-    rtl433_fprintf(stderr, "util:: test\n");
+    fprintf(stderr, "util:: test\n");
 
     uint8_t msg[] = {0x08, 0x0a, 0xe8, 0x80};
 
-    rtl433_fprintf(stderr, "util::crc8(): odd parity:  %02X\n", crc8(msg, 3, 0x80, 0x00));
-    rtl433_fprintf(stderr, "util::crc8(): even parity: %02X\n", crc8(msg, 4, 0x80, 0x00));
+    fprintf(stderr, "util::crc8(): odd parity:  %02X\n", crc8(msg, 3, 0x80, 0x00));
+    fprintf(stderr, "util::crc8(): even parity: %02X\n", crc8(msg, 4, 0x80, 0x00));
 
     return 0;
 }

@@ -13,7 +13,6 @@
 #define INCLUDE_LIST_H_
 
 #include <stddef.h>
-#include "librtl_433_export.h"
 
 /// Dynamically growing list, elems is always NULL terminated, call list_ensure_size() to alloc elems.
 typedef struct list {
@@ -22,27 +21,24 @@ typedef struct list {
     size_t len;
 } list_t;
 
-typedef void(*list_elem_free_fn)(void *);
-
-// ensure that list object is initially empty (should be used if the used memory is not guaranteed to start with all 0-bytes)
-RTL_433_API void list_initialize(list_t *list);
+typedef void (*list_elem_free_fn)(void *);
 
 /// Alloc elems if needed and ensure the list has room for at least min_size elements.
-RTL_433_API void list_ensure_size(list_t *list, size_t min_size);
+void list_ensure_size(list_t *list, size_t min_size);
 
 /// Add to the end of elems, allocs or grows the list if needed and ensures the list has a terminating NULL.
-RTL_433_API void list_push(list_t *list, void *p);
+void list_push(list_t *list, void *p);
 
 /// Adds all elements of a NULL terminated list to the end of elems, allocs or grows the list if needed and ensures the list has a terminating NULL.
-RTL_433_API void list_push_all(list_t *list, void **p);
+void list_push_all(list_t *list, void **p);
 
 /// Remove element from the list, frees element with fn.
-RTL_433_API void list_remove(list_t *list, size_t idx, list_elem_free_fn elem_free);
+void list_remove(list_t *list, size_t idx, list_elem_free_fn elem_free);
 
 /// Clear the list, frees each element with fn, does not free backing or list itself.
-RTL_433_API void list_clear(list_t *list, list_elem_free_fn elem_free);
+void list_clear(list_t *list, list_elem_free_fn elem_free);
 
 /// Clear the list, free backing, does not free list itself.
-RTL_433_API void list_free_elems(list_t *list, list_elem_free_fn elem_free);
+void list_free_elems(list_t *list, list_elem_free_fn elem_free);
 
-#endif // INCLUDE_LIST_H_
+#endif /* INCLUDE_LIST_H_ */
