@@ -51,7 +51,7 @@ static int fordremote_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdat
 				"id",		"device-id",	DATA_INT, device_id,
 				"code", 	"data",		DATA_INT, code,
 				NULL);
-		decoder_output_data(decoder, data, ext);
+        decoder_output_data(decoder, data, ext);
 
 		found++;
 	}

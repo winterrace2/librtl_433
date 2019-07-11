@@ -26,7 +26,7 @@ rtl_433 -R 0 -X 'n=name,m=OOK_PWM,s=370,l=772,r=14000,g=4000,t=152,y=0,preamble=
 
 #include "decoder.h"
 
-static int hcs200_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int hcs200_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     uint8_t *b = bitbuffer->bb[0];
@@ -64,7 +64,7 @@ static int hcs200_callback(r_device *decoder, bitbuffer_t *bitbuffer)
             NULL);
     /* clang-format on */
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
     return 1;
 }
 

@@ -149,7 +149,7 @@ battery change for each value
 {32} 1a e4 0c 64    -24
 */
 
-static int rubicson_48659_decode(r_device *decoder, bitbuffer_t *bitbuffer)
+static int rubicson_48659_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     int row;
     bitrow_t *bb = bitbuffer->bb;
@@ -178,7 +178,7 @@ static int rubicson_48659_decode(r_device *decoder, bitbuffer_t *bitbuffer)
             NULL);
     /* clang-format on */
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
     return 1;
 }
 

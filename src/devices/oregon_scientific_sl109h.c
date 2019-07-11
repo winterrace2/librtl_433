@@ -20,7 +20,7 @@ S.a. http://www.osengr.org/WxShield/Downloads/OregonScientific-RF-Protocols-II.p
 
 #include "decoder.h"
 
-static int oregon_scientific_sl109h_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int oregon_scientific_sl109h_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     uint8_t *msg;
@@ -78,7 +78,7 @@ static int oregon_scientific_sl109h_callback(r_device *decoder, bitbuffer_t *bit
                 NULL);
         /* clang-format on */
 
-        decoder_output_data(decoder, data);
+        decoder_output_data(decoder, data, ext);
         return 1;
     }
 

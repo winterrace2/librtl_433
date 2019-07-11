@@ -87,12 +87,12 @@ static int rtltcp_open(sdr_dev_t **out_dev, int *sample_size, char *dev_query, i
     char *port = "1234";
 
     char *param = arg_param(dev_query);
-	if (!hostport_param(param, &host, &port)) {
-		rtl433_fprintf(stderr, "Bad host/port param.\n");
-		return -1;
-	};
+    if (!hostport_param(param, &host, &port)) {
+        rtl433_fprintf(stderr, "Bad host/port param.\n");
+        return -1;
+    };
 
-	rtl433_fprintf(stderr, "rtl_tcp input from %s port %s\n", host, port);
+    rtl433_fprintf(stderr, "rtl_tcp input from %s port %s\n", host, port);
 
     struct addrinfo hints, *res, *res0;
     int ret;
@@ -107,7 +107,7 @@ static int rtltcp_open(sdr_dev_t **out_dev, int *sample_size, char *dev_query, i
 
     ret = getaddrinfo(host, port, &hints, &res0);
     if (ret) {
-		rtl433_fprintf(stderr, "%s\n", gai_strerror(ret));
+        rtl433_fprintf(stderr, "%s\n", gai_strerror(ret));
         return -1;
     }
     sock = INVALID_SOCKET;
@@ -137,12 +137,12 @@ static int rtltcp_open(sdr_dev_t **out_dev, int *sample_size, char *dev_query, i
     struct rtl_tcp_info info;
     ret = recv(sock, (char *)&info, sizeof (info), 0);
     if (ret != 12) {
-		rtl433_fprintf(stderr, "Bad rtl_tcp header (%d)\n", ret);
+        rtl433_fprintf(stderr, "Bad rtl_tcp header (%d)\n", ret);
         return -1;
     }
     if (strncmp(info.magic, "RTL0", 4)) {
         info.tuner_number = 0; // terminate magic
-		rtl433_fprintf(stderr, "Bad rtl_tcp header magic \"%s\"\n", info.magic);
+        rtl433_fprintf(stderr, "Bad rtl_tcp header magic \"%s\"\n", info.magic);
         return -1;
     }
 
@@ -152,7 +152,7 @@ static int rtltcp_open(sdr_dev_t **out_dev, int *sample_size, char *dev_query, i
     char const *tuner_names[] = { "Unknown", "E4000", "FC0012", "FC0013", "FC2580", "R820T", "R828D" };
     char const *tuner_name = tuner_number > sizeof (tuner_names) ? "Invalid" : tuner_names[tuner_number];
 
-	rtl433_fprintf(stderr, "rtl_tcp connected to %s:%s (Tuner: %s)\n", host, port, tuner_name);
+    rtl433_fprintf(stderr, "rtl_tcp connected to %s:%s (Tuner: %s)\n", host, port, tuner_name);
 
     sdr_dev_t *dev = calloc(1, sizeof(sdr_dev_t));
 
@@ -210,7 +210,7 @@ static int rtltcp_read_loop(sdr_dev_t *dev, sdr_read_cb_t cb, void *ctx, uint32_
         //rtl433_fprintf(stderr, "readStream ret=%d (read %u)\n", r, n_read);
 
         if (r < 0) {
-			rtl433_fprintf(stderr, "WARNING: sync read failed. %d\n", r);
+            rtl433_fprintf(stderr, "WARNING: sync read failed. %d\n", r);
         }
         if (n_read == 0) {
             perror("rtl_tcp");
@@ -265,12 +265,12 @@ static int sdr_open_rtl(sdr_dev_t **out_dev, int *sample_size, char *dev_query, 
 {
     uint32_t device_count = rtlsdr_get_device_count();
     if (!device_count) {
-		rtl433_fprintf(stderr, "No supported devices found.\n");
+        rtl433_fprintf(stderr, "No supported devices found.\n");
         return -1;
     }
 
     if (verbose)
-		rtl433_fprintf(stderr, "Found %d device(s)\n\n", device_count);
+        rtl433_fprintf(stderr, "Found %d device(s)\n\n", device_count);
 
     int dev_index = 0;
     // select rtlsdr device by serial (-d :<serial>)
@@ -278,7 +278,7 @@ static int sdr_open_rtl(sdr_dev_t **out_dev, int *sample_size, char *dev_query, 
         dev_index = rtlsdr_get_index_by_serial(&dev_query[1]);
         if (dev_index < 0) {
             if (verbose)
-				rtl433_fprintf(stderr, "Could not find device with serial '%s' (err %d)",
+                rtl433_fprintf(stderr, "Could not find device with serial '%s' (err %d)",
                         &dev_query[1], dev_index);
             return -1;
         }
@@ -306,17 +306,17 @@ static int sdr_open_rtl(sdr_dev_t **out_dev, int *sample_size, char *dev_query, 
         rtlsdr_get_device_usb_strings(i, vendor, product, serial);
 
         if (verbose)
-			rtl433_fprintf(stderr, "trying device  %d:  %s, %s, SN: %s\n",
+            rtl433_fprintf(stderr, "trying device  %d:  %s, %s, SN: %s\n",
                     i, vendor, product, serial);
 
         r = rtlsdr_open(&dev->rtlsdr_dev, i);
         if (r < 0) {
             if (verbose)
-				rtl433_fprintf(stderr, "Failed to open rtlsdr device #%d.\n\n", i);
+                rtl433_fprintf(stderr, "Failed to open rtlsdr device #%d.\n\n", i);
         }
         else {
             if (verbose)
-				rtl433_fprintf(stderr, "Using device %d: %s\n",
+                rtl433_fprintf(stderr, "Using device %d: %s\n",
                         i, rtlsdr_get_device_name(i));
             dev->sample_size = sizeof(uint8_t); // CU8
             *sample_size = sizeof(uint8_t); // CU8
@@ -326,7 +326,7 @@ static int sdr_open_rtl(sdr_dev_t **out_dev, int *sample_size, char *dev_query, 
     if (r < 0) {
         free(dev);
         if (verbose)
-			rtl433_fprintf(stderr, "Unable to open a device\n");
+            rtl433_fprintf(stderr, "Unable to open a device\n");
     }
     else {
         *out_dev = dev;
@@ -346,17 +346,17 @@ static int soapysdr_set_bandwidth(SoapySDRDevice *dev, uint32_t bandwidth)
     r = (int)SoapySDRDevice_setBandwidth(dev, SOAPY_SDR_RX, 0, (double)bandwidth);
     uint32_t applied_bw = 0;
     if (r != 0) {
-		rtl433_fprintf(stderr, "WARNING: Failed to set bandwidth.\n");
+        rtl433_fprintf(stderr, "WARNING: Failed to set bandwidth.\n");
     }
     else if (bandwidth > 0) {
         applied_bw = (uint32_t)SoapySDRDevice_getBandwidth(dev, SOAPY_SDR_RX, 0);
         if (applied_bw)
-			rtl433_fprintf(stderr, "Bandwidth parameter %u Hz resulted in %u Hz.\n", bandwidth, applied_bw);
+            rtl433_fprintf(stderr, "Bandwidth parameter %u Hz resulted in %u Hz.\n", bandwidth, applied_bw);
         else
-			rtl433_fprintf(stderr, "Set bandwidth parameter %u Hz.\n", bandwidth);
+            rtl433_fprintf(stderr, "Set bandwidth parameter %u Hz.\n", bandwidth);
     }
     else {
-		rtl433_fprintf(stderr, "Bandwidth set to automatic resulted in %u Hz.\n", applied_bw);
+        rtl433_fprintf(stderr, "Bandwidth set to automatic resulted in %u Hz.\n", applied_bw);
     }
     return r;
 }
@@ -377,17 +377,17 @@ static int soapysdr_direct_sampling(SoapySDRDevice *dev, int on)
     set_value = SoapySDRDevice_readSetting(dev, "direct_samp");
 
     if (set_value == NULL) {
-		rtl433_fprintf(stderr, "WARNING: Failed to set direct sampling mode.\n");
+        rtl433_fprintf(stderr, "WARNING: Failed to set direct sampling mode.\n");
         return r;
     }
     if (atoi(set_value) == 0) {
-		rtl433_fprintf(stderr, "Direct sampling mode disabled.\n");}
+        rtl433_fprintf(stderr, "Direct sampling mode disabled.\n");}
     if (atoi(set_value) == 1) {
-		rtl433_fprintf(stderr, "Enabled direct sampling mode, input 1/I.\n");}
+        rtl433_fprintf(stderr, "Enabled direct sampling mode, input 1/I.\n");}
     if (atoi(set_value) == 2) {
-		rtl433_fprintf(stderr, "Enabled direct sampling mode, input 2/Q.\n");}
+        rtl433_fprintf(stderr, "Enabled direct sampling mode, input 2/Q.\n");}
     if (on == 3) {
-		rtl433_fprintf(stderr, "Enabled no-mod direct sampling mode.\n");}
+        rtl433_fprintf(stderr, "Enabled no-mod direct sampling mode.\n");}
     return r;
 }
 
@@ -405,10 +405,10 @@ static int soapysdr_offset_tuning(SoapySDRDevice *dev)
             rtl433_fprintf(stderr, "WARNING: Failed to set offset tuning: direct sampling not combinable with offset tuning!\n");
         else
         */
-		    rtl433_fprintf(stderr, "WARNING: Failed to set offset tuning.\n");
+            rtl433_fprintf(stderr, "WARNING: Failed to set offset tuning.\n");
     }
     else {
-		rtl433_fprintf(stderr, "Offset tuning mode enabled.\n");
+        rtl433_fprintf(stderr, "Offset tuning mode enabled.\n");
     }
     return r;
 }
@@ -421,11 +421,11 @@ static int soapysdr_auto_gain(SoapySDRDevice *dev, int verbose)
     if (r) {
         r = SoapySDRDevice_setGainMode(dev, SOAPY_SDR_RX, 0, 1);
         if (r != 0) {
-			rtl433_fprintf(stderr, "WARNING: Failed to enable automatic gain.\n");
+            rtl433_fprintf(stderr, "WARNING: Failed to enable automatic gain.\n");
         }
         else {
             if (verbose)
-				rtl433_fprintf(stderr, "Tuner set to automatic gain.\n");
+                rtl433_fprintf(stderr, "Tuner set to automatic gain.\n");
         }
     }
 
@@ -438,15 +438,15 @@ static int soapysdr_auto_gain(SoapySDRDevice *dev, int verbose)
         // TODO: generic means to set all gains, of any SDR? string parsing LNA=#,VGA=#,AMP=#?
         r = SoapySDRDevice_setGainElement(dev, SOAPY_SDR_RX, 0, "LNA", 40.); // max 40
         if (r != 0) {
-			rtl433_fprintf(stderr, "WARNING: Failed to set LNA tuner gain.\n");
+            rtl433_fprintf(stderr, "WARNING: Failed to set LNA tuner gain.\n");
         }
         r = SoapySDRDevice_setGainElement(dev, SOAPY_SDR_RX, 0, "VGA", 20.); // max 65
         if (r != 0) {
-			rtl433_fprintf(stderr, "WARNING: Failed to set VGA tuner gain.\n");
+            rtl433_fprintf(stderr, "WARNING: Failed to set VGA tuner gain.\n");
         }
         r = SoapySDRDevice_setGainElement(dev, SOAPY_SDR_RX, 0, "AMP", 0.); // on or off
         if (r != 0) {
-			rtl433_fprintf(stderr, "WARNING: Failed to set AMP tuner gain.\n");
+            rtl433_fprintf(stderr, "WARNING: Failed to set AMP tuner gain.\n");
         }
 
     }
@@ -465,11 +465,11 @@ static int soapysdr_gain_str_set(SoapySDRDevice *dev, char *gain_str, int verbos
     if (r) {
         r = SoapySDRDevice_setGainMode(dev, SOAPY_SDR_RX, 0, 0);
         if (r != 0) {
-			rtl433_fprintf(stderr, "WARNING: Failed to disable automatic gain.\n");
+            rtl433_fprintf(stderr, "WARNING: Failed to disable automatic gain.\n");
         }
         else {
             if (verbose)
-				rtl433_fprintf(stderr, "Tuner set to manual gain.\n");
+                rtl433_fprintf(stderr, "Tuner set to manual gain.\n");
         }
     }
 
@@ -480,10 +480,10 @@ static int soapysdr_gain_str_set(SoapySDRDevice *dev, char *gain_str, int verbos
         while (getkwargs(&gain_str, &name, &value)) {
             double num = atof(value);
             if (verbose)
-				rtl433_fprintf(stderr, "Setting gain element %s: %f dB\n", name, num);
+                rtl433_fprintf(stderr, "Setting gain element %s: %f dB\n", name, num);
             r = SoapySDRDevice_setGainElement(dev, SOAPY_SDR_RX, 0, name, num);
             if (r != 0) {
-				rtl433_fprintf(stderr, "WARNING: setGainElement(%s, %f) failed: %d\n", name, num, r);
+                rtl433_fprintf(stderr, "WARNING: setGainElement(%s, %f) failed: %d\n", name, num, r);
             }
         }
     }
@@ -492,22 +492,22 @@ static int soapysdr_gain_str_set(SoapySDRDevice *dev, char *gain_str, int verbos
         double value = atof(gain_str);
         r = SoapySDRDevice_setGain(dev, SOAPY_SDR_RX, 0, value);
         if (r != 0) {
-			rtl433_fprintf(stderr, "WARNING: Failed to set tuner gain.\n");
+            rtl433_fprintf(stderr, "WARNING: Failed to set tuner gain.\n");
         }
         else {
             if (verbose)
-				rtl433_fprintf(stderr, "Tuner gain set to %0.2f dB.\n", value);
+                rtl433_fprintf(stderr, "Tuner gain set to %0.2f dB.\n", value);
         }
         // read back and print each individual gain element
         if (verbose) {
             size_t len = 0;
             char **gains = SoapySDRDevice_listGains(dev, SOAPY_SDR_RX, 0, &len);
-			rtl433_fprintf(stderr, "Gain elements: ");
+            rtl433_fprintf(stderr, "Gain elements: ");
             for (size_t i = 0; i < len; ++i) {
                 double gain = SoapySDRDevice_getGain(dev, SOAPY_SDR_RX, 0);
-				rtl433_fprintf(stderr, "%s=%g ", gains[i], gain);
+                rtl433_fprintf(stderr, "%s=%g ", gains[i], gain);
             }
-			rtl433_fprintf(stderr, "\n");
+            rtl433_fprintf(stderr, "\n");
         }
     }
 
@@ -533,72 +533,72 @@ static void soapysdr_show_device_info(SoapySDRDevice *dev)
     size_t channel = 0;
 
     hwkey = SoapySDRDevice_getHardwareKey(dev);
-	rtl433_fprintf(stderr, "Using device %s: ", hwkey);
+    rtl433_fprintf(stderr, "Using device %s: ", hwkey);
 
     args = SoapySDRDevice_getHardwareInfo(dev);
     for (i = 0; i < args.size; ++i) {
-		rtl433_fprintf(stderr, "%s=%s ", args.keys[i], args.vals[i]);
+        rtl433_fprintf(stderr, "%s=%s ", args.keys[i], args.vals[i]);
     }
-	rtl433_fprintf(stderr, "\n");
+    rtl433_fprintf(stderr, "\n");
 
     antennas = SoapySDRDevice_listAntennas(dev, direction, channel, &len);
-	rtl433_fprintf(stderr, "Found %zu antenna(s): ", len);
+    rtl433_fprintf(stderr, "Found %zu antenna(s): ", len);
     for (i = 0; i < len; ++i) {
-		rtl433_fprintf(stderr, "%s ", antennas[i]);
+        rtl433_fprintf(stderr, "%s ", antennas[i]);
     }
-	rtl433_fprintf(stderr, "\n");
+    rtl433_fprintf(stderr, "\n");
 
     gains = SoapySDRDevice_listGains(dev, direction, channel, &len);
-	rtl433_fprintf(stderr, "Found %zu gain(s): ", len);
+    rtl433_fprintf(stderr, "Found %zu gain(s): ", len);
     for (i = 0; i < len; ++i) {
         SoapySDRRange gainRange = SoapySDRDevice_getGainRange(dev, direction, channel);
-		rtl433_fprintf(stderr, "%s %.0f - %.0f (step %.0f) ", gains[i], gainRange.minimum, gainRange.maximum, gainRange.step);
+        rtl433_fprintf(stderr, "%s %.0f - %.0f (step %.0f) ", gains[i], gainRange.minimum, gainRange.maximum, gainRange.step);
     }
-	rtl433_fprintf(stderr, "\n");
+    rtl433_fprintf(stderr, "\n");
 
     frequencies = SoapySDRDevice_listFrequencies(dev, direction, channel, &len);
-	rtl433_fprintf(stderr, "Found %zu frequencies: ", len);
+    rtl433_fprintf(stderr, "Found %zu frequencies: ", len);
     for (i = 0; i < len; ++i) {
-		rtl433_fprintf(stderr, "%s ", frequencies[i]);
+        rtl433_fprintf(stderr, "%s ", frequencies[i]);
     }
-	rtl433_fprintf(stderr, "\n");
+    rtl433_fprintf(stderr, "\n");
 
     frequencyRanges = SoapySDRDevice_getFrequencyRange(dev, direction, channel, &len);
-	rtl433_fprintf(stderr, "Found %zu frequency range(s): ", len);
+    rtl433_fprintf(stderr, "Found %zu frequency range(s): ", len);
     for (i = 0; i < len; ++i) {
-		rtl433_fprintf(stderr, "%.0f - %.0f (step %.0f) ", frequencyRanges[i].minimum, frequencyRanges[i].maximum, frequencyRanges[i].step);
+        rtl433_fprintf(stderr, "%.0f - %.0f (step %.0f) ", frequencyRanges[i].minimum, frequencyRanges[i].maximum, frequencyRanges[i].step);
     }
-	rtl433_fprintf(stderr, "\n");
+    rtl433_fprintf(stderr, "\n");
 
     rates = SoapySDRDevice_getSampleRateRange(dev, direction, channel, &len);
-	rtl433_fprintf(stderr, "Found %zu sample rate range(s): ", len);
+    rtl433_fprintf(stderr, "Found %zu sample rate range(s): ", len);
     for (i = 0; i < len; ++i) {
         if (rates[i].minimum == rates[i].maximum)
-			rtl433_fprintf(stderr, "%.0f ", rates[i].minimum);
+            rtl433_fprintf(stderr, "%.0f ", rates[i].minimum);
         else
-			rtl433_fprintf(stderr, "%.0f - %.0f (step %.0f) ", rates[i].minimum, rates[i].maximum, rates[i].step);
+            rtl433_fprintf(stderr, "%.0f - %.0f (step %.0f) ", rates[i].minimum, rates[i].maximum, rates[i].step);
     }
-	rtl433_fprintf(stderr, "\n");
+    rtl433_fprintf(stderr, "\n");
 
     bandwidths = SoapySDRDevice_getBandwidthRange(dev, direction, channel, &len);
-	rtl433_fprintf(stderr, "Found %zu bandwidth range(s): ", len);
+    rtl433_fprintf(stderr, "Found %zu bandwidth range(s): ", len);
     for (i = 0; i < len; ++i) {
-		rtl433_fprintf(stderr, "%.0f - %.0f (step %.0f) ", bandwidths[i].minimum, bandwidths[i].maximum, bandwidths[i].step);
+        rtl433_fprintf(stderr, "%.0f - %.0f (step %.0f) ", bandwidths[i].minimum, bandwidths[i].maximum, bandwidths[i].step);
     }
-	rtl433_fprintf(stderr, "\n");
+    rtl433_fprintf(stderr, "\n");
 
     double bandwidth = SoapySDRDevice_getBandwidth(dev, direction, channel);
-	rtl433_fprintf(stderr, "Found current bandwidth %.0f\n", bandwidth);
+    rtl433_fprintf(stderr, "Found current bandwidth %.0f\n", bandwidth);
 
     stream_formats = SoapySDRDevice_getStreamFormats(dev, direction, channel, &len);
-	rtl433_fprintf(stderr, "Found %zu stream format(s): ", len);
+    rtl433_fprintf(stderr, "Found %zu stream format(s): ", len);
     for (i = 0; i < len; ++i) {
-		rtl433_fprintf(stderr, "%s ", stream_formats[i]);
+        rtl433_fprintf(stderr, "%s ", stream_formats[i]);
     }
-	rtl433_fprintf(stderr, "\n");
+    rtl433_fprintf(stderr, "\n");
 
     native_stream_format = SoapySDRDevice_getNativeStreamFormat(dev, direction, channel, &fullScale);
-	rtl433_fprintf(stderr, "Found native stream format: %s (full scale: %.1f)\n", native_stream_format, fullScale);
+    rtl433_fprintf(stderr, "Found native stream format: %s (full scale: %.1f)\n", native_stream_format, fullScale);
 }
 
 static int sdr_open_soapy(sdr_dev_t **out_dev, int *sample_size, char *dev_query, int verbose)
@@ -611,7 +611,7 @@ static int sdr_open_soapy(sdr_dev_t **out_dev, int *sample_size, char *dev_query
     dev->soapy_dev = SoapySDRDevice_makeStrArgs(dev_query);
     if (!dev->soapy_dev) {
         if (verbose)
-			rtl433_fprintf(stderr, "Failed to open sdr device matching '%s'.\n", dev_query);
+            rtl433_fprintf(stderr, "Failed to open sdr device matching '%s'.\n", dev_query);
         free(dev);
         return -1;
     }
@@ -647,7 +647,7 @@ static int sdr_open_soapy(sdr_dev_t **out_dev, int *sample_size, char *dev_query
     SoapySDRKwargs stream_args = {0};
     if (SoapySDRDevice_setupStream(dev->soapy_dev, &dev->soapy_stream, SOAPY_SDR_RX, format, NULL, 0, &stream_args) != 0) {
         if (verbose)
-			rtl433_fprintf(stderr, "Failed to setup sdr device\n");
+            rtl433_fprintf(stderr, "Failed to setup sdr device\n");
         free(dev);
         return -3;
     }
@@ -689,11 +689,11 @@ static int soapysdr_read_loop(sdr_dev_t *dev, sdr_read_cb_t cb, void *ctx, uint3
         //rtl433_fprintf(stderr, "readStream ret=%d (%d), flags=%d, timeNs=%lld\n", n_read, buf_len, flags, timeNs);
         if (r < 0) {
             if (r == SOAPY_SDR_OVERFLOW) {
-				rtl433_fprintf(stderr, "O");
+                rtl433_fprintf(stderr, "O");
                 fflush(stderr);
                 continue;
             }
-			rtl433_fprintf(stderr, "WARNING: sync read failed. %d\n", r);
+            rtl433_fprintf(stderr, "WARNING: sync read failed. %d\n", r);
         }
 
         // convert to CS16 or CU8 if needed
@@ -731,7 +731,7 @@ int sdr_open(sdr_dev_t **out_dev, int *sample_size, char *dev_query, int verbose
 
 #if !defined(RTLSDR) && !defined(SOAPYSDR)
     if (verbose)
-		rtl433_fprintf(stderr, "No input drivers (RTL-SDR or SoapySDR) compiled in.\n");
+        rtl433_fprintf(stderr, "No input drivers (RTL-SDR or SoapySDR) compiled in.\n");
     return -1;
 #endif
 
@@ -740,7 +740,7 @@ int sdr_open(sdr_dev_t **out_dev, int *sample_size, char *dev_query, int verbose
 #ifdef RTLSDR
         return sdr_open_rtl(out_dev, sample_size, dev_query, verbose);
 #else
-		rtl433_fprintf(stderr, "No input driver for RTL-SDR compiled in.\n");
+        rtl433_fprintf(stderr, "No input driver for RTL-SDR compiled in.\n");
         return -1;
 #endif
     }
@@ -796,9 +796,9 @@ int sdr_set_center_freq(sdr_dev_t *dev, uint32_t freq, int verbose)
 
     if (verbose) {
         if (r < 0)
-			rtl433_fprintf(stderr, "WARNING: Failed to set center freq.\n");
+            rtl433_fprintf(stderr, "WARNING: Failed to set center freq.\n");
         else
-			rtl433_fprintf(stderr, "Tuned to %s.\n", nice_freq(sdr_get_center_freq(dev)));
+            rtl433_fprintf(stderr, "Tuned to %s.\n", nice_freq(sdr_get_center_freq(dev)));
     }
     return r;
 }
@@ -837,9 +837,9 @@ int sdr_set_freq_correction(sdr_dev_t *dev, int ppm, int verbose)
 
     if (verbose) {
         if (r < 0)
-			rtl433_fprintf(stderr, "WARNING: Failed to set frequency correction.\n");
+            rtl433_fprintf(stderr, "WARNING: Failed to set frequency correction.\n");
         else
-			rtl433_fprintf(stderr, "Frequency correction set to %d ppm.\n", ppm);
+            rtl433_fprintf(stderr, "Frequency correction set to %d ppm.\n", ppm);
     }
     return r;
 }
@@ -863,9 +863,9 @@ int sdr_set_auto_gain(sdr_dev_t *dev, int verbose)
 
     if (verbose) {
         if (r < 0)
-			rtl433_fprintf(stderr, "WARNING: Failed to enable automatic gain.\n");
+            rtl433_fprintf(stderr, "WARNING: Failed to enable automatic gain.\n");
         else
-			rtl433_fprintf(stderr, "Tuner gain set to Auto.\n");
+            rtl433_fprintf(stderr, "Tuner gain set to Auto.\n");
     }
     return r;
 }
@@ -901,15 +901,15 @@ int sdr_set_tuner_gain(sdr_dev_t *dev, char *gain_str, int verbose)
     r = rtlsdr_set_tuner_gain_mode(dev->rtlsdr_dev, 1);
     if (verbose)
         if (r < 0)
-			rtl433_fprintf(stderr, "WARNING: Failed to enable manual gain.\n");
+            rtl433_fprintf(stderr, "WARNING: Failed to enable manual gain.\n");
 
     /* Set the tuner gain */
     r = rtlsdr_set_tuner_gain(dev->rtlsdr_dev, gain);
     if (verbose) {
         if (r < 0)
-			rtl433_fprintf(stderr, "WARNING: Failed to set tuner gain.\n");
+            rtl433_fprintf(stderr, "WARNING: Failed to set tuner gain.\n");
         else
-			rtl433_fprintf(stderr, "Tuner gain set to %f dB.\n", gain / 10.0);
+            rtl433_fprintf(stderr, "Tuner gain set to %f dB.\n", gain / 10.0);
     }
 #endif
 
@@ -929,10 +929,10 @@ int sdr_set_antenna(sdr_dev_t *dev, char *antenna_str, int verbose)
 
         if (verbose) {
             if (r < 0)
-                fprintf(stderr, "WARNING: Failed to set antenna.\n");
+                rtl433_fprintf(stderr, "WARNING: Failed to set antenna.\n");
 
             // report the antenna that is actually used
-            fprintf(stderr, "Antenna set to '%s'.\n",
+            rtl433_fprintf(stderr, "Antenna set to '%s'.\n",
                     SoapySDRDevice_getAntenna(dev->soapy_dev, SOAPY_SDR_RX, 0));
         }
         return r;
@@ -940,7 +940,7 @@ int sdr_set_antenna(sdr_dev_t *dev, char *antenna_str, int verbose)
 #endif
 
   // currently only SoapySDR supports devices with multiple antennas
-  fprintf(stderr, "WARNING: Antenna selection only available for SoapySDR devices\n");
+    rtl433_fprintf(stderr, "WARNING: Antenna selection only available for SoapySDR devices\n");
 
   return r;
 }
@@ -964,9 +964,9 @@ int sdr_set_sample_rate(sdr_dev_t *dev, uint32_t rate, int verbose)
 
     if (verbose) {
         if (r < 0)
-			rtl433_fprintf(stderr, "WARNING: Failed to set sample rate.\n");
+            rtl433_fprintf(stderr, "WARNING: Failed to set sample rate.\n");
         else
-			rtl433_fprintf(stderr, "Sample rate set to %d S/s.\n", sdr_get_sample_rate(dev)); // Unfortunately, doesn't return real rate
+            rtl433_fprintf(stderr, "Sample rate set to %d S/s.\n", sdr_get_sample_rate(dev)); // Unfortunately, doesn't return real rate
     }
     return r;
 }
@@ -995,7 +995,7 @@ int sdr_apply_settings(sdr_dev_t *dev, char const *sdr_settings, int verbose)
 
 #ifdef SOAPYSDR
     if (!dev->soapy_dev) {
-        fprintf(stderr, "WARNING: sdr settings only available for SoapySDR devices.\n");
+        rtl433_fprintf(stderr, "WARNING: sdr settings only available for SoapySDR devices.\n");
         return -1;
     }
 
@@ -1004,24 +1004,24 @@ int sdr_apply_settings(sdr_dev_t *dev, char const *sdr_settings, int verbose)
         const char *key   = settings.keys[i];
         const char *value = settings.vals[i];
         if (verbose)
-            fprintf(stderr, "Setting %s to %s\n", key, value);
+            rtl433_fprintf(stderr, "Setting %s to %s\n", key, value);
         if (!strcmp(key, "antenna")) {
             if (SoapySDRDevice_setAntenna(dev->soapy_dev, SOAPY_SDR_RX, 0, value) != 0) {
                 r = -1;
-                fprintf(stderr, "WARNING: Antenna setting failed: %s\n", SoapySDRDevice_lastError());
+                rtl433_fprintf(stderr, "WARNING: Antenna setting failed: %s\n", SoapySDRDevice_lastError());
             }
         }
         else if (!strcmp(key, "bandwidth")) {
             uint32_t f_value = atouint32_metric(value, "-t bandwidth= ");
             if (SoapySDRDevice_setBandwidth(dev->soapy_dev, SOAPY_SDR_RX, 0, (double)f_value) != 0) {
                 r = -1;
-                fprintf(stderr, "WARNING: Bandwidth setting failed: %s\n", SoapySDRDevice_lastError());
+                rtl433_fprintf(stderr, "WARNING: Bandwidth setting failed: %s\n", SoapySDRDevice_lastError());
             }
         }
         else {
             if (SoapySDRDevice_writeSetting(dev->soapy_dev, key, value) != 0) {
                 r = -1;
-                fprintf(stderr, "WARNING: sdr setting failed: %s\n", SoapySDRDevice_lastError());
+                rtl433_fprintf(stderr, "WARNING: sdr setting failed: %s\n", SoapySDRDevice_lastError());
             }
         }
     }
@@ -1029,7 +1029,7 @@ int sdr_apply_settings(sdr_dev_t *dev, char const *sdr_settings, int verbose)
     return r;
 #endif
 
-    fprintf(stderr, "WARNING: sdr settings only available for SoapySDR devices.\n");
+    rtl433_fprintf(stderr, "WARNING: sdr settings only available for SoapySDR devices.\n");
 
     return r;
 }
@@ -1039,7 +1039,7 @@ int sdr_activate(sdr_dev_t *dev)
 #ifdef SOAPYSDR
     if (dev->soapy_dev) {
         if (SoapySDRDevice_activateStream(dev->soapy_dev, dev->soapy_stream, 0, 0, 0) != 0) {
-			rtl433_fprintf(stderr, "Failed to activate stream\n");
+            rtl433_fprintf(stderr, "Failed to activate stream\n");
             exit(1);
         }
     }
@@ -1071,7 +1071,7 @@ int sdr_reset(sdr_dev_t *dev, int verbose)
 
     if (verbose) {
         if (r < 0)
-			rtl433_fprintf(stderr, "WARNING: Failed to reset buffers.\n");
+            rtl433_fprintf(stderr, "WARNING: Failed to reset buffers.\n");
     }
     return r;
 }

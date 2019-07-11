@@ -26,7 +26,7 @@ Ecowitt Wireless Outdoor Thermometer WH53/WH0280/WH0281A.
 
 #include "decoder.h"
 
-static int ecowitt_decode(r_device *decoder, bitbuffer_t *bitbuffer)
+static int ecowitt_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     // All Ecowitt packets have one row.
     if (bitbuffer->num_rows != 1) {
@@ -103,7 +103,7 @@ static int ecowitt_decode(r_device *decoder, bitbuffer_t *bitbuffer)
             NULL);
     /* clang-format on */
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
     return 1;
 }
 

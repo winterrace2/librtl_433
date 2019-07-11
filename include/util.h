@@ -159,6 +159,10 @@ uint8_t xor_bytes(uint8_t const message[], unsigned num_bytes);
 /// @return summation value
 int add_bytes(uint8_t const message[], unsigned num_bytes);
 
+// moved from optparse: todo: move to r_util.h/c?
+char *asepc(char **stringp, char delim);
+char *getkwargs(char **s, char **key, char **val);
+
 /// Compute Addition of a number of nibbles (byte wise).
 ///
 /// @param message bytes (of two nibbles) of message data

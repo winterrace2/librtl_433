@@ -109,7 +109,7 @@ static int cardin_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t 
 			"rbutton",    "right button switches",  DATA_STRING, rbutton[((bb[0][2] & 15) / 3)-1],
 			NULL);
 
-		decoder_output_data(decoder, data, ext);
+        decoder_output_data(decoder, data, ext);
 
 		return 1;
 	}

@@ -48,7 +48,7 @@ Example data:
 
 #include "decoder.h"
 
-static int tfa_303196_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int tfa_303196_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     uint8_t const preamble_pattern[] = {0x55, 0x56}; // 12 bit preamble + 4 bit data
     int row;
@@ -100,7 +100,7 @@ static int tfa_303196_callback(r_device *decoder, bitbuffer_t *bitbuffer)
             NULL);
     /* clang-format on */
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
     return 1;
 }
 

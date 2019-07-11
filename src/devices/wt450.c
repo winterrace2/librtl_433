@@ -55,7 +55,7 @@ every 60 seconds 3 packets.
 
 #include "decoder.h"
 
-static int wt450_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int wt450_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     uint8_t *b = bitbuffer->bb[0];
     uint8_t humidity;
@@ -66,13 +66,12 @@ static int wt450_callback(r_device *decoder, bitbuffer_t *bitbuffer)
     uint8_t battery_low;
     int seq;
     float temp;
-    uint8_t bit;
     uint8_t parity;
     data_t *data;
 
     if (bitbuffer->bits_per_row[0] != 36) {
         if (decoder->verbose)
-            fprintf(stderr, "wt450_callback: wrong size of bit per row %d\n",
+			rtl433_fprintf(stderr, "wt450_callback: wrong size of bit per row %d\n",
                     bitbuffer->bits_per_row[0]);
         return DECODE_ABORT_LENGTH;
     }
@@ -115,7 +114,7 @@ static int wt450_callback(r_device *decoder, bitbuffer_t *bitbuffer)
             NULL);
     /* clang-format on */
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
     return 1;
 }
 

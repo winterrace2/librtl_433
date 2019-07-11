@@ -20,8 +20,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
-#include <math.h>
 #include <errno.h>
+#include <math.h>
 //#include <signal.h>
 
 #include "librtl_433.h"
@@ -32,7 +32,6 @@
 #include "pulse_detect.h"
 #include "pulse_analyze.h"
 #include "pulse_demod.h"
-#include "decoder.h"
 #include "r_util.h"
 #include "redir_print.h"
 
@@ -240,7 +239,7 @@ static data_t *create_report_data(rtl_433_t *rtl, int level)
                     "fail_sanity",  "", DATA_INT, r_dev->decode_fails[-DECODE_FAIL_SANITY],
                     NULL);
 
-		list_push(&dev_data_list, data);
+        list_push(&dev_data_list, data);
     }
 
     data = data_make(
@@ -249,7 +248,7 @@ static data_t *create_report_data(rtl_433_t *rtl, int level)
             "events",           "", DATA_INT, rtl->frames_events,
             NULL);
 
-	data = data_make(
+    data = data_make(
             "enabled",          "", DATA_INT, r_devs->len,
             "frames",           "", DATA_DATA, data,
             "stats",            "", DATA_ARRAY, data_array(dev_data_list.len, DATA_DATA, dev_data_list.elems),
@@ -327,8 +326,8 @@ RTL_433_API int start(rtl_433_t *rtl, struct sigaction *sigact){
     if (rtl->cfg->outputs_configured &  OUTPUT_JSON) add_json_output(rtl->demod, rtl->cfg->output_path_json, ((rtl->cfg->overwrite_modes & OVR_SUBJ_DEC_JSON) != 0));
     if (rtl->cfg->outputs_configured &  OUTPUT_CSV)  add_csv_output(rtl->demod, rtl->cfg->output_path_csv, ((rtl->cfg->overwrite_modes & OVR_SUBJ_DEC_CSV) != 0));
     if (rtl->cfg->outputs_configured &  OUTPUT_KV)   add_kv_output(rtl->demod, rtl->cfg->output_path_kv, ((rtl->cfg->overwrite_modes & OVR_SUBJ_DEC_KV) != 0));
-	if (rtl->cfg->outputs_configured &  OUTPUT_MQTT) add_mqtt_output(rtl->demod, rtl->cfg->output_mqtt_host, rtl->cfg->output_mqtt_port, rtl->cfg->output_mqtt_opts);
-	if (rtl->cfg->outputs_configured &  OUTPUT_UDP)  add_syslog_output(rtl->demod, rtl->cfg->output_udp_host, rtl->cfg->output_udp_port);
+    if (rtl->cfg->outputs_configured &  OUTPUT_MQTT) add_mqtt_output(rtl->demod, rtl->cfg->output_mqtt_host, rtl->cfg->output_mqtt_port, rtl->cfg->output_mqtt_opts);
+    if (rtl->cfg->outputs_configured &  OUTPUT_UDP)  add_syslog_output(rtl->demod, rtl->cfg->output_udp_host, rtl->cfg->output_udp_port);
     if (rtl->cfg->outputs_configured &  OUTPUT_EXT)  add_ext_output(rtl->demod, rtl->cfg->output_extcallback);
         
     // Check dumper and activate, if required
@@ -483,7 +482,7 @@ void sdr_callback(unsigned char *iq_buf, uint32_t len, void *ctx)
     int d_events = 0; // Sensor events successfully detected
     if (rtl->demod->r_devs.len || rtl->cfg->analyze_pulses || rtl->demod->dumper.len || rtl->demod->samp_grab) {
         // Detect a package and loop through demodulators with pulse data
-        PulseDetectionResult package_type = PULSEDETECTION_OOK/*1*/;  // Just to get us started
+        int package_type = PULSE_DATA_OOK;  // Just to get us started
         
         for (void **iter = rtl->demod->dumper.elems; iter && *iter; ++iter) {
             file_info_t const *dumper = *iter;
@@ -492,17 +491,17 @@ void sdr_callback(unsigned char *iq_buf, uint32_t len, void *ctx)
                 break;
             }
         }
-        while (package_type != PULSEDETECTION_OUTOFDATA) {
+        while (package_type != 0) {
             int p_events = 0;  // Sensor events successfully detected per package
             package_type = pulse_detect_package(rtl->demod->pulse_detect, rtl->demod->am_buf, rtl->demod->buf.fm, n_samples, rtl->cfg->level_limit, rtl->cfg->samp_rate, rtl->input_pos, &rtl->demod->pulse_data, &rtl->demod->fsk_pulse_data);
-            if (package_type != PULSEDETECTION_OUTOFDATA) {
+            if (package_type != 0) {
                 // new package: set a first frame start if we are not tracking one already
                 if (!rtl->demod->frame_start_ago)
                     rtl->demod->frame_start_ago = rtl->demod->pulse_data.start_ago;
                 // always update the last frame end
                 rtl->demod->frame_end_ago = rtl->demod->pulse_data.end_ago;
             }
-            if (package_type == PULSEDETECTION_OOK /*1*/) {
+            if (package_type == PULSE_DATA_OOK) {
                 calc_rssi_snr(rtl, &rtl->demod->pulse_data);
                 if (rtl->cfg->analyze_pulses) rtl433_fprintf(stderr, "Detected OOK package\t%s\n", time_pos_str(rtl, rtl->demod->pulse_data.start_ago, time_str));
 
@@ -519,11 +518,11 @@ void sdr_callback(unsigned char *iq_buf, uint32_t len, void *ctx)
 
                 if (rtl->cfg->verbosity > 2) pulse_data_print(&rtl->demod->pulse_data);
                 if (rtl->cfg->analyze_pulses && (rtl->cfg->grab_mode <= GRAB_ALL_DEVICES || (rtl->cfg->grab_mode == GRAB_UNKNOWN_DEVICES && p_events == 0) || (rtl->cfg->grab_mode == GRAB_KNOWN_DEVICES && p_events > 0))) {
-                    pulse_analyzer(&rtl->demod->pulse_data, rtl);
+                    pulse_analyzer(&rtl->demod->pulse_data, package_type, rtl);
                 }
 
             }
-            else if (package_type == PULSEDETECTION_FSK/*2*/) {
+            else if (package_type == PULSE_DATA_FSK) {
                 calc_rssi_snr(rtl, &rtl->demod->fsk_pulse_data);
                 if (rtl->cfg->analyze_pulses) rtl433_fprintf(stderr, "Detected FSK package\t %s\n", time_pos_str(rtl, rtl->demod->fsk_pulse_data.start_ago, time_str));
 
@@ -540,7 +539,7 @@ void sdr_callback(unsigned char *iq_buf, uint32_t len, void *ctx)
 
                 if (rtl->cfg->verbosity > 2) pulse_data_print(&rtl->demod->fsk_pulse_data);
                 if (rtl->cfg->analyze_pulses && (rtl->cfg->grab_mode <= GRAB_ALL_DEVICES || (rtl->cfg->grab_mode == GRAB_UNKNOWN_DEVICES && p_events == 0) || (rtl->cfg->grab_mode == GRAB_KNOWN_DEVICES && p_events > 0))) {
-                    pulse_analyzer(&rtl->demod->fsk_pulse_data, rtl);
+                    pulse_analyzer(&rtl->demod->fsk_pulse_data, package_type, rtl);
                 }
             } // if (package_type == ...
             d_events += p_events;
@@ -749,10 +748,17 @@ char *time_pos_str(rtl_433_t *rtl, unsigned samples_ago, char *buf)
             ago.tv_usec += 1000000;
         }
         ago.tv_usec -= usecs_ago;
+
+        char const *format = NULL;
+        if (rtl->cfg->report_time_preference == REPORT_TIME_UNIX)
+            format = "%s";
+        else if (rtl->cfg->report_time_preference == REPORT_TIME_ISO)
+            format = "%Y-%m-%dT%H:%M:%S";
+
          if (rtl->cfg->report_time_hires)
-            return usecs_time_str(&ago, buf);
+            return usecs_time_str(buf, format, &ago);
         else
-            return local_time_str(ago.tv_sec, buf);
+            return format_time_str(buf, format, ago.tv_sec);
     }
 }
 

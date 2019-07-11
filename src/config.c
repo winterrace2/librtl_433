@@ -34,10 +34,10 @@ void r_init_cfg(r_cfg_t *cfg) {
     memset(cfg->output_path_kv, 0, sizeof(cfg->output_path_kv));
     strcpy(cfg->output_udp_host, "localhost");
     strcpy(cfg->output_udp_port, "514");
-	strcpy(cfg->output_mqtt_host, "localhost");
-	strcpy(cfg->output_mqtt_port, "1883");
-	memset(cfg->output_mqtt_opts, 0, sizeof(cfg->output_mqtt_opts));
-	cfg->output_extcallback = NULL;
+    strcpy(cfg->output_mqtt_host, "localhost");
+    strcpy(cfg->output_mqtt_port, "1883");
+    memset(cfg->output_mqtt_opts, 0, sizeof(cfg->output_mqtt_opts));
+    cfg->output_extcallback = NULL;
     cfg->report_unknown = 0;
     cfg->report_meta = 0;
     cfg->report_time_preference = REPORT_TIME_DEFAULT;

@@ -14,9 +14,9 @@
 
 RTL_433_API void list_initialize(list_t *list)
 {
-	list->elems = NULL;
-	list->size = 0;
-	list->len = 0;
+    list->elems = NULL;
+    list->size = 0;
+    list->len = 0;
 }
 
 RTL_433_API void list_ensure_size(list_t *list, size_t min_size)

@@ -420,6 +420,33 @@
     <ClCompile Include="..\src\devices\lacrosse_ws7000.c">
       <Filter>Source files\devices</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\devices\ts_ft002.c">
+      <Filter>Source files\devices</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\devices\companion_wtr001.c">
+      <Filter>Source files\devices</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\devices\ecowitt.c">
+      <Filter>Source files\devices</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\devices\directv.c">
+      <Filter>Source files\devices</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\devices\eurochron.c">
+      <Filter>Source files\devices</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\devices\ikea_sparsnas.c">
+      <Filter>Source files\devices</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\devices\hcs200.c">
+      <Filter>Source files\devices</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\devices\tfa_30_3196.c">
+      <Filter>Source files\devices</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\devices\rubicson_48659.c">
+      <Filter>Source files\devices</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\bitbuffer.h">

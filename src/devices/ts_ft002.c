@@ -36,11 +36,11 @@ Data layout:
 
 #include "decoder.h"
 
-static int ts_ft002_decoder(r_device *decoder, bitbuffer_t *bitbuffer)
+static int ts_ft002_decoder(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     uint8_t b[9];
-    int id, type, depth, flags, transmit, temp_raw, batt_low;
+    int id, type, depth, transmit, temp_raw, batt_low;
     float temp_c;
 
     if (bitbuffer->bits_per_row[0] == 72) {
@@ -97,7 +97,7 @@ static int ts_ft002_decoder(r_device *decoder, bitbuffer_t *bitbuffer)
             "flags",            "Battery Flag?",         DATA_INT,    batt_low,
             "mic",              "MIC",                  DATA_STRING, "CHECKSUM",
             NULL);
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
     /* clang-format on */
 
     return 1;

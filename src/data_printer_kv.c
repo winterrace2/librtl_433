@@ -65,8 +65,8 @@ static int kv_break_after_key(char const *key)
 
 typedef struct {
     data_output_t output;
-	void *term;
-	int color;
+    void *term;
+    int color;
     int ring_bell;
     int term_width;
     int data_recursion;
@@ -79,7 +79,7 @@ static void print_kv_data(data_output_t *output, data_t *data, char *format)
 {
     data_output_kv_t *kv = (data_output_kv_t *)output;
     
-	int color = kv->color;
+    int color = kv->color;
     int ring_bell = kv->ring_bell;
 
     // top-level: update width and print separator
@@ -104,8 +104,8 @@ static void print_kv_data(data_output_t *output, data_t *data, char *format)
         kv->column = 0;
     }
     
-	++kv->data_recursion;
-	while (data) {
+    ++kv->data_recursion;
+    while (data) {
         // break before some known keys
         if (kv->column > 0 && kv_break_before_key(data->key)) {
             fprintf(output->file, "\n");
@@ -115,32 +115,32 @@ static void print_kv_data(data_output_t *output, data_t *data, char *format)
         else if (kv->column >= kv->term_width - 26) {
             fprintf(output->file, "\n");
             kv->column = 0;
-		}
+        }
         // pad to next alignment if there is enough width left
         else if (kv->column > 0 && kv->column < kv->term_width - 26) {
             kv->column += fprintf(output->file, "%*s", 25 - kv->column % 26, " ");
         }
 
-		// print key
+        // print key
         char *key = *data->pretty_key ? data->pretty_key : data->key;
         kv->column += fprintf(output->file, "%-10s: ", key);
         // print value
         if (color)
             term_set_fg(kv->term, kv_color_for_key(data->key));
-		print_value(output, data->type, data->value, data->format);
+        print_value(output, data->type, data->value, data->format);
         if (color)
             term_set_fg(kv->term, TERM_COLOR_RESET);
         
-		// force break after some known keys
+        // force break after some known keys
         if (kv->column > 0 && kv_break_after_key(data->key)) {
             kv->column = kv->term_width; // force break;
         }
 
-		data = data->next;
+        data = data->next;
     }
     --kv->data_recursion;
     
-	// top-level: always end with newline
+    // top-level: always end with newline
     if (!kv->data_recursion && kv->column > 0) {
         //fprintf(output->file, "\n"); // data_output_print() already adds a newline
         kv->column = 0;
@@ -149,36 +149,36 @@ static void print_kv_data(data_output_t *output, data_t *data, char *format)
 
 static void print_kv_array(data_output_t *output, data_array_t *array, char *format)
 {
-	data_output_kv_t *kv = (data_output_kv_t *)output;
+    data_output_kv_t *kv = (data_output_kv_t *)output;
 
-	//fprintf(output->file, "[ ");
-	for (int c = 0; c < array->num_values; ++c) {
-		if (c)
-			fprintf(output->file, ", ");
-		print_array_value(output, array, format, c);
-	}
-	//fprintf(output->file, " ]");
+    //fprintf(output->file, "[ ");
+    for (int c = 0; c < array->num_values; ++c) {
+        if (c)
+            fprintf(output->file, ", ");
+        print_array_value(output, array, format, c);
+    }
+    //fprintf(output->file, " ]");
 }
 
 static void print_kv_double(data_output_t *output, double data, char *format)
 {
     data_output_kv_t *kv = (data_output_kv_t *)output;
     
-	kv->column += fprintf(output->file, format ? format : "%.3f", data);
+    kv->column += fprintf(output->file, format ? format : "%.3f", data);
 }
 
 static void print_kv_int(data_output_t *output, int data, char *format)
 {
     data_output_kv_t *kv = (data_output_kv_t *)output;
     
-	kv->column += fprintf(output->file, format ? format : "%d", data);
+    kv->column += fprintf(output->file, format ? format : "%d", data);
 }
 
 static void print_kv_string(data_output_t *output, const char *data, char *format)
 {
     data_output_kv_t *kv = (data_output_kv_t *)output;
     
-	kv->column += fprintf(output->file, format ? format : "%s", data);
+    kv->column += fprintf(output->file, format ? format : "%s", data);
 }
 
 static void data_output_kv_free(data_output_t *output)
@@ -186,34 +186,34 @@ static void data_output_kv_free(data_output_t *output)
     if (!output)
         return;
     
-	if(output->file != stdout)
-		fclose(output->file);
+    if(output->file != stdout)
+        fclose(output->file);
 
-	free(output);
+    free(output);
 }
 
 data_output_t *data_output_kv_create(FILE *file)
 {
     data_output_kv_t *kv = calloc(1, sizeof(data_output_kv_t));
     if (!kv) {
-	    rtl433_fprintf(stderr, "calloc() failed");
+        rtl433_fprintf(stderr, "calloc() failed");
         return NULL;
     }
 
     kv->output.print_data   = print_kv_data;
-	kv->output.print_array  = print_kv_array;
-	kv->output.print_string = print_kv_string;
-	kv->output.print_double = print_kv_double;
-	kv->output.print_int    = print_kv_int;
-	kv->output.output_free  = data_output_kv_free;
-	kv->output.file         = file;
-	kv->output.ext_callback = NULL; // prevents this printer to receive unknown signals
+    kv->output.print_array  = print_kv_array;
+    kv->output.print_string = print_kv_string;
+    kv->output.print_double = print_kv_double;
+    kv->output.print_int    = print_kv_int;
+    kv->output.output_free  = data_output_kv_free;
+    kv->output.file         = file;
+    kv->output.ext_callback = NULL; // prevents this printer to receive unknown signals
 
     kv->term = term_init(file);
     kv->color = term_has_color(kv->term);
     
-	kv->ring_bell = 0; // TODO: enable if requested...
+    kv->ring_bell = 0; // TODO: enable if requested...
     
-	return &kv->output;
+    return &kv->output;
 }
 

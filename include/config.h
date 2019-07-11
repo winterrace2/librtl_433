@@ -16,10 +16,12 @@ typedef enum {
 } conversion_mode_t;
 
 typedef enum {
-	REPORT_TIME_DEFAULT,
-	REPORT_TIME_DATE,
-	REPORT_TIME_SAMPLES,
-	REPORT_TIME_OFF,
+    REPORT_TIME_DEFAULT,
+    REPORT_TIME_DATE,
+    REPORT_TIME_SAMPLES,
+    REPORT_TIME_UNIX,
+    REPORT_TIME_ISO,
+    REPORT_TIME_OFF,
 } time_mode_t;
 
 // valid options for r_cfg_t->grab_mode

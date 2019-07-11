@@ -36,8 +36,7 @@ void get_time_now(struct timeval *tv);
 /** Printable timestamp in local time.
 
     @param buf[out]: output buffer, long enough for "YYYY-MM-DD HH:MM:SS"
-    @param format: time format string, uses "%Y-%m-%d %H:%M:%S" if NULL
-    @param time_secs: 0 for now, or seconds since the epoch
+    @param format: time format string, uses "%Y-%m-%d %H:%M:%S" if NULL    @param time_secs: 0 for now, or seconds since the epoch
     @return buf pointer (for short hand use as operator)
 */
 char *format_time_str(char *buf, char const *format, time_t time_secs);

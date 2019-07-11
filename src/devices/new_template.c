@@ -63,7 +63,7 @@ Data layout:
 #define MYDEVICE_CRC_POLY    0x07
 #define MYDEVICE_CRC_INIT    0x00
 
-static int new_template_decode(r_device *decoder, bitbuffer_t *bitbuffer)
+static int new_template_decode(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     int r; // a row index
@@ -82,7 +82,7 @@ static int new_template_decode(r_device *decoder, bitbuffer_t *bitbuffer)
      * 1. Enable with -D -D (debug level of 2)
      * 2. Delete this block when your decoder is working
      */
-    //    if (decoder->verbose > 1) {
+    //    if (verbose > 1) {
     //        bitbuffer_printf(bitbuffer, "%s: ", __func__);
     //    }
 
@@ -168,7 +168,7 @@ static int new_template_decode(r_device *decoder, bitbuffer_t *bitbuffer)
 
     if (!parity) {
         if (decoder->verbose) {
-            fprintf(stderr, "%s: parity check failed\n", __func__);
+			rtl433_fprintf(stderr, "%s: parity check failed\n", __func__);
         }
         return 0;
     }
@@ -178,7 +178,7 @@ static int new_template_decode(r_device *decoder, bitbuffer_t *bitbuffer)
      */
     if (((b[0] + b[1] + b[2] + b[3] - b[4]) & 0xFF) != 0) {
         if (decoder->verbose) {
-            fprintf(stderr, "%s: checksum error\n", __func__);
+			rtl433_fprintf(stderr, "%s: checksum error\n", __func__);
         }
         return 0;
     }
@@ -193,7 +193,7 @@ static int new_template_decode(r_device *decoder, bitbuffer_t *bitbuffer)
     if (r_crc != c_crc) {
         // example debugging output
         if (decoder->verbose) {
-            fprintf(stderr, "%s: bad CRC: calculated %02x, received %02x\n",
+            rtl433_fprintf(stderr, "%s: bad CRC: calculated %02x, received %02x\n",
                     __func__, c_crc, r_crc);
         }
 
@@ -219,14 +219,14 @@ static int new_template_decode(r_device *decoder, bitbuffer_t *bitbuffer)
     }
 
     /* clang-format off */
-    data = data_make(
+	data = data_make(
             "model", "", DATA_STRING, "New Template",
             "id",    "", DATA_INT,    sensor_id,
             "data",  "", DATA_INT,    value,
             "mic",   "", DATA_STRING, "CHECKSUM", // CRC, CHECKSUM, or PARITY
             NULL);
     /* clang-format on */
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     // Return 1 if message successfully decoded
     return 1;

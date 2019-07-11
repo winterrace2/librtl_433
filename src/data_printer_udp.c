@@ -172,7 +172,7 @@ static void print_syslog_data(data_output_t *output, data_t *data, char *format)
     char timestamp[21];
     strftime(timestamp, 21, "%Y-%m-%dT%H:%M:%SZ", &tm_info);
 
-	abuf_printf(&msg, "<%d>1 %s %s rtl_433 - - - ", syslog->pri, timestamp, syslog->hostname);
+    abuf_printf(&msg, "<%d>1 %s %s rtl_433 - - - ", syslog->pri, timestamp, syslog->hostname);
 
     msg.tail += data_print_jsons(data, msg.tail, msg.left);
     if (msg.tail >= msg.head + sizeof(message))
@@ -194,9 +194,9 @@ static void data_output_syslog_free(data_output_t *output)
     free(syslog);
 
 #ifdef _WIN32
-	if(WSACleanup() != 0) {
-		perror("WSAStartup()");
-	}
+    if(WSACleanup() != 0) {
+        perror("WSAStartup()");
+    }
 #endif
 }
 
@@ -217,11 +217,11 @@ data_output_t *data_output_syslog_create(const char *host, const char *port)
     }
 #endif
 
-	syslog->output.print_data   = print_syslog_data;
+    syslog->output.print_data   = print_syslog_data;
     syslog->output.output_free  = data_output_syslog_free;
-	syslog->output.file = NULL;
-	syslog->output.ext_callback = NULL; // prevents this printer to receive unknown signals
-	// Severity 5 "Notice", Facility 20 "local use 4"
+    syslog->output.file = NULL;
+    syslog->output.ext_callback = NULL; // prevents this printer to receive unknown signals
+    // Severity 5 "Notice", Facility 20 "local use 4"
     syslog->pri = 20 * 8 + 5;
     gethostname(syslog->hostname, _POSIX_HOST_NAME_MAX + 1);
     syslog->hostname[_POSIX_HOST_NAME_MAX] = '\0';

@@ -88,7 +88,7 @@ static int oil_watchman_callback(r_device *decoder, bitbuffer_t *bitbuffer, extd
 				NULL);
 		/* clang-format on */
 
-		decoder_output_data(decoder, data, ext);
+        decoder_output_data(decoder, data, ext);
 		events++;
 	}
 	return events;

@@ -244,14 +244,14 @@ int run_ook_demods(dm_state *dm) {
     }
 
     if (!p_events && dm->rtl->cfg->report_unknown && dm->pulse_data.num_pulses > 10) { // unknown OOK signal (no matching device demodulator) - pass to GUI as unknown signal if it has a significant length
-		extdata_t ext = {
-			.bitbuffer = NULL,
-			.pulses = &dm->pulse_data,
-			.pulseexc_startidx = 0,
-			.pulseexc_len = 0,
-			.mod = UNKNOWN_OOK,
-			//.samprate = dm->rtl->cfg->samp_rate,
-			//.freq = dm->rtl->center_frequency
+        extdata_t ext = {
+            .bitbuffer = NULL,
+            .pulses = &dm->pulse_data,
+            .pulseexc_startidx = 0,
+            .pulseexc_len = 0,
+            .mod = UNKNOWN_OOK,
+            //.samprate = dm->rtl->cfg->samp_rate,
+            //.freq = dm->rtl->center_frequency
         };
         r_device pseudo = {
             .name = "pseudo device",
@@ -299,14 +299,14 @@ int run_fsk_demods(dm_state *dm) {
     } // for demodulators
 
     if (!p_events && dm->rtl->cfg->report_unknown && dm->fsk_pulse_data.num_pulses > 10) { // unknown FSK signal (no matching device demodulator) - pass to GUI as unknown signal if it has a significant length
-		extdata_t ext = {
-			.bitbuffer = NULL,
-			.pulses = &dm->fsk_pulse_data,
-			.pulseexc_startidx = 0,
-			.pulseexc_len = 0,
-			.mod = UNKNOWN_FSK,
-			//.samprate = dm->rtl->cfg->samp_rate,
-			//.freq = dm->rtl->center_frequency
+        extdata_t ext = {
+            .bitbuffer = NULL,
+            .pulses = &dm->fsk_pulse_data,
+            .pulseexc_startidx = 0,
+            .pulseexc_len = 0,
+            .mod = UNKNOWN_FSK,
+            //.samprate = dm->rtl->cfg->samp_rate,
+            //.freq = dm->rtl->center_frequency
         };
         r_device pseudo = {
             .name = "pseudo device",
@@ -402,28 +402,28 @@ int ReadFromFiles(dm_state *dm) {
         }
         dm->sample_file_pos = 0.0;
 
-		// special case for pulse data file-inputs
-		if (dm->load_info.format == PULSE_OOK) {
-			while (!dm->rtl->do_exit) {
-				pulse_data_load(in_file, &dm->pulse_data);
-				if (!dm->pulse_data.num_pulses)
-					break;
+        // special case for pulse data file-inputs
+        if (dm->load_info.format == PULSE_OOK) {
+            while (!dm->rtl->do_exit) {
+                pulse_data_load(in_file, &dm->pulse_data);
+                if (!dm->pulse_data.num_pulses)
+                    break;
 
-				if (dm->pulse_data.fsk_f2_est) {
-					run_fsk_demods(dm);
-				}
-				else {
-					run_ook_demods(dm);
-				}
-			}
+                if (dm->pulse_data.fsk_f2_est) {
+                    run_fsk_demods(dm);
+                }
+                else {
+                    run_ook_demods(dm);
+                }
+            }
 
-			if (in_file != stdin)
-				fclose(in_file = stdin);
+            if (in_file != stdin)
+                fclose(in_file = stdin);
 
-			continue;
-		}
+            continue;
+        }
 
-		// default case for file-inputs
+        // default case for file-inputs
         int n_blocks = 0;
         unsigned long n_read;
         do {
@@ -660,7 +660,7 @@ static void data_acquired_handler(r_device *r_dev, data_t *data, extdata_t *ext)
                 // Convert double type fields ending in _in to _mm
                 else if ((d->type == DATA_DOUBLE) &&
                          (str_endswith(d->key, "_in") || str_endswith(d->key, "_inch"))) {
-					*(double*)d->value = inch2mm(*(double*)d->value);
+                    *(double*)d->value = inch2mm(*(double*)d->value);
                     char *new_label = str_replace(str_replace(d->key, "_inch", "_in"), "_in", "_mm");
                     free(d->key);
                     d->key = new_label;
@@ -865,8 +865,8 @@ static void update_protocol(r_cfg_t *cfg, r_device *r_dev)
 {
     float samples_per_us = cfg->samp_rate / 1.0e6;
 
-    r_dev->f_short_width = 1.0 / (r_dev->short_width * samples_per_us);
-    r_dev->f_long_width  = 1.0 / (r_dev->long_width * samples_per_us);
+    r_dev->f_short_width = r_dev->short_width > 0.0 ? 1.0 / (r_dev->short_width * samples_per_us) : 0;
+    r_dev->f_long_width  = r_dev->long_width > 0.0 ? 1.0 / (r_dev->long_width * samples_per_us) : 0;
     r_dev->s_short_width = r_dev->short_width * samples_per_us;
     r_dev->s_long_width  = r_dev->long_width * samples_per_us;
     r_dev->s_reset_limit = r_dev->reset_limit * samples_per_us;
@@ -905,7 +905,7 @@ static int register_protocol(dm_state *dm, r_device *r_dev, char *arg)
     }
     else {
         if (arg && *arg) {
-			rtl433_fprintf(stderr, "Protocol [%d] \"%s\" does not take arguments \"%s\"!\n", r_dev->protocol_num, r_dev->name, arg);
+            rtl433_fprintf(stderr, "Protocol [%d] \"%s\" does not take arguments \"%s\"!\n", r_dev->protocol_num, r_dev->name, arg);
         }
         p = malloc(sizeof (*p));
         *p = *r_dev; // copy
@@ -1041,8 +1041,12 @@ int add_mqtt_output(dm_state *dm, char *host, char *port, char *opts)
         return RTL_433_ERROR_INVALID_PARAM;
     }
 
-    list_push(&dm->output_handler, data_output_mqtt_create(host, port, opts, dm->rtl->cfg->dev_query));
-	return 0;
+    data_output_t *dat = data_output_mqtt_create(host, port, opts, dm->rtl->cfg->dev_query);
+    if (dat == NULL)
+        return RTL_433_ERROR_MQTTINTERNAL;
+
+    list_push(&dm->output_handler, dat);
+    return 0;
 }
 
 int add_syslog_output(dm_state *dm, char *host, char *port) {

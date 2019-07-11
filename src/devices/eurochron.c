@@ -33,7 +33,7 @@
 
 #include "decoder.h"
 
-static int eurochron_callback(r_device *decoder, bitbuffer_t *bitbuffer)
+static int eurochron_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata_t *ext)
 {
     data_t *data;
     int row;
@@ -76,7 +76,7 @@ static int eurochron_callback(r_device *decoder, bitbuffer_t *bitbuffer)
             "button", "Button", DATA_INT, button,
             NULL);
 
-    decoder_output_data(decoder, data);
+    decoder_output_data(decoder, data, ext);
 
     return 1;
 }

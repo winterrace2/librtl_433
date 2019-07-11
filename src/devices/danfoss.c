@@ -140,7 +140,7 @@ static int danfoss_cfr_callback(r_device *decoder, bitbuffer_t *bitbuffer, extda
 			"switch",		"Switch",	DATA_STRING,	str_sw,
 			"mic",           "Integrity",            DATA_STRING,    "CRC",
 			NULL);
-		decoder_output_data(decoder, data, ext);
+        decoder_output_data(decoder, data, ext);
 
 		return 1;
 	}
