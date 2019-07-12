@@ -132,6 +132,15 @@
     DECL(fs20) \
     DECL(tpms_jansite) \
     DECL(lacrosse_ws7000) \
+    DECL(ts_ft002) \
+    DECL(companion_wtr001) \
+    DECL(ecowitt) \
+    DECL(directv) \
+    DECL(eurochron) \
+    DECL(ikea_sparsnas) \
+    DECL(hcs200) \
+    DECL(tfa_303196) \
+    DECL(rubicson_48659) \
     /* Add new decoders here. */
 
 #define DECL(name) extern r_device name;

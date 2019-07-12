@@ -28,7 +28,7 @@
 /* CSV printer; doesn't really support recursive data objects yet */
 
 typedef struct {
-	data_output_t output;
+    data_output_t output;
     const char **fields;
     int data_recursion;
     const char *separator;
@@ -83,7 +83,7 @@ static int compare_strings(const void *a, const void *b){
 }
 
 void data_output_csv_start(data_output_t *output, const char **fields, int num_fields){
-	data_output_csv_t *csv = (data_output_csv_t *)output;
+    data_output_csv_t *csv = (data_output_csv_t *)output;
 
     int csv_fields = 0;
     int i, j;
@@ -96,9 +96,9 @@ void data_output_csv_start(data_output_t *output, const char **fields, int num_f
     csv->separator = ",";
 
     allowed = calloc(num_fields, sizeof(const char *));
-	if (!allowed)
-		goto alloc_error;
-	memcpy(allowed, fields, sizeof(const char *) * num_fields);
+    if (!allowed)
+        goto alloc_error;
+    memcpy(allowed, fields, sizeof(const char *) * num_fields);
 
     qsort(allowed, num_fields, sizeof(char *), compare_strings);
 
@@ -157,21 +157,21 @@ alloc_error:
 
 static void print_csv_double(data_output_t *output, double data, char *format)
 {
-	fprintf(output->file, "%.3f", data);
+    fprintf(output->file, "%.3f", data);
 }
 
 static void print_csv_int(data_output_t *output, int data, char *format)
 {
-	fprintf(output->file, "%d", data);
+    fprintf(output->file, "%d", data);
 }
 
 static void data_output_csv_free(data_output_t *output){
     data_output_csv_t *csv = (data_output_csv_t *)output;
 
-	if (output->file != stdout)
-		fclose(output->file);
+    if (output->file != stdout)
+        fclose(output->file);
 
-	free(csv->fields);
+    free(csv->fields);
     free(csv);
 }
 
@@ -187,11 +187,11 @@ data_output_t *data_output_csv_create(FILE *file){
     csv->output.print_string = print_csv_string;
     csv->output.print_double = print_csv_double;
     csv->output.print_int    = print_csv_int;
-	csv->output.output_start = data_output_csv_start;
+    csv->output.output_start = data_output_csv_start;
     csv->output.output_free  = data_output_csv_free;
     csv->output.file         = file;
-	csv->output.ext_callback = NULL; // prevents this printer to receive unknown signals
+    csv->output.ext_callback = NULL; // prevents this printer to receive unknown signals
 
-	return &csv->output;
+    return &csv->output;
 }
 

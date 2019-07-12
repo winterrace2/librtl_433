@@ -129,7 +129,7 @@ static int lacrossews_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdat
         case 1: // Humidity
             if (msg_nybbles[7] == 0xA && msg_nybbles[8] == 0xA) {
                 if (decoder->verbose)
-					rtl433_fprintf(stderr, "LaCrosse WS %02X-%02X: Humidity Error\n",
+                    rtl433_fprintf(stderr, "LaCrosse WS %02X-%02X: Humidity Error\n",
                             ws_id, sensor_id);
                 break;
             }
@@ -168,7 +168,7 @@ static int lacrossews_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdat
             wind_spd = (msg_nybbles[7] * 16 + msg_nybbles[8]) / 10.0;
             if (msg_nybbles[7] == 0xF && msg_nybbles[8] == 0xE) {
                 if (decoder->verbose) {
-					rtl433_fprintf(stderr, "LaCrosse WS %02X-%02X: %s Not Connected\n",
+                    rtl433_fprintf(stderr, "LaCrosse WS %02X-%02X: %s Not Connected\n",
                             ws_id, sensor_id, msg_type == 3 ? "Wind" : "Gust");
                 }
                 break;
@@ -191,7 +191,7 @@ static int lacrossews_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdat
 
         default:
             if (decoder->verbose) {
-				rtl433_fprintf(stderr,
+                rtl433_fprintf(stderr,
                         "LaCrosse WS %02X-%02X: Unknown data type %d, bcd %d bin %d\n",
                         ws_id, sensor_id, msg_type, msg_value_bcd, msg_value_bin);
             }

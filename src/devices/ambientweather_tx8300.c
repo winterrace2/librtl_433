@@ -67,7 +67,7 @@ static int ambientweather_tx8300_callback(r_device *decoder, bitbuffer_t *bitbuf
     /* length check */
     if (74 != bitbuffer->bits_per_row[0]) {
         if (decoder->verbose > 1)
-			rtl433_fprintf(stderr, "AmbientWeather-TX8300: wrong size (%i bits)\n", bitbuffer->bits_per_row[0]);
+            rtl433_fprintf(stderr, "AmbientWeather-TX8300: wrong size (%i bits)\n", bitbuffer->bits_per_row[0]);
         return 0;
     }
 

@@ -27,7 +27,7 @@ void pulse_data_print(pulse_data_t const *data)
 {
     rtl433_fprintf(stderr, "Pulse data: %u pulses\n", data->num_pulses);
     for (unsigned n = 0; n < data->num_pulses; ++n) {
-		rtl433_fprintf(stderr, "[%3u] Pulse: %4u, Gap: %4u, Period: %4u\n", n, data->pulse[n], data->gap[n], data->pulse[n] + data->gap[n]);
+        rtl433_fprintf(stderr, "[%3u] Pulse: %4u, Gap: %4u, Period: %4u\n", n, data->pulse[n], data->gap[n], data->pulse[n] + data->gap[n]);
     }
 }
 
@@ -64,7 +64,7 @@ RTL_433_API void pulse_data_print_vcd_header(FILE *file, uint32_t sample_rate)
         timescale = "1 us";
     else
         timescale = "100 ns";
-    fprintf(file, "$date %s $end\n", local_time_str(0, time_str));
+    fprintf(file, "$date %s $end\n", format_time_str(time_str, NULL, 0));
     fprintf(file, "$version rtl_433 0.1.0 $end\n");
     fprintf(file, "$comment Acquisition at %s Hz $end\n", nice_freq(sample_rate));
     fprintf(file, "$timescale %s $end\n", timescale);
@@ -145,7 +145,7 @@ RTL_433_API void pulse_data_print_pulse_header(FILE *file)
     fprintf(file, ";version 1\n");
     fprintf(file, ";timescale 1us\n");
     //fprintf(file, ";samplerate %u\n", data->sample_rate);
-    fprintf(file, ";created %s\n", local_time_str(0, time_str));
+    fprintf(file, ";created %s\n", format_time_str(time_str, NULL, 0));
 }
 
 RTL_433_API void pulse_data_dump(FILE *file, pulse_data_t *data)
@@ -283,7 +283,7 @@ void pulse_FSK_detect(int16_t fm_n, pulse_data_t *fsk_pulses, pulse_FSK_state_t 
                     s->fsk_pulse_length = 0;
                     // When pulse buffer is full go to error state
                     if (fsk_pulses->num_pulses >= PD_MAX_PULSES) {
-						rtl433_fprintf(stderr, "pulse_FSK_detect(): Maximum number of pulses reached!\n");
+                        rtl433_fprintf(stderr, "pulse_FSK_detect(): Maximum number of pulses reached!\n");
                         s->fsk_state = PD_FSK_STATE_ERROR;
                     }
                 }
@@ -307,7 +307,7 @@ void pulse_FSK_detect(int16_t fm_n, pulse_data_t *fsk_pulses, pulse_FSK_state_t 
         case PD_FSK_STATE_ERROR:        // Stay here until cleared
             break;
         default:
-			rtl433_fprintf(stderr, "pulse_FSK_detect(): Unknown FSK state!!\n");
+            rtl433_fprintf(stderr, "pulse_FSK_detect(): Unknown FSK state!!\n");
             s->fsk_state = PD_FSK_STATE_ERROR;
     } // switch(s->fsk_state)
 }
@@ -363,7 +363,7 @@ void pulse_detect_free(pulse_detect_t *pulse_detect)
 }
 
 /// Demodulate On/Off Keying (OOK) and Frequency Shift Keying (FSK) from an envelope signal
-PulseDetectionResult pulse_detect_package(pulse_detect_t *pulse_detect, int16_t const *envelope_data, int16_t const *fm_data, int len, int16_t level_limit, uint32_t samp_rate, uint64_t sample_offset, pulse_data_t *pulses, pulse_data_t *fsk_pulses)
+int pulse_detect_package(pulse_detect_t *pulse_detect, int16_t const *envelope_data, int16_t const *fm_data, int len, int16_t level_limit, uint32_t samp_rate, uint64_t sample_offset, pulse_data_t *pulses, pulse_data_t *fsk_pulses)
 {
     int const samples_per_ms = samp_rate / 1000;
     pulse_detect_t *s = pulse_detect;
@@ -467,7 +467,7 @@ PulseDetectionResult pulse_detect_package(pulse_detect_t *pulse_detect, int16_t 
                         pulses->end_ago = len - s->data_counter;
                         fsk_pulses->end_ago = len - s->data_counter;
                         s->ook_state = PD_OOK_STATE_IDLE;    // Ensure everything is reset
-                        return PULSEDETECTION_FSK /*2*/;    // FSK package detected!!!
+                        return PULSE_DATA_FSK;
                     }
                 } // if
                 // FSK Demodulation (continue during short gap - we might return...)
@@ -489,7 +489,7 @@ PulseDetectionResult pulse_detect_package(pulse_detect_t *pulse_detect, int16_t 
                         pulses->ook_low_estimate = s->ook_low_estimate;
                         pulses->ook_high_estimate = s->ook_high_estimate;
                         pulses->end_ago = len - s->data_counter;
-                        return PULSEDETECTION_OOK /*1*/;    // End Of Package!!
+                        return PULSE_DATA_OOK;    // End Of Package!!
                     }
 
                     s->pulse_length = 0;
@@ -507,16 +507,16 @@ PulseDetectionResult pulse_detect_package(pulse_detect_t *pulse_detect, int16_t 
                     pulses->ook_low_estimate = s->ook_low_estimate;
                     pulses->ook_high_estimate = s->ook_high_estimate;
                     pulses->end_ago = len - s->data_counter;
-                    return PULSEDETECTION_OOK /*1*/;    // End Of Package!!
+                    return PULSE_DATA_OOK;    // End Of Package!!
                 }
                 break;
             default:
-				rtl433_fprintf(stderr, "demod_OOK(): Unknown state!!\n");
+                rtl433_fprintf(stderr, "demod_OOK(): Unknown state!!\n");
                 s->ook_state = PD_OOK_STATE_IDLE;
         } // switch
         s->data_counter++;
     } // while
 
     s->data_counter = 0;
-   	return PULSEDETECTION_OUTOFDATA /*0*/;	// Out of data
+    return 0;    // Out of data
 }

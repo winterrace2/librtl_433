@@ -215,7 +215,7 @@ static int interlogix_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdat
 
 static char *output_fields[] = {
     "model",
-	"subtype",
+    "subtype",
     "id",
     "device_type", // TODO: delete this
     "raw_message",

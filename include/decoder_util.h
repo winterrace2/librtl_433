@@ -17,8 +17,8 @@
 #include "r_device.h"
 #include "data_printer_ext.h"
 
-/// Create a new r_device, copy from template if not NULL.
-r_device *create_device(r_device *new_template);
+/// Create a new r_device, copy from dev_template if not NULL.
+r_device *create_device(r_device *dev_template);
 
 /// Output data.
 void decoder_output_data(r_device *decoder, data_t *data, extdata_t *ext);

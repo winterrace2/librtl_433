@@ -163,4 +163,11 @@ int add_bytes(uint8_t const message[], unsigned num_bytes);
 char *asepc(char **stringp, char delim);
 char *getkwargs(char **s, char **key, char **val);
 
+/// Compute Addition of a number of nibbles (byte wise).
+///
+/// @param message bytes (of two nibbles) of message data
+/// @param num_bytes number of bytes to sum
+/// @return summation value
+int add_nibbles(uint8_t const message[], unsigned num_bytes);
+
 #endif /* INCLUDE_UTIL_H_ */

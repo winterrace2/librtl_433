@@ -93,7 +93,7 @@ int pulse_demod_pcm(const pulse_data_t *pulses, r_device *device)
             }
             // Debug printout
             if (!device->decode_fn || (device->verbose && events > 0)) {
-                rtl433_fprintf(stderr, "pulse_demod_pcm(): %s \n", device->name);
+                rtl433_fprintf(stderr, "%s(): %s \n", __func__, device->name);
                 bitbuffer_print(&bits);
             }
             bitbuffer_clear(&bits);
@@ -169,7 +169,7 @@ int pulse_demod_ppm(const pulse_data_t *pulses, r_device *device)
             }
             // Debug printout
             if (!device->decode_fn || (device->verbose && events > 0)) {
-                rtl433_fprintf(stderr, "pulse_demod_ppm(): %s \n", device->name);
+                rtl433_fprintf(stderr, "%s(): %s \n", __func__, device->name);
                 bitbuffer_print(&bits);
             }
             bitbuffer_clear(&bits);
@@ -274,7 +274,7 @@ int pulse_demod_pwm(const pulse_data_t *pulses, r_device *device)
             }
             // Debug printout
             if (!device->decode_fn || (device->verbose && events > 0)) {
-                rtl433_fprintf(stderr, "pulse_demod_pwm(): %s \n", device->name);
+                rtl433_fprintf(stderr, "%s(): %s \n", __func__, device->name);
                 bitbuffer_print(&bits);
             }
             bitbuffer_clear(&bits);
@@ -300,17 +300,22 @@ int pulse_demod_manchester_zerobit(const pulse_data_t *pulses, r_device *device)
 
     unsigned startpulse = 0;
     for (unsigned n = 0; n < pulses->num_pulses; ++n) {
-        // Falling edge is on end of pulse
+        // The pulse or gap is too long or too short, thus invalid
         if (device->s_tolerance > 0
                 && (pulses->pulse[n] < device->s_short_width - device->s_tolerance
                 || pulses->pulse[n] > device->s_short_width * 2 + device->s_tolerance
                 || pulses->gap[n] < device->s_short_width - device->s_tolerance
                 || pulses->gap[n] > device->s_short_width * 2 + device->s_tolerance)) {
-            // The pulse or gap is too long or too short, thus invalid
+            if (pulses->pulse[n] > device->s_short_width * 1.5
+                    && pulses->pulse[n] <= device->s_short_width * 2 + device->s_tolerance) {
+                // Long last pulse means with the gap this is a [1]10 transition, add a one
+                bitbuffer_add_bit(&bits, 1);
+            }
             bitbuffer_add_row(&bits);
             bitbuffer_add_bit(&bits, 0); // Prepare for new message with hardcoded 0
             time_since_last = 0;
         }
+        // Falling edge is on end of pulse
         else if (pulses->pulse[n] + time_since_last > (device->s_short_width * 1.5)) {
             // Last bit was recorded more than short_width*1.5 samples ago
             // so this pulse start must be a data edge (falling data edge means bit = 1)
@@ -322,8 +327,9 @@ int pulse_demod_manchester_zerobit(const pulse_data_t *pulses, r_device *device)
         }
 
         // End of Message?
-        if (pulses->gap[n] > device->s_reset_limit) {
-            int newevents = 0;
+        if (((n == pulses->num_pulses - 1)                       // No more pulses? (FSK)
+                    || (pulses->gap[n] > device->s_reset_limit)) // Long silence (OOK)
+                && (bits.num_rows > 0)) {                        // Only if data has been accumulated
             if (device->decode_fn) {
                 extdata_t ext;
                 ext.bitbuffer = &bits;
@@ -337,7 +343,7 @@ int pulse_demod_manchester_zerobit(const pulse_data_t *pulses, r_device *device)
             }
             // Debug printout
             if (!device->decode_fn || (device->verbose && events > 0)) {
-                rtl433_fprintf(stderr, "pulse_demod_manchester_zerobit(): %s \n", device->name);
+                rtl433_fprintf(stderr, "%s(): %s \n", __func__, device->name);
                 bitbuffer_print(&bits);
             }
             bitbuffer_clear(&bits);
@@ -412,7 +418,7 @@ int pulse_demod_dmc(const pulse_data_t *pulses, r_device *device)
                 events += account_event(device, device->decode_fn(device, &bits, &ext));
             }
             if (!device->decode_fn || (device->verbose && events > 0)) {
-                rtl433_fprintf(stderr, "pulse_demod_dmc(): %s \n", device->name);
+                rtl433_fprintf(stderr, "%s(): %s \n", __func__, device->name);
                 bitbuffer_print(&bits);
             }
             bitbuffer_clear(&bits);
@@ -476,7 +482,7 @@ int pulse_demod_piwm_raw(const pulse_data_t *pulses, r_device *device)
                 events += account_event(device, device->decode_fn(device, &bits, &ext));
             }
             if (!device->decode_fn || (device->verbose && events > 0)) {
-                rtl433_fprintf(stderr, "pulse_demod_piwm_raw(): %s \n", device->name);
+                rtl433_fprintf(stderr, "%s(): %s \n", __func__, device->name);
                 bitbuffer_print(&bits);
             }
             bitbuffer_clear(&bits);
@@ -538,7 +544,7 @@ int pulse_demod_piwm_dc(const pulse_data_t *pulses, r_device *device)
                 events += account_event(device, device->decode_fn(device, &bits, &ext));
             }
             if (!device->decode_fn || (device->verbose && events > 0)) {
-                rtl433_fprintf(stderr, "pulse_demod_piwm_dc(): %s \n", device->name);
+                rtl433_fprintf(stderr, "%s(): %s \n", __func__, device->name);
                 bitbuffer_print(&bits);
             }
             bitbuffer_clear(&bits);
@@ -651,11 +657,11 @@ int pulse_demod_string(const char *code, r_device *device)
     bitbuffer_parse(&bits, code);
 
     if (device->decode_fn) {
-		events += account_event(device, device->decode_fn(device, &bits, NULL));
+        events += account_event(device, device->decode_fn(device, &bits, NULL));
     }
     // Debug printout
     if (!device->decode_fn || (device->verbose && events > 0)) {
-        rtl433_fprintf(stderr, "pulse_demod_pcm(): %s \n", device->name);
+        rtl433_fprintf(stderr, "%s(): %s \n", __func__, device->name);
         bitbuffer_print(&bits);
     }
 

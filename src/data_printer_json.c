@@ -67,28 +67,28 @@ static void print_json_string(data_output_t *output, const char *str, char *form
 
 static void print_json_double(data_output_t *output, double data, char *format)
 {
-	fprintf(output->file, "%.3f", data);
+    fprintf(output->file, "%.3f", data);
 }
 
 static void print_json_int(data_output_t *output, int data, char *format)
 {
-	fprintf(output->file, "%d", data);
+    fprintf(output->file, "%d", data);
 }
 
 static void data_output_json_free(data_output_t *output)
 {
-	if (!output)
+    if (!output)
         return;
 
-	if (output->file != stdout)
-		fclose(output->file);
+    if (output->file != stdout)
+        fclose(output->file);
 
-	free(output);
+    free(output);
 }
 
 data_output_t *data_output_json_create(FILE *file)
 {
-	data_output_t *output = calloc(1, sizeof(data_output_t));
+    data_output_t *output = calloc(1, sizeof(data_output_t));
     if (!output) {
         rtl433_fprintf(stderr, "calloc() failed");
         return NULL;
@@ -101,7 +101,7 @@ data_output_t *data_output_json_create(FILE *file)
     output->print_int    = print_json_int;
     output->output_free  = data_output_json_free;
     output->file         = file;
-	output->ext_callback = NULL; // prevents this printer to receive unknown signals
+    output->ext_callback = NULL; // prevents this printer to receive unknown signals
 
     return output;
 }
