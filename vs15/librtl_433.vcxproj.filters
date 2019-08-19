@@ -447,6 +447,9 @@
     <ClCompile Include="..\src\devices\rubicson_48659.c">
       <Filter>Source files\devices</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\devices\holman_ws5029.c">
+      <Filter>Source files\devices</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\bitbuffer.h">
