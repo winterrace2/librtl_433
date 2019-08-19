@@ -8,7 +8,7 @@ void r_init_cfg(r_cfg_t *cfg) {
     memset(cfg->settings_str, 0, sizeof(cfg->settings_str));
     for (int a = 0; a < MAX_FREQS; a++) cfg->frequency[a] = 0;
     cfg->frequencies = 0;
-    cfg->hop_time = DEFAULT_HOP_TIME;
+    cfg->hop_times = 0;
     cfg->ppm_error = 0;
     cfg->samp_rate = DEFAULT_SAMPLE_RATE;
     cfg->out_block_size = DEFAULT_BUF_LENGTH;
@@ -49,7 +49,7 @@ void r_init_cfg(r_cfg_t *cfg) {
     cfg->new_model_keys = 0;
     cfg->conversion_mode = CONVERT_NATIVE;
     cfg->duration = 0;
-    cfg->stop_after_successful_events_flag = 0;
+    cfg->after_successful_events_flag = 0;
 }
 
 r_cfg_t *r_create_cfg(void)

@@ -139,7 +139,7 @@ RTL_433_API int rtl_433_init(rtl_433_t **out_rtl) {
         rtl->dev = NULL;
         rtl->do_exit = 0;
         rtl->do_exit_async = 0;
-        rtl->rawtime_old = 0;
+        rtl->hop_start_time = 0;
         rtl->stop_time = 0;
         rtl->bytes_to_read_left = 0;
         rtl->input_pos = 0;
@@ -281,7 +281,7 @@ static void flush_report_data(rtl_433_t *rtl)
 }
 
 /** Pass the data structure to all output handlers. Frees data afterwards. */
-void event_occured_handler(rtl_433_t *rtl, data_t *data)
+void event_occurred_handler(rtl_433_t *rtl, data_t *data)
 {
     // prepend "time" if requested
     if (rtl->demod->report_time != REPORT_TIME_OFF) {
@@ -407,7 +407,7 @@ RTL_433_API int start(rtl_433_t *rtl, struct sigaction *sigact){
                     r = ReadRtlAsync(rtl, sigact);
 
                     if (rtl->cfg->report_stats > 0) {
-                        event_occured_handler(rtl, create_report_data(rtl, rtl->cfg->report_stats));
+                        event_occurred_handler(rtl, create_report_data(rtl, rtl->cfg->report_stats));
                         flush_report_data(rtl);
                     }
 
@@ -573,11 +573,6 @@ void sdr_callback(unsigned char *iq_buf, uint32_t len, void *ctx)
                 break;
             }
         }
-
-        if (rtl->cfg->stop_after_successful_events_flag && (d_events > 0)) {
-            rtl->do_exit = rtl->do_exit_async = 1;
-            sdr_stop(rtl->dev);
-        }
     } // if (rtl->cfg->analyze...
 
     if (rtl->demod->am_analyze) {
@@ -593,10 +588,21 @@ void sdr_callback(unsigned char *iq_buf, uint32_t len, void *ctx)
 
     if (rtl->bytes_to_read_left > 0) rtl->bytes_to_read_left -= len;
 
+    if (rtl->cfg->after_successful_events_flag && (d_events > 0)) {
+        if (rtl->cfg->after_successful_events_flag == 1) {
+            rtl->do_exit = 1;
+        }
+        rtl->do_exit_async = 1;
+#ifndef _WIN32
+        alarm(0); // cancel the watchdog timer
+#endif
+        sdr_stop(rtl->dev);
+    }
+
     time_t rawtime;
     time(&rawtime);
-    if (rtl->cfg->frequencies > 1 && difftime(rawtime, rtl->rawtime_old) > rtl->cfg->hop_time) {
-        rtl->rawtime_old = rawtime;
+    int hop_index = rtl->cfg->hop_times > rtl->frequency_index ? rtl->frequency_index : rtl->cfg->hop_times - 1;
+    if (rtl->cfg->frequencies > 1 && difftime(rawtime, rtl->hop_start_time) > rtl->cfg->hop_time[hop_index]) {
         rtl->do_exit_async = 1;
 #ifndef _WIN32
         alarm(0); // cancel the watchdog timer
@@ -612,7 +618,7 @@ void sdr_callback(unsigned char *iq_buf, uint32_t len, void *ctx)
         rtl433_fprintf(stderr, "Time expired, exiting!\n");
     }
     if (rtl->cfg->stats_now || (rtl->cfg->report_stats && rtl->cfg->stats_interval && rawtime >= rtl->cfg->stats_time)) {
-        event_occured_handler(rtl, create_report_data(rtl, rtl->cfg->stats_now ? 3 : rtl->cfg->report_stats));
+        event_occurred_handler(rtl, create_report_data(rtl, rtl->cfg->stats_now ? 3 : rtl->cfg->report_stats));
         flush_report_data(rtl);
         if (rawtime >= rtl->cfg->stats_time)
             rtl->cfg->stats_time += rtl->cfg->stats_interval; // todo: move/copy?
@@ -662,22 +668,24 @@ static int ReadRtlAsync(rtl_433_t *rtl, struct sigaction *sigact) {
     }
 
     int r = 0;
-    int frequency_index = 0;
+    rtl->frequency_index = 0;
 
     if (rtl->cfg->frequencies == 0) {
         rtl->cfg->frequency[0] = DEFAULT_FREQUENCY;
         rtl->cfg->frequencies = 1;
     }
-    else {
-        time(&rtl->rawtime_old);
+    if (rtl->cfg->frequencies > 1 && rtl->cfg->hop_times == 0) {
+        rtl->cfg->hop_time[rtl->cfg->hop_times++] = DEFAULT_HOP_TIME;
     }
     if (rtl->cfg->verbosity) {
         rtl433_fprintf(stderr, "Reading samples in async mode...\n");
     }
     uint32_t samp_rate = rtl->cfg->samp_rate;
     while (!rtl->do_exit) {
+        time(&rtl->hop_start_time);
+
         /* Set the frequency */
-        rtl->center_frequency = rtl->cfg->frequency[frequency_index];
+        rtl->center_frequency = rtl->cfg->frequency[rtl->frequency_index];
         r = sdr_set_center_freq(rtl->dev, rtl->center_frequency, 1); // always verbose
 
         if (samp_rate != rtl->cfg->samp_rate) {
@@ -704,7 +712,7 @@ static int ReadRtlAsync(rtl_433_t *rtl, struct sigaction *sigact) {
         }
 #endif
         rtl->do_exit_async = 0;
-        frequency_index = (frequency_index + 1) % rtl->cfg->frequencies;
+        rtl->frequency_index = (rtl->frequency_index + 1) % rtl->cfg->frequencies;
     }
     return r;
 }
@@ -762,13 +770,25 @@ char *time_pos_str(rtl_433_t *rtl, unsigned samples_ago, char *buf)
     }
 }
 
-RTL_433_API int stop_signal(rtl_433_t *rtl){
+RTL_433_API int signal_stop(rtl_433_t *rtl){
     if (!rtl) {
-        rtl433_fprintf(stderr, "stop_signal: missing context.\n");
+        rtl433_fprintf(stderr, "signal_stop: missing context.\n");
         return RTL_433_ERROR_INVALID_PARAM;
     }
 
     rtl->do_exit = 1;
+    sdr_stop(rtl->dev);
+
+    return 0;
+}
+
+RTL_433_API int signal_hop(rtl_433_t *rtl) {
+    if (!rtl) {
+        rtl433_fprintf(stderr, "signal_hop: missing context.\n");
+        return RTL_433_ERROR_INVALID_PARAM;
+    }
+
+    rtl->do_exit_async = 1;
     sdr_stop(rtl->dev);
 
     return 0;

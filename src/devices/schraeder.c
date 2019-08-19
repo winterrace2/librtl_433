@@ -35,7 +35,7 @@ static int schraeder_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata
     uint8_t b[8];
     int serial_id;
     char id_str[9];
-    unsigned flags;
+    int flags;
     char flags_str[3];
     int pressure;    // mbar/hectopascal
     int temperature; // deg C
@@ -78,6 +78,8 @@ static int schraeder_callback(r_device *decoder, bitbuffer_t *bitbuffer, extdata
 TPMS Model: Schrader Electronics EG53MA4.
 Contributed by: Leonardo Hamada (hkazu).
 
+Also Schrader PA66-GF35 (OPEL OEM 13348393) TPMS Sensor.
+
 Probable packet payload:
 
     SSSSSSSSSS ???????? IIIIII TT PP CC
@@ -94,7 +96,7 @@ static int schrader_EG53MA4_callback(r_device *decoder, bitbuffer_t *bitbuffer, 
     uint8_t b[10];
     int serial_id;
     char id_str[9];
-    int flags;
+    unsigned flags;
     char flags_str[9];
     int pressure;    // mbar
     int temperature; // degree Fahrenheit
@@ -108,7 +110,7 @@ static int schrader_EG53MA4_callback(r_device *decoder, bitbuffer_t *bitbuffer, 
     bitbuffer_extract_bytes(bitbuffer, 0, 40, b, 80);
 
     /* Calculate the checksum */
-    checksum = (b[0]+b[1]+b[2]+b[3]+b[4]+b[5]+b[6]+b[7]+b[8]) & 0xff;
+    checksum = add_bytes(b, 9) & 0xff;
     if (checksum != b[9]) {
         return 0;
     }
@@ -136,45 +138,45 @@ static int schrader_EG53MA4_callback(r_device *decoder, bitbuffer_t *bitbuffer, 
 }
 
 static char *output_fields[] = {
-    "model",
-    "type",
-    "id",
-    "flags",
-    "pressure_kPa",
-    "temperature_C",
-    "mic",
-    NULL
+        "model",
+        "type",
+        "id",
+        "flags",
+        "pressure_kPa",
+        "temperature_C",
+        "mic",
+        NULL,
 };
 
 static char *output_fields_EG53MA4[] = {
-    "model",
-    "type",
-    "id",
-    "flags",
-    "pressure_kPa",
-    "temperature_F",
-    "mic",
-    NULL
+        "model",
+        "type",
+        "id",
+        "flags",
+        "pressure_kPa",
+        "temperature_F",
+        "mic",
+        NULL,
 };
 
 r_device schraeder = {
-    .name           = "Schrader TPMS",
-    .modulation     = OOK_PULSE_MANCHESTER_ZEROBIT,
-    .short_width    = 120,
-    .long_width     = 0,
-    .reset_limit    = 480,
-    .decode_fn      = &schraeder_callback,
-    .disabled       = 0,
-    .fields         = output_fields,
+        .name        = "Schrader TPMS",
+        .modulation  = OOK_PULSE_MANCHESTER_ZEROBIT,
+        .short_width = 120,
+        .long_width  = 0,
+        .reset_limit = 480,
+        .decode_fn   = &schraeder_callback,
+        .disabled    = 0,
+        .fields      = output_fields,
 };
 
 r_device schrader_EG53MA4 = {
-    .name           = "Schrader TPMS EG53MA4",
-    .modulation     = OOK_PULSE_MANCHESTER_ZEROBIT,
-    .short_width    = 123,
-    .long_width     = 0,
-    .reset_limit    = 236,
-    .decode_fn      = &schrader_EG53MA4_callback,
-    .disabled       = 0,
-    .fields         = output_fields_EG53MA4,
+        .name        = "Schrader TPMS EG53MA4, PA66GF35",
+        .modulation  = OOK_PULSE_MANCHESTER_ZEROBIT,
+        .short_width = 123,
+        .long_width  = 0,
+        .reset_limit = 300,
+        .decode_fn   = &schrader_EG53MA4_callback,
+        .disabled    = 0,
+        .fields      = output_fields_EG53MA4,
 };

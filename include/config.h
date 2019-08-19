@@ -54,7 +54,8 @@ typedef struct r_cfg { // following explanations contain the former command line
     char settings_str[MAX_SDRSET_LEN];                  ///< [-t] soapy-sdr antenna settings etc.
     uint32_t frequency[MAX_FREQS];                      ///< [-f] list of target frequencies.
     int frequencies;                                    ///< [-f] number of target frequencies.
-    int hop_time;                                       ///< [-H] Hop interval for polling of multiple frequencies.
+    int hop_times;                                      
+    int hop_time[MAX_FREQS];                            ///< [-H] Hop intervals for polling of multiple frequencies.
     int ppm_error;                                      ///< [-p] Correct rtl-sdr tuner frequency offset error.
     uint32_t samp_rate;                                 ///< [-s] Sample rate.
     uint32_t out_block_size;                            ///< [-b] Output block size for RTL-SDR.
@@ -98,7 +99,7 @@ typedef struct r_cfg { // following explanations contain the former command line
     int new_model_keys;                                 ///< [-M newmodel] Use "newmodel" to transition to new model keys. This will become the default someday
     conversion_mode_t conversion_mode;                  ///< [-C] Convert units in decoded output.
     uint32_t duration;                                  ///< [-T] Specify number of seconds to run.
-    int stop_after_successful_events_flag;              ///< [-E] 1 for stopping after outputting successful event(s).
+    int after_successful_events_flag;                   ///< [-E] 1 for stopping after outputting successful event(s).
 } r_cfg_t;
 
 void r_init_cfg(r_cfg_t *cfg); // Fills a config with all default elements

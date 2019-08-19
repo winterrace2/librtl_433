@@ -62,12 +62,13 @@ typedef struct _rtl_433 {
         sdr_dev_t *dev;
         int do_exit;                                    // set to 1 in order to quit processing
         int do_exit_async;                              // set to 1 in order to quit 1 processing round (async frequency hopping)
-        time_t rawtime_old;                             // used by async mode to check multiple frequencies hopping time
+        time_t hop_start_time;                          // used by async mode to check multiple frequencies hopping time
         time_t stop_time;                               // used by async mode to check duration
         uint32_t bytes_to_read_left;                    // rest of bytes_to_read (value is initialized with cfg->bytes_to_read on startup)
         uint64_t input_pos;
         dm_state *demod;
         uint32_t center_frequency;
+        int frequency_index;
         /* stats*/
         unsigned frames_count; ///< stats counter for interval
         unsigned frames_fsk; ///< stats counter for interval
@@ -78,7 +79,8 @@ typedef struct _rtl_433 {
 RTL_433_API int rtl_433_init(rtl_433_t **out_rtl);
 RTL_433_API int rtl_433_destroy(rtl_433_t *rtl);
 RTL_433_API int start(rtl_433_t *rtl, struct sigaction *sigact);
-RTL_433_API int stop_signal(rtl_433_t *rtl);
+RTL_433_API int signal_stop(rtl_433_t *rtl);
+RTL_433_API int signal_hop(rtl_433_t *rtl);
 RTL_433_API int getDevCount();
 RTL_433_API int getDev(int idx, r_device **dev);
 RTL_433_API SdrDriverType getDriverType();
