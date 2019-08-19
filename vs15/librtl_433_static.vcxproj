@@ -142,6 +142,7 @@
     <ClCompile Include="..\src\devices\gt_wt_02.c" />
     <ClCompile Include="..\src\devices\hcs200.c" />
     <ClCompile Include="..\src\devices\hideki.c" />
+    <ClCompile Include="..\src\devices\holman_ws5029.c" />
     <ClCompile Include="..\src\devices\hondaremote.c" />
     <ClCompile Include="..\src\devices\honeywell.c" />
     <ClCompile Include="..\src\devices\honeywell_wdb.c" />
